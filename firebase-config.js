@@ -46,40 +46,11 @@ if (configurado) {
     db = getFirestore(app);
 }
 
-const PINNED_72H_MS = 72 * 60 * 60 * 1000;
-const APPROVED_UNIVERSE_IDS_KEY = "kixuz_universos_aprobados_ids_v1";
-
-function norm(v) {
-    return String(v || "").trim().toLowerCase();
-}
-
-function normHandle(h) {
+const norm = v => String(v || "").trim().toLowerCase();
+const normHandle = h => {
     const limp = norm(h).replace(/^@+/, "").replace(/\s+/g, "_");
     return limp ? "@" + limp : "";
-}
-
-function esCuentaKixuz(perfil, user) {
-    let localUser = {};
-    try {
-        localUser = JSON.parse(localStorage.getItem("kixuz_usuario_local") || "{}") || {};
-    } catch {}
-    const nombres = [
-        perfil?.nombreMaestro,
-        perfil?.nombre,
-        user?.displayName,
-        localUser?.nombreMaestro,
-        localUser?.nombre
-    ].map(norm);
-    const emails = [
-        perfil?.email,
-        user?.email,
-        localUser?.email
-    ].map(norm);
-    if (perfil?.rolSistema === "admin" || localUser?.rolSistema === "admin") return true;
-    if (nombres.some(n => n === "kixuz")) return true;
-    if (emails.some(e => e.startsWith("kixuz@"))) return true;
-    return false;
-}
+};
 
 function guardarLocalListaYActivo(personaje) {
     try {
@@ -92,78 +63,33 @@ function guardarLocalListaYActivo(personaje) {
     } catch {}
 }
 
-function leerIdsAprobadosLocal() {
-    try {
-        const arr = JSON.parse(localStorage.getItem(APPROVED_UNIVERSE_IDS_KEY) || "[]");
-        return new Set(Array.isArray(arr) ? arr.map(String) : []);
-    } catch {
-        return new Set();
-    }
-}
-
-function guardarIdAprobadoLocal(id) {
-    if (!id) return;
-    try {
-        const s = leerIdsAprobadosLocal();
-        s.add(String(id));
-        localStorage.setItem(APPROVED_UNIVERSE_IDS_KEY, JSON.stringify(Array.from(s)));
-    } catch {}
-}
-
 window.KIXUZ_DB = {
     activo: configurado,
     usuarioActual: null,
     perfilCuenta: null,
     esAdmin: false,
 
-    esPin72hVigente(post) {
-        if (!post || !post.esAviso72h) return false;
-        if (post.desfijadoManual) return false;
-        const inicioMs = Number(post.pinInicioMs || 0);
-        if (!inicioMs) return false;
-        return (Date.now() - inicioMs) < PINNED_72H_MS;
-    },
-
     async cargarPerfilCuenta(userOverride = null) {
         const u = userOverride || auth?.currentUser || this.usuarioActual;
-        if (!configurado || !u) {
-            this.esAdmin = esCuentaKixuz(this.perfilCuenta, u);
-            return this.perfilCuenta;
-        }
+        if (!configurado || !u) return this.perfilCuenta;
         try {
             const snap = await getDoc(doc(db, "cuentas", u.uid));
             const data = snap.exists() ? snap.data() : {};
-            const admin = esCuentaKixuz(data, u);
-            if (admin && data.rolSistema !== "admin") {
-                try {
-                    await setDoc(doc(db, "cuentas", u.uid), { rolSistema: "admin" }, { merge: true });
-                    data.rolSistema = "admin";
-                } catch {}
-            }
             this.perfilCuenta = { id: snap.id || u.uid, uid: u.uid, email: u.email, ...data };
-            this.esAdmin = admin;
+            this.esAdmin = false;
             window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
             return this.perfilCuenta;
         } catch {
-            this.esAdmin = esCuentaKixuz(this.perfilCuenta, u);
             return this.perfilCuenta;
         }
     },
 
     esDuenioDePersonaje(personaje = null) {
         if (!personaje) return false;
-        if (this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual)) return true;
-
         const miUid = norm(auth?.currentUser?.uid || this.usuarioActual?.uid || this.perfilCuenta?.uid || "");
         const duenioUid = norm(personaje.uidMaestro || "");
-
-        if (duenioUid && miUid) {
-            return duenioUid === miUid;
-        }
-        if (duenioUid && !miUid) {
-            return false;
-        }
-
+        if (duenioUid && miUid) return duenioUid === miUid;
+        if (duenioUid && !miUid) return false;
         const handleObj = normHandle(personaje.handle || "");
         if (!handleObj) return false;
         try {
@@ -179,7 +105,6 @@ window.KIXUZ_DB = {
     },
 
     puedeEliminar(autorUid = "", autorHandle = "") {
-        if (this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual)) return true;
         const miUid = norm(auth?.currentUser?.uid || this.usuarioActual?.uid || "");
         const miHandle = normHandle(window.KIXUZ_ACTIVE_CHAR?.handle || "");
         if (autorUid && miUid && norm(autorUid) === miUid) return true;
@@ -188,44 +113,32 @@ window.KIXUZ_DB = {
     },
 
     async registrarCuenta(email, password, nombreMaestro) {
-        const esKixuz = norm(nombreMaestro) === "kixuz" || norm(email).startsWith("kixuz@");
         if (!configurado) {
-            const localUser = {
-                email,
-                nombreMaestro,
-                rolSistema: esKixuz ? "admin" : "user"
-            };
+            const localUser = { email, nombreMaestro, rolSistema: "user" };
             localStorage.setItem("kixuz_usuario_local", JSON.stringify(localUser));
             this.perfilCuenta = localUser;
-            this.esAdmin = esKixuz;
             window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
             return { modo: "local", email };
         }
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         this.usuarioActual = cred.user;
-        localStorage.removeItem("kixuz_subpersonajes");
-        localStorage.removeItem("kixuz_personaje_activo");
-
         const perfilDoc = {
             nombreMaestro,
             email,
-            rolSistema: esKixuz ? "admin" : "user",
+            rolSistema: "user",
             creadoEn: serverTimestamp()
         };
         await setDoc(doc(db, "cuentas", cred.user.uid), perfilDoc);
         this.perfilCuenta = { ...perfilDoc, id: cred.user.uid, uid: cred.user.uid };
-        this.esAdmin = esKixuz;
         window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
         return cred.user;
     },
 
     async iniciarSesion(email, password) {
         if (!configurado) {
-            const esKixuz = norm(email).startsWith("kixuz@");
-            const localUser = { email, rolSistema: esKixuz ? "admin" : "user" };
+            const localUser = { email, rolSistema: "user" };
             localStorage.setItem("kixuz_usuario_local", JSON.stringify(localUser));
             this.perfilCuenta = localUser;
-            this.esAdmin = esKixuz;
             window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
             return { modo: "local", email };
         }
@@ -238,11 +151,9 @@ window.KIXUZ_DB = {
     },
 
     async cerrarSesion() {
-        localStorage.removeItem("kixuz_subpersonajes");
         localStorage.removeItem("kixuz_personaje_activo");
         localStorage.removeItem("kixuz_usuario_local");
         this.perfilCuenta = null;
-        this.esAdmin = false;
         if (configurado && auth) {
             try { await signOut(auth); } catch {}
         }
@@ -253,25 +164,6 @@ window.KIXUZ_DB = {
 
     async guardarSubpersonaje(personaje) {
         if (!personaje) return { modo: "bloqueado" };
-        const miUidReal = auth?.currentUser?.uid || this.usuarioActual?.uid || this.perfilCuenta?.uid || "";
-        const soyAdmin = this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual);
-
-        if (configurado && personaje.handle && !soyAdmin) {
-            const handleLimpio = normHandle(personaje.handle).replace(/^@/, "") || "char";
-            const docId = personaje.id || (miUidReal ? `${miUidReal}_${handleLimpio}` : "");
-            if (docId) {
-                try {
-                    const snap = await getDoc(doc(db, "personajes", docId));
-                    if (snap.exists()) {
-                        const existente = snap.data();
-                        if (existente.uidMaestro && miUidReal && existente.uidMaestro !== miUidReal) {
-                            return { modo: "denegado" };
-                        }
-                    }
-                } catch {}
-            }
-        }
-
         guardarLocalListaYActivo(personaje);
         window.dispatchEvent(new Event("kixuz:personajes-actualizados"));
 
@@ -295,21 +187,8 @@ window.KIXUZ_DB = {
     async eliminarSubpersonaje(handle, docId = "") {
         const hTarget = normHandle(handle);
         const miUidReal = auth?.currentUser?.uid || this.usuarioActual?.uid || this.perfilCuenta?.uid || "";
-        const soyAdmin = this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual);
         const handleLimpio = hTarget.replace(/^@/, "") || "char";
         const idFinal = docId || (miUidReal ? `${miUidReal}_${handleLimpio}` : "");
-
-        if (configurado && idFinal && !soyAdmin) {
-            try {
-                const snap = await getDoc(doc(db, "personajes", idFinal));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    if (data.uidMaestro && miUidReal && data.uidMaestro !== miUidReal) {
-                        return false;
-                    }
-                }
-            } catch {}
-        }
 
         try {
             const existentes = JSON.parse(localStorage.getItem("kixuz_subpersonajes") || "[]");
@@ -338,32 +217,44 @@ window.KIXUZ_DB = {
     },
 
     async cargarSubpersonajes() {
+        let locales = [];
+        try { locales = JSON.parse(localStorage.getItem("kixuz_subpersonajes") || "[]"); } catch { locales = []; }
+        if (!Array.isArray(locales)) locales = [];
+
         if (!configurado || !auth?.currentUser) {
-            try { return JSON.parse(localStorage.getItem("kixuz_subpersonajes") || "[]"); } catch { return []; }
+            return locales;
         }
         try {
             const q = query(collection(db, "personajes"), where("uidMaestro", "==", auth.currentUser.uid));
             const snap = await getDocs(q);
-            const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            localStorage.setItem("kixuz_subpersonajes", JSON.stringify(lista));
+            const remotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const mapa = new Map();
+            locales.forEach(p => {
+                const k = normHandle(p?.handle || p?.nombre);
+                if (k) mapa.set(k, p);
+            });
+            remotos.forEach(p => {
+                const k = normHandle(p?.handle || p?.nombre);
+                if (k) mapa.set(k, { ...mapa.get(k), ...p });
+            });
+            const combinados = Array.from(mapa.values());
+            localStorage.setItem("kixuz_subpersonajes", JSON.stringify(combinados));
 
-            if (lista.length > 0) {
+            if (combinados.length > 0) {
                 let activo = null;
                 try {
                     const parsed = JSON.parse(localStorage.getItem("kixuz_personaje_activo") || "null");
                     if (parsed?.handle) {
-                        activo = lista.find(p => normHandle(p.handle) === normHandle(parsed.handle));
+                        activo = combinados.find(p => normHandle(p.handle) === normHandle(parsed.handle));
                     }
                 } catch {}
-                localStorage.setItem("kixuz_personaje_activo", JSON.stringify(activo || lista[0]));
-            } else {
-                localStorage.removeItem("kixuz_personaje_activo");
+                localStorage.setItem("kixuz_personaje_activo", JSON.stringify(activo || combinados[0]));
             }
 
             window.dispatchEvent(new Event("kixuz:personajes-actualizados"));
-            return lista;
+            return combinados;
         } catch {
-            try { return JSON.parse(localStorage.getItem("kixuz_subpersonajes") || "[]"); } catch { return []; }
+            return locales;
         }
     },
 
@@ -397,24 +288,12 @@ window.KIXUZ_DB = {
         return lista.find(p => normHandle(p.handle) === target) || null;
     },
 
-    async desfijarAvisos72hAnteriores() {
-        if (!configurado || !(this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual))) return;
-        try {
-            const snap = await getDocs(collection(db, "publicaciones"));
-            const updates = snap.docs
-                .filter(d => d.data()?.esAviso72h && !d.data()?.desfijadoManual)
-                .map(d => updateDoc(doc(db, "publicaciones", d.id), { desfijadoManual: true }));
-            await Promise.allSettled(updates);
-        } catch {}
-    },
-
     async publicarPost({
         contenido,
         universo = "",
         imagen = "",
         muroHandle = "",
         muroNombre = "",
-        esAviso72h = false,
         alcanceTipo = "general",
         alcanceDestino = "",
         autorNombre = "",
@@ -422,29 +301,20 @@ window.KIXUZ_DB = {
     }) {
         const personaje = window.KIXUZ_ACTIVE_CHAR || { nombre: "Personaje", handle: "@rol" };
         const uid = auth?.currentUser?.uid || this.perfilCuenta?.uid || "invitado";
-        const soyAdmin = this.esAdmin || esCuentaKixuz(this.perfilCuenta, this.usuarioActual);
-        const aplicar72h = Boolean(esAviso72h && soyAdmin);
-
-        if (aplicar72h) {
-            await this.desfijarAvisos72hAnteriores();
-        }
 
         const payload = {
-            autorNombre: aplicar72h ? "Kixuz" : (autorNombre || personaje.nombre),
-            autorHandle: aplicar72h ? "@Kixuz" : (autorHandle || personaje.handle),
+            autorNombre: autorNombre || personaje.nombre,
+            autorHandle: autorHandle || personaje.handle,
             autorAvatar: personaje.avatar || "",
             autorUid: uid,
             uidMaestro: uid,
-            muroHandle: muroHandle || (aplicar72h ? "@Kixuz" : personaje.handle),
+            muroHandle: muroHandle || personaje.handle,
             muroNombre: muroNombre || "",
             contenido,
-            universo: aplicar72h ? "#Kixuz" : universo,
+            universo,
             imagen,
-            alcanceTipo: aplicar72h ? "general" : alcanceTipo,
-            alcanceDestino: aplicar72h ? "#Kixuz" : alcanceDestino,
-            esAviso72h: aplicar72h,
-            pinInicioMs: aplicar72h ? Date.now() : 0,
-            desfijadoManual: false,
+            alcanceTipo,
+            alcanceDestino,
             kixiz: 0,
             respuestas: [],
             creadoEn: serverTimestamp()
@@ -459,7 +329,7 @@ window.KIXUZ_DB = {
     },
 
     async eliminarPost(postId) {
-        if (!configurado || !postId || String(postId).startsWith("local_") || String(postId).startsWith("wall_") || String(postId).startsWith("uni_")) return;
+        if (!configurado || !postId || String(postId).startsWith("local_")) return;
         await deleteDoc(doc(db, "publicaciones", String(postId)));
     },
 
@@ -491,54 +361,6 @@ window.KIXUZ_DB = {
             const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             callback(posts);
         }, () => {});
-    },
-
-    esSolicitudPendiente(sol) {
-        if (!sol) return false;
-        const aprobadosLocal = leerIdsAprobadosLocal();
-        if (sol.id && aprobadosLocal.has(String(sol.id))) return false;
-        return norm(sol.estado || "pendiente") === "pendiente";
-    },
-
-    async aprobarSolicitudUniverso(solicitud) {
-        if (!solicitud) return;
-        if (solicitud.id) guardarIdAprobadoLocal(solicitud.id);
-        if (configurado && solicitud.id && !String(solicitud.id).startsWith("local_")) {
-            try {
-                await updateDoc(doc(db, "solicitudes_universo", String(solicitud.id)), {
-                    estado: "aprobada",
-                    aprobadaPor: "Kixuz",
-                    aprobadaEn: serverTimestamp()
-                });
-            } catch {}
-            try {
-                const tagLimpio = String(solicitud.tag || solicitud.nombre || "Universo")
-                    .trim()
-                    .replace(/^#+/, "")
-                    .replace(/\s+/g, "");
-                const uniDocId = tagLimpio.toLowerCase() || ("uni_" + Date.now());
-                await setDoc(doc(db, "universos_aprobados", uniDocId), {
-                    nombre: solicitud.nombre || tagLimpio,
-                    tag: "#" + tagLimpio,
-                    descripcion: solicitud.descripcion || "",
-                    creadoPorHandle: solicitud.solicitanteHandle || "",
-                    creadoPorUid: solicitud.solicitanteUid || "",
-                    estado: "aprobada",
-                    aprobadaPor: "Kixuz",
-                    aprobadaEn: serverTimestamp()
-                }, { merge: true });
-            } catch {}
-        }
-        window.dispatchEvent(new Event("kixuz:universos-actualizados"));
-    },
-
-    async rechazarSolicitudUniverso(solicitud) {
-        if (!solicitud) return;
-        if (solicitud.id) guardarIdAprobadoLocal(solicitud.id);
-        if (configurado && solicitud.id && !String(solicitud.id).startsWith("local_")) {
-            try { await deleteDoc(doc(db, "solicitudes_universo", String(solicitud.id))); } catch {}
-        }
-        window.dispatchEvent(new Event("kixuz:universos-actualizados"));
     },
 
     async crearConversacionChat({ nombre, usuario = "", tipo = "privado", participantesExtra = [] }) {
@@ -669,7 +491,6 @@ if (configurado) {
             await window.KIXUZ_DB.cargarSubpersonajes();
         } else {
             window.KIXUZ_DB.perfilCuenta = null;
-            window.KIXUZ_DB.esAdmin = esCuentaKixuz(null, null);
             window.dispatchEvent(new Event("kixuz:personajes-actualizados"));
         }
         window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
@@ -677,9 +498,6 @@ if (configurado) {
 } else {
     try {
         const localUser = JSON.parse(localStorage.getItem("kixuz_usuario_local") || "null");
-        if (localUser) {
-            window.KIXUZ_DB.perfilCuenta = localUser;
-            window.KIXUZ_DB.esAdmin = esCuentaKixuz(localUser, null);
-        }
+        if (localUser) window.KIXUZ_DB.perfilCuenta = localUser;
     } catch {}
 }
