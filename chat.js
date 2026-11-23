@@ -160,7 +160,7 @@
         }
         .kixuz-chat-modal-backdrop.open { display: flex; }
         .kixuz-chat-modal {
-            width: 100%; max-width: 340px; background: var(--bg-principal, #150A24); color: var(--texto, #EDE7E0);
+            width: 100%; max-width: 350px; background: var(--bg-principal, #150A24); color: var(--texto, #EDE7E0);
             border: 1px solid var(--acento, #2DD4C4); border-radius: 14px; padding: 14px;
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
         }
@@ -169,11 +169,27 @@
         .kixuz-chat-modal-top h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--acento, #2DD4C4); margin: 0; }
         .kixuz-chat-modal label { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
         .kixuz-chat-modal select, .kixuz-chat-modal input {
-            width: 100%; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px;
+            width: 100%; padding: 8px 10px; border-radius: 8px; margin-bottom: 8px;
             background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(108, 60, 224, 0.6);
             color: var(--texto, #EDE7E0); font-family: 'Inter', sans-serif; font-size: 16px; outline: none;
         }
         html[data-theme="light"] .kixuz-chat-modal select, html[data-theme="light"] .kixuz-chat-modal input { background: #fff; color: #150A24; }
+
+        /* Lista de usuarios agregados en el grupo al ir apretando Enter */
+        .kixuz-added-members-box {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 10px;
+        }
+        .kixuz-member-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(45, 212, 196, 0.16); border: 1px solid var(--acento, #2DD4C4);
+            color: var(--acento, #2DD4C4); border-radius: 999px; padding: 3px 9px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
+        }
+        .kixuz-member-pill button {
+            background: none; border: none; color: inherit; font-weight: 700;
+            cursor: pointer; padding: 0; font-size: 12px; line-height: 1;
+        }
+
         .kixuz-quick-handles { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
         .kixuz-chip-btn {
             background: rgba(108, 60, 224, 0.24); border: 1px solid rgba(108, 60, 224, 0.5);
@@ -245,6 +261,8 @@
 
         document.querySelectorAll('.chat-trigger, .chat-sidebar, .kixuz-chat-trigger, .kixuz-chat-sidebar, .kixuz-chat-modal-backdrop').forEach(el => el.remove());
 
+        let miembrosPendientes = [];
+
         const trigger = document.createElement('div');
         trigger.className = 'kixuz-chat-trigger';
         trigger.title = 'Abrir comunicaciones';
@@ -305,8 +323,9 @@
                     <option value="privado">1×1 Privado</option>
                     <option value="grupo">Grupo</option>
                 </select>
-                <label for="kixuzModalNewChatInput">@Usuario o participantes</label>
-                <input type="text" id="kixuzModalNewChatInput" placeholder="@usuario (separados por coma)" autocomplete="off">
+                <label for="kixuzModalNewChatInput">Agregar @usuario (tocá Enter para sumar)</label>
+                <input type="text" id="kixuzModalNewChatInput" placeholder="Ej. @personaje2 y presioná Enter..." autocomplete="off">
+                <div class="kixuz-added-members-box" id="kixuzAddedMembersBox"></div>
                 <div class="kixuz-quick-handles" id="kixuzQuickHandles"></div>
                 <div class="kixuz-chat-modal-actions">
                     <button type="button" class="kixuz-modal-btn-create" id="kixuzConfirmCreateBtn">Crear</button>
@@ -325,16 +344,47 @@
         const newChatInput = modalBackdrop.querySelector('#kixuzModalNewChatInput');
         const chatTipoSelect = modalBackdrop.querySelector('#kixuzModalChatTipo');
         const confirmCreateBtn = modalBackdrop.querySelector('#kixuzConfirmCreateBtn');
+        const addedMembersBox = modalBackdrop.querySelector('#kixuzAddedMembersBox');
         const quickHandlesEl = modalBackdrop.querySelector('#kixuzQuickHandles');
         const messagesBox = sidebar.querySelector('#kixuzMessagesBox');
         const msgInput = sidebar.querySelector('#kixuzMsgInput');
         const badgeEl = trigger.querySelector('#kixuzChatBadge');
 
+        function renderMiembrosPendientes() {
+            addedMembersBox.innerHTML = miembrosPendientes.map((m, idx) => `
+                <span class="kixuz-member-pill">
+                    <span>${esc(m)}</span>
+                    <button type="button" data-remove-member="${idx}" title="Quitar">✕</button>
+                </span>
+            `).join('');
+
+            addedMembersBox.querySelectorAll('[data-remove-member]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = Number(btn.dataset.removeMember);
+                    miembrosPendientes.splice(idx, 1);
+                    renderMiembrosPendientes();
+                });
+            });
+        }
+
+        function sumarTextoComoMiembro(textoRaw) {
+            const piezas = String(textoRaw || '').split(',').map(s => s.trim()).filter(Boolean);
+            let agregado = false;
+            piezas.forEach(p => {
+                const limpio = normHandle(p) || normToken(p);
+                if (limpio && !miembrosPendientes.includes(limpio)) {
+                    miembrosPendientes.push(limpio);
+                    agregado = true;
+                }
+            });
+            if (agregado) renderMiembrosPendientes();
+            return agregado;
+        }
+
         function obtenerChatActivo() {
             return chatActivoId ? conversaciones.find(c => String(c.id) === String(chatActivoId)) || null : null;
         }
 
-        // Claves EXCLUSIVAS del personaje activo actual (no de toda la cuenta maestra)
         function obtenerClavesPersonajeActivo() {
             const set = new Set();
             const add = v => {
@@ -367,10 +417,8 @@
             return set;
         }
 
-        // Solo los personajes explícitamente implicados en este chat pueden verlo
         function esImplicado(conv) {
             if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-
             const misPjClaves = obtenerClavesPersonajeActivo();
             if (!misPjClaves.size) return false;
 
@@ -387,7 +435,6 @@
             return Boolean(dest && (misPjClaves.has(dest) || misPjClaves.has(normHandle(dest))));
         }
 
-        // El mensaje es "mío" solo si lo envió el personaje activo actual
         function esMensajeMio(msg) {
             if (!msg) return false;
             const misPjClaves = obtenerClavesPersonajeActivo();
@@ -432,8 +479,11 @@
             quickHandlesEl.querySelectorAll('.kixuz-chip-btn').forEach(b => {
                 b.addEventListener('click', () => {
                     const h = b.dataset.h;
-                    const cur = newChatInput.value.trim();
-                    newChatInput.value = cur ? `${cur}, ${h}` : h;
+                    if (!miembrosPendientes.includes(h)) {
+                        miembrosPendientes.push(h);
+                        renderMiembrosPendientes();
+                    }
+                    newChatInput.value = '';
                     newChatInput.focus();
                 });
             });
@@ -542,19 +592,26 @@
         }
 
         function crearNuevaConversacion() {
-            const raw = (newChatInput.value || '').trim();
-            if (!raw) { newChatInput.focus(); return; }
+            // Si quedó texto escrito sin apretar Enter, sumarlo antes de crear
+            if ((newChatInput.value || '').trim()) {
+                sumarTextoComoMiembro(newChatInput.value);
+                newChatInput.value = '';
+            }
+
+            if (!miembrosPendientes.length) {
+                newChatInput.focus();
+                return;
+            }
+
             const tipo = chatTipoSelect.value || 'privado';
-            const partes = raw.split(',').map(s => s.trim()).filter(Boolean);
-            const primer = partes[0] || raw;
-            const usuario = normHandle(primer) || primer.toLowerCase();
-            const nombreFinal = tipo === 'grupo' && partes.length > 1 ? partes.join(', ') : primer;
+            const primer = miembrosPendientes[0];
+            const usuario = normHandle(primer) || primer;
+            const nombreFinal = tipo === 'grupo' ? miembrosPendientes.join(', ') : primer;
 
             const misPjClaves = Array.from(obtenerClavesPersonajeActivo());
             const participantes = Array.from(new Set([
                 ...misPjClaves,
-                usuario,
-                ...partes.map(p => normHandle(p) || normToken(p))
+                ...miembrosPendientes
             ].filter(Boolean)));
 
             const nueva = {
@@ -569,6 +626,8 @@
             conversaciones.unshift(nueva);
             guardarLocal();
             actualizarBadge();
+            miembrosPendientes = [];
+            renderMiembrosPendientes();
             modalBackdrop.classList.remove('open');
             abrirConversacion(nueva);
         }
@@ -623,6 +682,8 @@
             volverLista();
         });
         sidebar.querySelector('#kixuzOpenCreateModalBtn').addEventListener('click', () => {
+            miembrosPendientes = [];
+            renderMiembrosPendientes();
             newChatInput.value = '';
             renderSugerenciasRapidas();
             modalBackdrop.classList.add('open');
@@ -631,12 +692,24 @@
         modalBackdrop.querySelector('#kixuzCancelModalBtn').addEventListener('click', () => modalBackdrop.classList.remove('open'));
         confirmCreateBtn.addEventListener('click', crearNuevaConversacion);
         modalBackdrop.addEventListener('click', e => { if (e.target === modalBackdrop) modalBackdrop.classList.remove('open'); });
-        newChatInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crearNuevaConversacion(); } });
+
+        // Al apretar Enter en el input de participantes, agrega el usuario a la lista y limpia el input para seguir sumando
+        newChatInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if ((newChatInput.value || '').trim()) {
+                    sumarTextoComoMiembro(newChatInput.value);
+                    newChatInput.value = '';
+                } else if (miembrosPendientes.length > 0) {
+                    crearNuevaConversacion();
+                }
+            }
+        });
+
         searchInput.addEventListener('input', e => renderLista(e.target.value));
         sidebar.querySelector('#kixuzSendBtn').addEventListener('click', enviarMensaje);
         msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enviarMensaje(); } });
 
-        // Al cambiar de sub-personaje en el desplegable, refrescar de inmediato los chats visibles y no leídos
         const refrescarPorCambioDePersonaje = () => {
             if (chatActivoId) {
                 const act = obtenerChatActivo();
