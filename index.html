@@ -27,51 +27,59 @@
             background-attachment: fixed;
         }
         header {
-            position: relative;
+            position: sticky;
+            top: 0;
             z-index: 900;
-            background: rgba(21, 10, 36, 0.95);
+            background: rgba(21, 10, 36, 0.96);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--borde);
-            padding: 10px 20px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
+            transition: transform 0.24s ease;
         }
-        @media (max-width: 980px) {
-            header { flex-wrap: wrap; }
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
+        header.header-hidden { transform: translateY(-100%); }
+        .logo { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 32px; width: auto; }
+        .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .nav-links a {
             color: var(--texto);
             text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
             padding: 6px 10px;
             border-radius: 8px;
-            font-size: 14px;
             white-space: nowrap;
         }
         .nav-links a:hover, .nav-links a.active {
             background: rgba(108, 60, 224, 0.28);
             color: var(--acento);
         }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .user-menu { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
         #activeCharSelect {
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            max-width: 220px;
+        }
+        .btn-auth-link {
+            background: var(--acento);
+            color: #150A24 !important;
             padding: 6px 10px;
             border-radius: 8px;
-            border: 1px solid var(--borde);
-            background: rgba(15, 8, 28, 0.9);
-            color: var(--texto);
-            font-size: 13px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
         }
         main {
             max-width: 980px;
@@ -125,7 +133,6 @@
         }
         .muted { opacity: 0.75; font-size: 13px; }
         .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
         input, textarea, select {
             width: 100%;
             padding: 9px 12px;
@@ -175,24 +182,23 @@
             color: #150A24;
             border-color: var(--acento);
         }
-</style>
+    </style>
 </head>
 <body>
     <header>
-        <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
             <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
         </a>
         <nav class="nav-links">
-            <a href="index.html" class="active">Inicio</a>
-            <a href="perfil.html">Mi Perfil</a>
-            <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
-            <a href="cuenta-maestra.html">Cuenta Maestra</a>
+            <a href="index.html" class="active">🏠 Inicio</a>
+            <a href="perfil.html">🎭 Mi Perfil</a>
+            <a href="universo.html">🌌 Universos</a>
+            <a href="familia.html">🌳 Familia / Clan</a>
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
+            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro">🔑 Entrar</a>
         </div>
     </header>
     <main>
@@ -203,10 +209,6 @@
                     <div id="postingAsLabel" class="muted" style="margin-top:3px;">Publicando con personaje activo</div>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <label id="pin72hWrap" style="display:none !important;" style="display:none; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--acento); cursor:pointer;">
-                        <input type="checkbox" id="pin72hCheckbox" style="width:auto;">
-                        <span>📌 Fijar 72h en Inicio (Aviso Kixuz)</span>
-                    </label>
                     <select id="postAlcanceTipo" style="width:auto; padding:7px 10px; font-size:13px;">
                         <option value="general">🌐 Inicio y Muro</option>
                         <option value="universo">🌌 Solo Universo</option>
@@ -239,14 +241,14 @@
     <script type="module" src="firebase-config.js"></script>
     <script src="characters.js"></script>
     <script src="theme.js"></script>
+    <script src="universos-core.js"></script>
     <script src="kixuz-72h-aviso.js"></script>
     <script src="kixuz-admin-master.js"></script>
     <script src="chat.js"></script>
-
+    <script src="barra-buscador.js"></script>
     <script>
         (() => {
             const POSTS_KEY = 'kixuz_posts_v1';
-            const PIN_72H_MS = 72 * 60 * 60 * 1000;
             const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             const norm = v => String(v || '').trim().toLowerCase();
             const normHandle = v => {
@@ -257,17 +259,6 @@
             let postsCache = [];
             let ordenActual = 'recientes';
 
-            function esKixuz() {
-                if (window.KIXUZ_DB?.esAdmin) return true;
-                const p = window.KIXUZ_DB?.perfilCuenta || {};
-                const u = window.KIXUZ_DB?.usuarioActual || {};
-                let loc = {};
-                try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
-                const n = norm(p.nombreMaestro || u.displayName || loc.nombreMaestro || loc.nombre || '');
-                const e = norm(p.email || u.email || loc.email || '');
-                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || n === 'kixuz' || e.startsWith('kixuz@');
-            }
-
             function getAutor() {
                 const ac = window.KIXUZ_ACTIVE_CHAR;
                 if (ac && ac.nombre) {
@@ -277,78 +268,13 @@
                         uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
                     };
                 }
-                if (esKixuz()) {
-                    return { nombre: 'Kixuz', handle: '@Kixuz', uid: window.KIXUZ_DB?.usuarioActual?.uid || '' };
-                }
                 return { nombre: 'Invitado', handle: '@invitado', uid: '' };
             }
 
             function puedeBorrar(uid = '', handle = '') {
-                if (esKixuz()) return true;
                 if (window.KIXUZ_DB?.puedeEliminar) return window.KIXUZ_DB.puedeEliminar(uid, handle);
                 const a = getAutor();
                 return Boolean(handle && normHandle(handle) === normHandle(a.handle));
-            }
-
-            function obtenerUniversosDePersonaje(handle) {
-                const h = normHandle(handle);
-                const set = new Set();
-                try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    subs.forEach(p => {
-                        if (normHandle(p.handle) === h) {
-                            const arr = Array.isArray(p.universos) ? p.universos : (p.universo ? [p.universo] : []);
-                            arr.forEach(u => set.add(norm(u).replace(/^#+/, '')));
-                        }
-                    });
-                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
-                    unis.forEach(u => {
-                        const miembros = Array.isArray(u.miembros) ? u.miembros.map(normHandle) : [];
-                        if (miembros.includes(h) || normHandle(u.creadoPorHandle) === h) {
-                            set.add(norm(u.tag || u.nombre).replace(/^#+/, ''));
-                        }
-                    });
-                } catch {}
-                return set;
-            }
-
-            function obtenerFamiliasYClanesDePersonaje(handle) {
-                const h = normHandle(handle);
-                const set = new Set();
-                try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    subs.forEach(p => {
-                        if (normHandle(p.handle) === h && p.clan) set.add(norm(p.clan));
-                    });
-                    const vincs = JSON.parse(localStorage.getItem('kixuz_vinculos_familia_v1') || '[]');
-                    vincs.forEach(v => {
-                        if (v.estado === 'aceptada' && (normHandle(v.deHandle) === h || normHandle(v.paraHandle) === h)) {
-                            if (v.grupoNombre) set.add(norm(v.grupoNombre));
-                            set.add(normHandle(v.deHandle));
-                            set.add(normHandle(v.paraHandle));
-                        }
-                    });
-                } catch {}
-                return set;
-            }
-
-            function puedeVerPost(p) {
-                if (esKixuz()) return true;
-                const tipo = norm(p.alcanceTipo || 'general');
-                if (tipo === 'general' || !tipo) return true;
-                const autor = getAutor();
-                if (normHandle(p.autorHandle) === normHandle(autor.handle)) return true;
-
-                const destino = norm(p.alcanceDestino || p.universo || '').replace(/^#+/, '');
-                if (!destino) return true;
-
-                if (tipo === 'universo') {
-                    return obtenerUniversosDePersonaje(autor.handle).has(destino);
-                }
-                if (tipo === 'familia') {
-                    return obtenerFamiliasYClanesDePersonaje(autor.handle).has(destino);
-                }
-                return true;
             }
 
             function leerPosts() {
@@ -362,14 +288,12 @@
                 try { localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 150))); } catch {}
             }
 
-            function poblarSelectoresUniversoYFamilia() {
-                const autor = getAutor();
+            function poblarSelectores() {
                 const selDestino = document.getElementById('postAlcanceDestino');
                 const selFiltroUni = document.getElementById('filterUniverseSelect');
                 const tipo = document.getElementById('postAlcanceTipo').value;
 
                 const unisSet = new Set();
-                if (esKixuz()) unisSet.add('#Kixuz');
                 try {
                     const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
                     unis.forEach(u => {
@@ -377,9 +301,6 @@
                         if (t) unisSet.add(t.startsWith('#') ? t : '#' + t);
                     });
                 } catch {}
-                postsCache.forEach(p => {
-                    if (p.universo && norm(p.universo) !== '#kixuz') unisSet.add(p.universo);
-                });
 
                 if (selFiltroUni) {
                     const prev = selFiltroUni.value;
@@ -399,42 +320,16 @@
                         selDestino.innerHTML = '';
                     } else if (tipo === 'universo') {
                         selDestino.style.display = 'inline-block';
-                        selDestino.innerHTML = '';
-                        const misUnis = esKixuz() ? Array.from(unisSet) : Array.from(obtenerUniversosDePersonaje(autor.handle)).map(u => '#' + u);
-                        if (!misUnis.length) {
-                            selDestino.innerHTML = '<option value="">Unite a un universo primero</option>';
-                        } else {
-                            misUnis.forEach(u => {
-                                if (!esKixuz() && norm(u) === '#kixuz') return;
-                                const opt = document.createElement('option');
-                                opt.value = u;
-                                opt.textContent = u;
-                                selDestino.appendChild(opt);
-                            });
-                        }
+                        selDestino.innerHTML = Array.from(unisSet).map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('') || '<option value="">Sin universos</option>';
                     } else if (tipo === 'familia') {
                         selDestino.style.display = 'inline-block';
-                        selDestino.innerHTML = '';
                         const famSet = new Set();
                         if (window.KIXUZ_ACTIVE_CHAR?.clan) famSet.add(window.KIXUZ_ACTIVE_CHAR.clan);
                         try {
-                            const vincs = JSON.parse(localStorage.getItem('kixuz_vinculos_familia_v1') || '[]');
-                            vincs.forEach(v => {
-                                if (v.estado === 'aceptada' && (normHandle(v.deHandle) === normHandle(autor.handle) || normHandle(v.paraHandle) === normHandle(autor.handle))) {
-                                    if (v.grupoNombre) famSet.add(v.grupoNombre);
-                                }
-                            });
+                            const d = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+                            (Array.isArray(d.clan) ? d.clan : []).forEach(c => { if (c.clanNombre) famSet.add(c.clanNombre); });
                         } catch {}
-                        if (!famSet.size) {
-                            selDestino.innerHTML = '<option value="">Sin familia/clan vinculado aún</option>';
-                        } else {
-                            Array.from(famSet).forEach(f => {
-                                const opt = document.createElement('option');
-                                opt.value = f;
-                                opt.textContent = f;
-                                selDestino.appendChild(opt);
-                            });
-                        }
+                        selDestino.innerHTML = Array.from(famSet).map(f => `<option value="${esc(f)}">${esc(f)}</option>`).join('') || '<option value="">Sin familia/clan</option>';
                     }
                 }
             }
@@ -442,23 +337,16 @@
             function actualizarUI() {
                 const autor = getAutor();
                 document.getElementById('postingAsLabel').textContent = `Publicando como: ${autor.nombre} (${autor.handle})`;
-                document.getElementById('pin72hWrap').style.display = esKixuz() ? 'inline-flex' : 'none';
-                poblarSelectoresUniversoYFamilia();
+                poblarSelectores();
             }
 
             function renderFeed() {
                 const feed = document.getElementById('feedPosts');
                 if (!feed) return;
                 const filtroUni = norm((document.getElementById('filterUniverseSelect')?.value || '').replace(/^#+/, ''));
-                const ahora = Date.now();
 
                 let visibles = postsCache.filter(p => {
-                    if (!puedeVerPost(p)) return false;
-                    if (p.esAviso72h) {
-                        const inicio = Number(p.pinInicioMs || 0);
-                        const vigente = !p.desfijadoManual && inicio > 0 && (ahora - inicio) < PIN_72H_MS;
-                        if (!vigente) return false;
-                    }
+                    if (window.KIXUZ_UNIVERSOS?.puedeVerPublicacion && !window.KIXUZ_UNIVERSOS.puedeVerPublicacion(p)) return false;
                     if (filtroUni) {
                         const uPost = norm((p.universo || p.alcanceDestino || '').replace(/^#+/, ''));
                         if (uPost !== filtroUni) return false;
@@ -466,34 +354,27 @@
                     return true;
                 });
 
-                const fijados = visibles.filter(p => p.esAviso72h).sort((a, b) => Number(b.pinInicioMs || 0) - Number(a.pinInicioMs || 0));
-                const normales = visibles.filter(p => !p.esAviso72h);
-
                 if (ordenActual === 'kixiz') {
-                    normales.sort((a, b) => Number(b.kixiz || 0) - Number(a.kixiz || 0));
+                    visibles.sort((a, b) => Number(b.kixiz || 0) - Number(a.kixiz || 0));
                 }
 
-                const finalLista = [...fijados, ...normales];
-
-                if (!finalLista.length) {
+                if (!visibles.length) {
                     feed.innerHTML = `<div class="card muted" style="text-align:center;">No hay publicaciones visibles con este filtro.</div>`;
                     return;
                 }
 
                 feed.innerHTML = '';
-                finalLista.forEach(p => {
+                visibles.forEach(p => {
                     const art = document.createElement('article');
                     art.className = 'post-card';
-                    if (p.esAviso72h) art.style.borderColor = 'var(--acento)';
-
                     const delPost = puedeBorrar(p.autorUid, p.autorHandle);
                     const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
                     const hLink = encodeURIComponent(p.autorHandle || p.autorNombre || '');
+                    const kixCount = Number(p.kixiz || 0);
+                    const kixLabel = kixCount === 1 ? 'Kix' : 'Kixiz';
 
                     let alcanceBadge = '';
-                    if (p.esAviso72h) {
-                        alcanceBadge = `<span class="tag-pill">📌 Aviso Oficial Kixuz (72h)</span>`;
-                    } else if (p.alcanceTipo === 'universo' && p.alcanceDestino) {
+                    if (p.alcanceTipo === 'universo' && p.alcanceDestino) {
                         alcanceBadge = `<a href="universo.html" class="tag-pill">🌌 ${esc(p.alcanceDestino)}</a>`;
                     } else if (p.alcanceTipo === 'familia' && p.alcanceDestino) {
                         alcanceBadge = `<a href="familia.html" class="tag-pill">🏰 ${esc(p.alcanceDestino)}</a>`;
@@ -514,7 +395,7 @@
                         </div>
                         <div class="post-content">${esc(p.contenido || '')}</div>
                         <div class="row-between">
-                            <button type="button" class="btn btn-secondary btn-kix" style="padding:6px 12px; font-size:12.5px;">🔥 Kix (${Number(p.kixiz || 0)})</button>
+                            <button type="button" class="btn btn-secondary btn-kix" style="padding:6px 12px; font-size:12.5px;">🔥 ${kixLabel} (${kixCount})</button>
                             <span class="muted">${respuestas.length} comentario(s)</span>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:7px;">
@@ -570,9 +451,6 @@
                             p.respuestas = arr;
                             guardarPosts(postsCache);
                             renderFeed();
-                            if (window.KIXUZ_DB?.actualizarRespuestasPost) {
-                                try { await window.KIXUZ_DB.actualizarRespuestasPost(p.id, arr); } catch {}
-                            }
                         });
                     });
 
@@ -594,16 +472,13 @@
                         rInp.value = '';
                         guardarPosts(postsCache);
                         renderFeed();
-                        if (window.KIXUZ_DB?.agregarRespuestaPost) {
-                            try { await window.KIXUZ_DB.agregarRespuestaPost(p.id, rep); } catch {}
-                        }
                     });
 
                     feed.appendChild(art);
                 });
             }
 
-            document.getElementById('postAlcanceTipo').addEventListener('change', poblarSelectoresUniversoYFamilia);
+            document.getElementById('postAlcanceTipo').addEventListener('change', poblarSelectores);
 
             const ta = document.getElementById('postContentInput');
             ta.addEventListener('keydown', e => {
@@ -619,34 +494,19 @@
                 if (!contenido.trim()) return;
 
                 const autor = getAutor();
-                const pin72h = Boolean(document.getElementById('pin72hCheckbox')?.checked && esKixuz());
-                const alcanceTipo = pin72h ? 'general' : document.getElementById('postAlcanceTipo').value;
-                const alcanceDestino = pin72h ? '#Kixuz' : (document.getElementById('postAlcanceDestino').value || '');
-
-                if (alcanceTipo !== 'general' && !alcanceDestino) {
-                    alert('Elegí un Universo o Familia/Clan válido para publicar en ese grupo.');
-                    return;
-                }
-
-                if (pin72h) {
-                    postsCache.forEach(item => {
-                        if (item.esAviso72h) item.desfijadoManual = true;
-                    });
-                }
+                const alcanceTipo = document.getElementById('postAlcanceTipo').value;
+                const alcanceDestino = document.getElementById('postAlcanceDestino').value || '';
 
                 const nuevo = {
                     id: 'local_' + Date.now(),
-                    autorNombre: pin72h ? 'Kixuz' : autor.nombre,
-                    autorHandle: pin72h ? '@Kixuz' : autor.handle,
+                    autorNombre: autor.nombre,
+                    autorHandle: autor.handle,
                     autorUid: autor.uid,
-                    muroHandle: pin72h ? '@Kixuz' : autor.handle,
+                    muroHandle: autor.handle,
                     contenido,
-                    universo: pin72h ? '#Kixuz' : (alcanceTipo === 'universo' ? alcanceDestino : ''),
+                    universo: alcanceTipo === 'universo' ? alcanceDestino : '',
                     alcanceTipo,
                     alcanceDestino,
-                    esAviso72h: pin72h,
-                    pinInicioMs: pin72h ? Date.now() : 0,
-                    desfijadoManual: false,
                     kixiz: 0,
                     respuestas: []
                 };
@@ -654,21 +514,12 @@
                 postsCache = [nuevo, ...postsCache];
                 guardarPosts(postsCache);
                 ta.value = '';
-                if (document.getElementById('pin72hCheckbox')) document.getElementById('pin72hCheckbox').checked = false;
-                poblarSelectoresUniversoYFamilia();
+                poblarSelectores();
                 renderFeed();
 
                 if (window.KIXUZ_DB?.publicarPost) {
                     try {
-                        const resId = await window.KIXUZ_DB.publicarPost({
-                            contenido,
-                            universo: nuevo.universo,
-                            esAviso72h: pin72h,
-                            alcanceTipo,
-                            alcanceDestino,
-                            autorNombre: nuevo.autorNombre,
-                            autorHandle: nuevo.autorHandle
-                        });
+                        const resId = await window.KIXUZ_DB.publicarPost(nuevo);
                         if (typeof resId === 'string' && resId) {
                             nuevo.id = resId;
                             guardarPosts(postsCache);
@@ -695,24 +546,7 @@
             });
             window.addEventListener('kixuz:personajes-actualizados', () => { actualizarUI(); renderFeed(); });
             window.addEventListener('kixuz:sesion-actualizada', () => { actualizarUI(); renderFeed(); });
-            window.addEventListener('load', () => {
-                actualizarUI();
-                if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharPosts) {
-                    window.KIXUZ_DB.escucharPosts(nube => {
-                        if (!Array.isArray(nube)) return;
-                        const loc = leerPosts().filter(p => String(p.id || '').startsWith('local_'));
-                        const m = new Map();
-                        nube.forEach(p => m.set(String(p.id), p));
-                        loc.forEach(p => { if (!m.has(String(p.id))) m.set(String(p.id), p); });
-                        postsCache = Array.from(m.values());
-                        guardarPosts(postsCache);
-                        poblarSelectoresUniversoYFamilia();
-                        renderFeed();
-                    });
-                }
-            });
         })();
     </script>
-
 </body>
 </html>

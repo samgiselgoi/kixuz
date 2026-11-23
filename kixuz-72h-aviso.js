@@ -1,7 +1,4 @@
 (() => {
-    const PINNED_72H_MS = 72 * 60 * 60 * 1000;
-    const APPROVED_KEY = "kixuz_universos_aprobados_ids_v1";
-
     const nlStyle = document.createElement("style");
     nlStyle.id = "kixuz-multiline-global-style";
     nlStyle.textContent = `
@@ -87,100 +84,9 @@
         });
     }
 
-    function leerAprobados() {
-        try {
-            const raw = JSON.parse(localStorage.getItem(APPROVED_KEY) || "[]");
-            return new Set(Array.isArray(raw) ? raw.map(String) : []);
-        } catch {
-            return new Set();
-        }
-    }
-
-    function marcarAprobado(id) {
-        if (!id) return;
-        try {
-            const s = leerAprobados();
-            s.add(String(id));
-            localStorage.setItem(APPROVED_KEY, JSON.stringify(Array.from(s)));
-        } catch {}
-    }
-
-    function limpiarPendientesAprobados() {
-        const aprobados = leerAprobados();
-        if (!aprobados.size) return;
-
-        document.querySelectorAll("[data-solicitud-id], [data-id], .solicitud-universo-item, .pendiente-item").forEach(el => {
-            const id = el.getAttribute("data-solicitud-id") || el.getAttribute("data-id") || "";
-            if (id && aprobados.has(String(id))) {
-                el.remove();
-            }
-        });
-    }
-
-    document.addEventListener("click", e => {
-        const btn = e.target.closest("button");
-        if (!btn) return;
-        const txt = (btn.textContent || "").trim().toLowerCase();
-        if (txt.includes("aprobar") || txt.includes("aceptar")) {
-            const card = btn.closest("[data-solicitud-id], [data-id], .solicitud-universo-item, .pendiente-item, .card, article, div");
-            const solId = card?.getAttribute("data-solicitud-id") || card?.getAttribute("data-id") || "";
-            if (solId) {
-                marcarAprobado(solId);
-                if (card && card !== document.body && card.parentElement && !card.contains(document.querySelector("#feedPosts"))) {
-                    setTimeout(() => card.remove(), 60);
-                }
-            }
-            setTimeout(limpiarPendientesAprobados, 120);
-        }
-    });
-
-    function aplicarRegla72hEnMuro() {
-        const esPerfil = /perfil\.html/i.test(window.location.pathname || "");
-        const params = new URLSearchParams(window.location.search || "");
-        const charParam = (params.get("char") || "").toLowerCase();
-        const esPerfilKixuz = esPerfil && (charParam === "@kixuz" || charParam === "kixuz");
-
-        const feed = document.getElementById("feedPosts") || document.getElementById("profileFeed");
-        if (!feed) return;
-
-        const ahora = Date.now();
-        const cards = Array.from(feed.querySelectorAll(".post, .post-card, article"));
-        const vigentes = [];
-
-        cards.forEach(card => {
-            const es72h = card.dataset.esAviso72h === "1" || card.dataset.pin72h === "1";
-            if (!es72h) return;
-
-            const inicioMs = Number(card.dataset.pinInicioMs || 0);
-            const desfijado = card.dataset.desfijadoManual === "1";
-            const vigente = !desfijado && inicioMs > 0 && (ahora - inicioMs) < PINNED_72H_MS;
-
-            if (!vigente && !esPerfilKixuz) {
-                card.style.display = "none";
-            } else if (vigente && !esPerfilKixuz) {
-                vigentes.push(card);
-            }
-        });
-
-        vigentes.sort((a, b) => Number(b.dataset.pinInicioMs || 0) - Number(a.dataset.pinInicioMs || 0));
-        vigentes.forEach(c => feed.prepend(c));
-    }
-
     window.addEventListener("DOMContentLoaded", () => {
         habilitarMultilineaEnComentariosYPosts();
-        limpiarPendientesAprobados();
-        aplicarRegla72hEnMuro();
-
-        const obs = new MutationObserver(() => {
-            habilitarMultilineaEnComentariosYPosts();
-        });
+        const obs = new MutationObserver(() => habilitarMultilineaEnComentariosYPosts());
         obs.observe(document.body, { childList: true, subtree: true });
     });
-
-    window.addEventListener("kixuz:universos-actualizados", limpiarPendientesAprobados);
-
-    setInterval(() => {
-        limpiarPendientesAprobados();
-        aplicarRegla72hEnMuro();
-    }, 5000);
 })();
