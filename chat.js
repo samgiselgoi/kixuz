@@ -25,7 +25,7 @@
     const SVG_CHAT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
     const SVG_LOCK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
     const SVG_GROUP = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M16 20a5 5 0 0 1 6 0"/></svg>`;
-    const SVG_TRASH = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+    const SVG_MORE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>`;
 
     const style = document.createElement('style');
     style.id = 'kixuz-chat-styles';
@@ -60,6 +60,7 @@
         html[data-theme="light"] .kixuz-chat-sidebar { background-color: rgba(244, 241, 250, 0.98); color: #150A24; }
         .kixuz-chat-sidebar.active { right: 0; }
         .kixuz-chat-header {
+            position: relative;
             padding: 12px 14px; border-bottom: 1px solid rgba(108, 60, 224, 0.45);
             display: flex; justify-content: space-between; align-items: center; gap: 8px;
             background: rgba(0, 0, 0, 0.22); flex-shrink: 0;
@@ -67,14 +68,50 @@
         .kixuz-chat-header h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; color: var(--acento, #2DD4C4); font-size: 16px; }
         .kixuz-chat-icon-btn {
             background: none; border: none; color: inherit; font-size: 16px; cursor: pointer;
-            padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center;
+            padding: 5px 7px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
         }
-        .kixuz-chat-icon-btn:hover { color: var(--acento, #2DD4C4); }
-        .kixuz-add-member-btn {
-            background: rgba(45, 212, 196, 0.15); border: 1px solid var(--acento, #2DD4C4);
-            color: var(--acento, #2DD4C4); border-radius: 8px; padding: 5px 9px;
-            font-family: 'Space Grotesk', sans-serif; font-size: 11.5px; font-weight: 700; cursor: pointer;
+        .kixuz-chat-icon-btn:hover { background: rgba(108, 60, 224, 0.26); color: var(--acento, #2DD4C4); }
+
+        /* Menú desplegable compacto [•••] */
+        .kixuz-more-wrap { position: relative; display: inline-flex; align-items: center; }
+        .kixuz-more-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 195px;
+            background: #1D0F34;
+            border: 1px solid var(--acento, #2DD4C4);
+            border-radius: 12px;
+            padding: 6px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.72);
+            z-index: 10020;
+            flex-direction: column;
+            gap: 2px;
         }
+        html[data-theme="light"] .kixuz-more-menu {
+            background: #FFFFFF;
+            box-shadow: 0 10px 24px rgba(21, 10, 36, 0.18);
+        }
+        .kixuz-more-wrap.open .kixuz-more-menu { display: flex; }
+        .kixuz-more-item {
+            background: none;
+            border: none;
+            color: var(--texto, #EDE7E0);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+        }
+        html[data-theme="light"] .kixuz-more-item { color: #150A24; }
+        .kixuz-more-item:hover { background: rgba(108, 60, 224, 0.28); color: var(--acento, #2DD4C4); }
+        .kixuz-more-item.danger { color: #ff9bb4; }
+        .kixuz-more-item.danger:hover { background: rgba(224, 60, 108, 0.24); color: #ffb8c9; }
+
         .kixuz-chat-toolbar {
             padding: 10px 14px; border-bottom: 1px solid rgba(108, 60, 224, 0.35);
             background: rgba(0, 0, 0, 0.2); display: flex; gap: 8px; align-items: center; flex-shrink: 0;
@@ -109,11 +146,6 @@
         .kixuz-unread-pill {
             background: #e03c6c; color: #fff; font-family: 'Space Grotesk', sans-serif;
             font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px; flex-shrink: 0;
-        }
-        .kixuz-del-conv-btn {
-            background: rgba(224, 60, 108, 0.16); border: 1px solid rgba(224, 60, 108, 0.45);
-            color: #ff9bb4; border-radius: 8px; width: 26px; height: 26px; font-size: 11px; cursor: pointer; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
         }
         .kixuz-conv-meta-strip {
             padding: 6px 14px; font-size: 11.5px; background: rgba(108, 60, 224, 0.14);
@@ -174,11 +206,7 @@
             color: var(--texto, #EDE7E0); font-family: 'Inter', sans-serif; font-size: 16px; outline: none;
         }
         html[data-theme="light"] .kixuz-chat-modal select, html[data-theme="light"] .kixuz-chat-modal input { background: #fff; color: #150A24; }
-
-        /* Lista de usuarios agregados en el grupo al ir apretando Enter */
-        .kixuz-added-members-box {
-            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 10px;
-        }
+        .kixuz-added-members-box { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 10px; }
         .kixuz-member-pill {
             display: inline-flex; align-items: center; gap: 6px;
             background: rgba(45, 212, 196, 0.16); border: 1px solid var(--acento, #2DD4C4);
@@ -186,10 +214,8 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
         }
         .kixuz-member-pill button {
-            background: none; border: none; color: inherit; font-weight: 700;
-            cursor: pointer; padding: 0; font-size: 12px; line-height: 1;
+            background: none; border: none; color: inherit; font-weight: 700; cursor: pointer; padding: 0; font-size: 12px; line-height: 1;
         }
-
         .kixuz-quick-handles { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
         .kixuz-chip-btn {
             background: rgba(108, 60, 224, 0.24); border: 1px solid rgba(108, 60, 224, 0.5);
@@ -292,8 +318,10 @@
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                        <button type="button" class="kixuz-add-member-btn" id="kixuzAddMemberBtn">+ Persona</button>
-                        <button class="kixuz-chat-icon-btn" id="kixuzDeleteConvHeaderBtn" title="Eliminar chat">${SVG_TRASH}</button>
+                        <div class="kixuz-more-wrap" id="kixuzMoreWrap">
+                            <button type="button" class="kixuz-chat-icon-btn" id="kixuzMoreBtn" title="Opciones" aria-label="Opciones">${SVG_MORE}</button>
+                            <div class="kixuz-more-menu" id="kixuzMoreMenu" role="menu"></div>
+                        </div>
                         <button class="kixuz-chat-icon-btn" id="kixuzClose2" title="Cerrar">✕</button>
                     </div>
                 </div>
@@ -349,6 +377,9 @@
         const messagesBox = sidebar.querySelector('#kixuzMessagesBox');
         const msgInput = sidebar.querySelector('#kixuzMsgInput');
         const badgeEl = trigger.querySelector('#kixuzChatBadge');
+        const moreWrap = sidebar.querySelector('#kixuzMoreWrap');
+        const moreBtn = sidebar.querySelector('#kixuzMoreBtn');
+        const moreMenu = sidebar.querySelector('#kixuzMoreMenu');
 
         function renderMiembrosPendientes() {
             addedMembersBox.innerHTML = miembrosPendientes.map((m, idx) => `
@@ -360,8 +391,7 @@
 
             addedMembersBox.querySelectorAll('[data-remove-member]').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const idx = Number(btn.dataset.removeMember);
-                    miembrosPendientes.splice(idx, 1);
+                    miembrosPendientes.splice(Number(btn.dataset.removeMember), 1);
                     renderMiembrosPendientes();
                 });
             });
@@ -394,18 +424,12 @@
                 if (s.startsWith('@')) set.add(s.slice(1));
                 else set.add('@' + s.replace(/\s+/g, '_'));
             };
-
             add(window.KIXUZ_ACTIVE_CHAR?.handle);
             add(window.KIXUZ_ACTIVE_CHAR?.nombre);
-
             try {
                 const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                if (act) {
-                    add(act.handle);
-                    add(act.nombre);
-                }
+                if (act) { add(act.handle); add(act.nombre); }
             } catch {}
-
             const selectEl = document.getElementById('activeCharSelect');
             if (selectEl && selectEl.value && !selectEl.value.startsWith('__')) {
                 add(selectEl.value);
@@ -413,7 +437,6 @@
                 const paren = txt.match(/\((@[^)]+)\)/);
                 if (paren && paren[1]) add(paren[1]);
             }
-
             return set;
         }
 
@@ -421,16 +444,13 @@
             if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
             const misPjClaves = obtenerClavesPersonajeActivo();
             if (!misPjClaves.size) return false;
-
             const participantes = [
                 ...(Array.isArray(conv.participantes) ? conv.participantes : []),
                 ...(Array.isArray(conv.miembros) ? conv.miembros : [])
             ].map(normToken).filter(x => x && x !== 'todos');
-
             if (participantes.length > 0) {
                 return participantes.some(p => misPjClaves.has(p) || misPjClaves.has(normHandle(p)));
             }
-
             const dest = normToken(conv.usuario);
             return Boolean(dest && (misPjClaves.has(dest) || misPjClaves.has(normHandle(dest))));
         }
@@ -468,6 +488,71 @@
             try { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch { return ''; }
         }
 
+        function construirMenuOpciones(conv) {
+            if (!conv) return;
+            const esGrupo = conv.tipo === 'grupo';
+            moreMenu.innerHTML = esGrupo
+                ? `
+                    <button type="button" class="kixuz-more-item" data-act="rename">Editar nombre</button>
+                    <button type="button" class="kixuz-more-item" data-act="add-person">Agregar persona</button>
+                    <button type="button" class="kixuz-more-item" data-act="remove-person">Eliminar persona</button>
+                    <button type="button" class="kixuz-more-item danger" data-act="delete">Eliminar chat</button>
+                `
+                : `
+                    <button type="button" class="kixuz-more-item" data-act="rename">Editar nombre</button>
+                    <button type="button" class="kixuz-more-item danger" data-act="delete">Eliminar chat</button>
+                `;
+
+            moreMenu.querySelector('[data-act="rename"]')?.addEventListener('click', () => {
+                moreWrap.classList.remove('open');
+                const nuevoNombre = prompt('Nuevo nombre para el chat:', conv.nombre || '');
+                if (nuevoNombre !== null && nuevoNombre.trim()) {
+                    conv.nombre = nuevoNombre.trim();
+                    guardarLocal();
+                    actualizarCabeceraConversacion(conv);
+                    renderLista(searchInput.value);
+                }
+            });
+
+            moreMenu.querySelector('[data-act="add-person"]')?.addEventListener('click', () => {
+                moreWrap.classList.remove('open');
+                const dato = prompt('Escribe el @usuario a agregar al grupo:');
+                if (!dato || !dato.trim()) return;
+                const h = normHandle(dato) || normToken(dato);
+                conv.participantes = Array.from(new Set([...(conv.participantes || []), h]));
+                conv.miembros = Array.from(new Set([...(conv.miembros || []), h]));
+                guardarLocal();
+                actualizarCabeceraConversacion(conv);
+            });
+
+            moreMenu.querySelector('[data-act="remove-person"]')?.addEventListener('click', () => {
+                moreWrap.classList.remove('open');
+                const parts = (conv.participantes || []).filter(p => p && p !== 'todos');
+                if (!parts.length) return;
+                const dato = prompt(`Participantes actuales: ${parts.join(', ')}\nEscribe el @usuario que deseas quitar:`);
+                if (!dato || !dato.trim()) return;
+                const target = normToken(dato);
+                const targetH = normHandle(dato);
+                conv.participantes = parts.filter(p => normToken(p) !== target && normToken(p) !== targetH);
+                conv.miembros = [...conv.participantes];
+                guardarLocal();
+                if (!esImplicado(conv)) {
+                    volverLista();
+                } else {
+                    actualizarCabeceraConversacion(conv);
+                }
+            });
+
+            moreMenu.querySelector('[data-act="delete"]')?.addEventListener('click', () => {
+                moreWrap.classList.remove('open');
+                idsEliminadosRecientemente.add(String(conv.id));
+                conversaciones = conversaciones.filter(x => String(x.id) !== String(conv.id));
+                guardarLocal();
+                actualizarBadge();
+                volverLista();
+            });
+        }
+
         function renderSugerenciasRapidas() {
             const handles = new Set();
             try {
@@ -490,6 +575,7 @@
         }
 
         function volverLista() {
+            moreWrap.classList.remove('open');
             chatActivoId = null;
             convView.style.display = 'none';
             listView.style.display = 'flex';
@@ -523,17 +609,7 @@
                         <p>${ultimo ? `<strong>${esc(ultimo.autor)}:</strong> ${esc(ultimo.texto)}` : (c.tipo === 'grupo' ? 'Grupo · Solo implicados' : '1×1 Privado · Solo implicados')}</p>
                     </div>
                     ${noLeidos > 0 ? `<span class="kixuz-unread-pill">${noLeidos}</span>` : ''}
-                    <button type="button" class="kixuz-del-conv-btn" title="Eliminar">✕</button>
                 `;
-                item.querySelector('.kixuz-del-conv-btn').addEventListener('click', e => {
-                    e.stopPropagation();
-                    idsEliminadosRecientemente.add(String(c.id));
-                    conversaciones = conversaciones.filter(x => String(x.id) !== String(c.id));
-                    guardarLocal();
-                    actualizarBadge();
-                    if (chatActivoId === String(c.id)) volverLista();
-                    else renderLista(searchInput.value);
-                });
                 item.addEventListener('click', () => abrirConversacion(c));
                 chatListEl.appendChild(item);
             });
@@ -545,7 +621,8 @@
             sidebar.querySelector('#kixuzConvSub').textContent = conv.tipo === 'grupo' ? 'Grupo · Solo implicados' : '1×1 Privado · Solo implicados';
             sidebar.querySelector('#kixuzSpeakingAs').textContent = `Como: ${pj.nombre}`;
             const total = Array.isArray(conv.participantes) ? conv.participantes.filter(p => p && p !== 'todos').length : 0;
-            sidebar.querySelector('#kixuzMembersCount').textContent = total > 0 ? `${total} implicados` : 'Privado';
+            sidebar.querySelector('#kixuzMembersCount').textContent = conv.tipo === 'grupo' ? `${total} participantes` : '1×1 Privado';
+            construirMenuOpciones(conv);
         }
 
         function abrirConversacion(conv) {
@@ -592,37 +669,21 @@
         }
 
         function crearNuevaConversacion() {
-            // Si quedó texto escrito sin apretar Enter, sumarlo antes de crear
             if ((newChatInput.value || '').trim()) {
                 sumarTextoComoMiembro(newChatInput.value);
                 newChatInput.value = '';
             }
-
             if (!miembrosPendientes.length) {
                 newChatInput.focus();
                 return;
             }
-
             const tipo = chatTipoSelect.value || 'privado';
             const primer = miembrosPendientes[0];
             const usuario = normHandle(primer) || primer;
             const nombreFinal = tipo === 'grupo' ? miembrosPendientes.join(', ') : primer;
-
             const misPjClaves = Array.from(obtenerClavesPersonajeActivo());
-            const participantes = Array.from(new Set([
-                ...misPjClaves,
-                ...miembrosPendientes
-            ].filter(Boolean)));
-
-            const nueva = {
-                id: 'chat_' + Date.now(),
-                nombre: nombreFinal,
-                usuario,
-                tipo,
-                participantes,
-                miembros: participantes,
-                mensajes: []
-            };
+            const participantes = Array.from(new Set([...misPjClaves, ...miembrosPendientes].filter(Boolean)));
+            const nueva = { id: 'chat_' + Date.now(), nombre: nombreFinal, usuario, tipo, participantes, miembros: participantes, mensajes: [] };
             conversaciones.unshift(nueva);
             guardarLocal();
             actualizarBadge();
@@ -637,11 +698,9 @@
             if (!conv || !esImplicado(conv)) return;
             const texto = (msgInput.value || '').trim();
             if (!texto) return;
-
             const pj = window.KIXUZ_ACTIVE_CHAR && !window.KIXUZ_ACTIVE_CHAR.esPlaceholder
                 ? window.KIXUZ_ACTIVE_CHAR
                 : { nombre: 'Personaje', handle: '@personaje' };
-
             conv.mensajes = Array.isArray(conv.mensajes) ? conv.mensajes : [];
             conv.mensajes.push({
                 de: 'me',
@@ -662,25 +721,15 @@
         sidebar.querySelector('#kixuzClose1').addEventListener('click', () => sidebar.classList.remove('active'));
         sidebar.querySelector('#kixuzClose2').addEventListener('click', () => sidebar.classList.remove('active'));
         sidebar.querySelector('#kixuzBackBtn').addEventListener('click', volverLista);
-        sidebar.querySelector('#kixuzAddMemberBtn').addEventListener('click', () => {
-            const conv = obtenerChatActivo();
-            if (!conv || !esImplicado(conv)) return;
-            const dato = prompt('Escribe el @usuario del personaje a agregar:');
-            if (!dato || !dato.trim()) return;
-            const h = normHandle(dato) || normToken(dato);
-            conv.participantes = Array.from(new Set([...(conv.participantes || []), h]));
-            conv.miembros = Array.from(new Set([...(conv.miembros || []), h]));
-            guardarLocal();
-            actualizarCabeceraConversacion(conv);
+
+        moreBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            moreWrap.classList.toggle('open');
         });
-        sidebar.querySelector('#kixuzDeleteConvHeaderBtn').addEventListener('click', () => {
-            if (!chatActivoId) return;
-            idsEliminadosRecientemente.add(String(chatActivoId));
-            conversaciones = conversaciones.filter(x => String(x.id) !== String(chatActivoId));
-            guardarLocal();
-            actualizarBadge();
-            volverLista();
+        document.addEventListener('click', e => {
+            if (!moreWrap.contains(e.target)) moreWrap.classList.remove('open');
         });
+
         sidebar.querySelector('#kixuzOpenCreateModalBtn').addEventListener('click', () => {
             miembrosPendientes = [];
             renderMiembrosPendientes();
@@ -693,7 +742,6 @@
         confirmCreateBtn.addEventListener('click', crearNuevaConversacion);
         modalBackdrop.addEventListener('click', e => { if (e.target === modalBackdrop) modalBackdrop.classList.remove('open'); });
 
-        // Al apretar Enter en el input de participantes, agrega el usuario a la lista y limpia el input para seguir sumando
         newChatInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
