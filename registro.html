@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Entrar / Registro de Cuenta Maestra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(34, 18, 58, 0.92);
+            --borde: rgba(108, 60, 224, 0.4);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-principal);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+        header {
+            position: relative;
+            z-index: 900;
+            background: rgba(21, 10, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+        @media (max-width: 980px) {
+            header { flex-wrap: wrap; }
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .nav-links a {
+            color: var(--texto);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(108, 60, 224, 0.28);
+            color: var(--acento);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        main {
+            max-width: 480px;
+            margin: 36px auto;
+            padding: 0 16px 60px;
+        }
+        .card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 22px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(21, 10, 36, 0.65);
+            color: var(--texto);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: var(--acento);
+            color: #150A24;
+            border-color: var(--acento);
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(0, 0, 0, 0.32);
+            color: var(--texto);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 10px;
+            border: none;
+            background: var(--acento);
+            color: #150A24;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .status-msg {
+            margin-top: 12px;
+            font-size: 13px;
+            min-height: 20px;
+            word-break: break-word;
+        }
+        .muted {
+            opacity: 0.75;
+            font-size: 12.5px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="perfil.html">Mi Perfil</a>
+            <a href="universo.html">Universos</a>
+            <a href="familia.html">Familia / Clan</a>
+            <a href="cuenta-maestra.html">Cuenta Maestra</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link active" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="card">
+            <h1 style="margin:0 0 6px; font-family:'Space Grotesk',sans-serif; font-size:22px;">🔑 Cuenta Maestra KIXUZ</h1>
+            <p class="muted" style="margin:0 0 16px;">Iniciá sesión en tu cuenta o creá una nueva para administrar tus personajes.</p>
+
+            <div class="tabs">
+                <button type="button" class="tab-btn active" id="tabLogin">Iniciar Sesión</button>
+                <button type="button" class="tab-btn" id="tabRegister">Crear Cuenta</button>
+            </div>
+
+            <form id="authForm">
+                <div class="field" id="apodoField" style="display:none;">
+                    <label for="apodoInput">Apodo de Cuenta Maestra</label>
+                    <input type="text" id="apodoInput" placeholder="Ej. Kixuz (o tu apodo)">
+                    <span class="muted">Si usás <strong>Kixuz</strong>, se habilitan los permisos de administración general.</span>
+                </div>
+
+                <div class="field">
+                    <label for="emailInput">Correo electrónico</label>
+                    <input type="email" id="emailInput" required placeholder="correo@ejemplo.com" autocomplete="email">
+                </div>
+
+                <div class="field">
+                    <label for="passwordInput">Contraseña</label>
+                    <input type="password" id="passwordInput" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitAuthBtn">Entrar a mi cuenta</button>
+                <div class="status-msg" id="authStatusMsg"></div>
+            </form>
+        </section>
+    </main>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script src="characters.js"></script>
+    <script src="theme.js"></script>
+    <script src="kixuz-72h-aviso.js"></script>
+    <script src="kixuz-admin-master.js"></script>
+    <script src="chat.js"></script>
+    <script>
+        (() => {
+            let modoRegistro = false;
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const apodoField = document.getElementById('apodoField');
+            const submitBtn = document.getElementById('submitAuthBtn');
+            const statusMsg = document.getElementById('authStatusMsg');
+            const form = document.getElementById('authForm');
+
+            function setModo(esRegistro) {
+                modoRegistro = esRegistro;
+                tabLogin.classList.toggle('active', !esRegistro);
+                tabRegister.classList.toggle('active', esRegistro);
+                apodoField.style.display = esRegistro ? 'flex' : 'none';
+                document.getElementById('apodoInput').required = esRegistro;
+                submitBtn.textContent = esRegistro ? 'Crear Cuenta Maestra' : 'Entrar a mi cuenta';
+                document.getElementById('passwordInput').autocomplete = esRegistro ? 'new-password' : 'current-password';
+                statusMsg.textContent = '';
+            }
+
+            tabLogin.addEventListener('click', () => setModo(false));
+            tabRegister.addEventListener('click', () => setModo(true));
+
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value.trim();
+                const password = document.getElementById('passwordInput').value;
+                const apodo = document.getElementById('apodoInput').value.trim();
+
+                if (!email || !password) return;
+                submitBtn.disabled = true;
+                statusMsg.style.color = 'var(--acento)';
+                statusMsg.textContent = modoRegistro ? 'Creando cuenta...' : 'Iniciando sesión...';
+
+                try {
+                    if (!window.KIXUZ_DB) {
+                        throw new Error('No se cargó la conexión con la base de datos.');
+                    }
+                    if (modoRegistro) {
+                        const nombreFinal = apodo || email.split('@')[0];
+                        await window.KIXUZ_DB.registrarCuenta(email, password, nombreFinal);
+                    } else {
+                        await window.KIXUZ_DB.iniciarSesion(email, password);
+                    }
+                    statusMsg.textContent = '✓ Acceso concedido. Redirigiendo a Cuenta Maestra...';
+                    setTimeout(() => {
+                        window.location.href = 'cuenta-maestra.html';
+                    }, 350);
+                } catch (err) {
+                    statusMsg.style.color = '#ff9bb4';
+                    statusMsg.textContent = err?.message || 'No se pudo iniciar sesión. Revisá el correo y la contraseña.';
+                    submitBtn.disabled = false;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
