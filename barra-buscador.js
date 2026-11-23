@@ -121,13 +121,12 @@
         const resultados = [];
         const vistos = new Set();
 
-        // 1. Todos los personajes conocidos (locales, públicos de BD, familia, clan, parejas)
         const personajesMap = new Map();
         const registrarChar = (nombreRaw, handleRaw, extra = {}) => {
             const h = normHandle(handleRaw || nombreRaw);
             const nom = String(nombreRaw || (h ? h.replace(/^@/, '') : '')).trim();
             const clave = h || norm(nom);
-            if (!clave) return;
+            if (!clave || clave === '@rol' || clave === '@invitado') return;
             const prev = personajesMap.get(clave) || {};
             personajesMap.set(clave, {
                 ...prev,
@@ -137,8 +136,10 @@
             });
         };
 
+        // 1. Subpersonajes propios
         leerSubpersonajes().forEach(p => registrarChar(p.nombre, p.handle, p));
 
+        // 2. Todos los personajes públicos de Firestore
         if (window.KIXUZ_DB?.listarPersonajesPublicos) {
             try {
                 const remotos = await window.KIXUZ_DB.listarPersonajesPublicos();
@@ -148,6 +149,7 @@
             } catch {}
         }
 
+        // 3. Familia, Clanes y Parejas
         try {
             const famData = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
             (Array.isArray(famData.familia) ? famData.familia : []).forEach(f => {
@@ -166,6 +168,37 @@
                 parejas.forEach(p => {
                     if (p.deHandle) registrarChar('', p.deHandle);
                     if (p.paraHandle) registrarChar('', p.paraHandle);
+                });
+            }
+        } catch {}
+
+        // 4. Autores/participantes conocidos en posts, amistades y chats (solo para indexar sus perfiles, sin mostrar posts)
+        try {
+            const posts = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+            if (Array.isArray(posts)) {
+                posts.forEach(p => {
+                    registrarChar(p.autorNombre, p.autorHandle);
+                    if (p.muroHandle) registrarChar(p.muroNombre || '', p.muroHandle);
+                    (Array.isArray(p.respuestas) ? p.respuestas : []).forEach(r => registrarChar(r.autorNombre, r.autorHandle));
+                });
+            }
+        } catch {}
+
+        try {
+            const amistades = JSON.parse(localStorage.getItem('kixuz_amistades_v1') || '[]');
+            if (Array.isArray(amistades)) {
+                amistades.forEach(a => {
+                    registrarChar(a.deNombre, a.deHandle);
+                    registrarChar(a.paraNombre, a.paraHandle);
+                });
+            }
+        } catch {}
+
+        try {
+            const chats = JSON.parse(localStorage.getItem('kixuz_chats_v1') || '[]');
+            if (Array.isArray(chats)) {
+                chats.forEach(c => {
+                    (Array.isArray(c.participantes) ? c.participantes : []).forEach(h => registrarChar('', h));
                 });
             }
         } catch {}
@@ -189,7 +222,7 @@
             }
         });
 
-        // 2. Universos
+        // 5. Universos
         try {
             const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
             if (Array.isArray(unis)) {
@@ -214,7 +247,7 @@
             }
         } catch {}
 
-        // 3. Familia y Clanes
+        // 6. Familia y Clanes
         try {
             const famData = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
             const clanes = Array.isArray(famData.clan) ? famData.clan : [];
@@ -259,7 +292,7 @@
             });
         } catch {}
 
-        return resultados.slice(0, 12);
+        return resultados.slice(0, 15);
     }
 
     function montarBarraYBuscador() {

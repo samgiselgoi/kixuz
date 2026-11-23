@@ -352,59 +352,7 @@
                         <button type="button" class="btn" id="btnFriendAction">🤝 Solicitar amigo</button>
                     </div>
 
-                    <div id="editFichaPanel" class="kixuz-modal-backdrop" role="dialog" aria-modal="true" aria-label="Editar información del personaje">
-                        <div class="kixuz-modal-card">
-                            <div class="row-between">
-                                <h2 style="font-size:18px; color:var(--acento);">✏️ Editar información del personaje</h2>
-                                <button type="button" class="btn btn-secondary" id="btnCloseEditX" style="padding:4px 9px;">✕</button>
-                            </div>
-                            <input type="text" id="inpNombre" placeholder="Nombre">
-                            <input type="text" id="inpEspecie" placeholder="Especie / Raza">
-                            <input type="text" id="inpEdad" placeholder="Edad">
-                            <input type="text" id="inpGenero" placeholder="Género">
-                            <input type="text" id="inpClan" placeholder="Clan / Familia principal">
-                            <input type="text" id="inpUniversos" placeholder="Universos (#Tag1, #Tag2)">
-                            <input type="text" id="inpParejaHandle" placeholder="Pareja (@usuario, ej. @Asmodeus)">
-                            <input type="text" id="inpEstadoCivil" placeholder="Estado de pareja (ej. Casado con, En pareja con)">
-                            <select id="inpEstadoRol">
-                                <option value="🟢 Libre para rol">🟢 Libre para rol</option>
-                                <option value="🎭 En rol">🎭 En rol</option>
-                                <option value="🔴 Ocupado">🔴 Ocupado</option>
-                            </select>
-                            <textarea id="inpBio" rows="3" placeholder="Biografía / Historia"></textarea>
-                            <textarea id="inpHabilidades" rows="2" placeholder="Habilidades (ej. Sigilo:8, Telepatía:7)"></textarea>
-                            <textarea id="inpDebilidades" rows="2" placeholder="Debilidades (ej. Luz solar:6, Orgullo:5)"></textarea>
-                            <div class="row-between" style="margin-top:4px;">
-                                <button type="button" class="btn btn-secondary" id="btnCancelEdit">Cancelar</button>
-                                <button type="button" class="btn" id="btnSaveFicha">Guardar cambios</button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div id="photosModal" class="kixuz-modal-backdrop" role="dialog" aria-modal="true" aria-label="Fotos del personaje">
-                        <div class="kixuz-modal-card">
-                            <div class="row-between">
-                                <h2 style="font-size:18px; color:var(--acento);">🖼️ Fotos del personaje</h2>
-                                <button type="button" class="btn btn-secondary" id="btnClosePhotosModal" style="padding:4px 9px;">✕</button>
-                            </div>
-                            <p class="muted">Elegí qué imagen querés actualizar para este personaje:</p>
-                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                <label class="btn btn-secondary" style="cursor:pointer;">
-                                    🖼️ Foto de Perfil (Avatar)
-                                    <input type="file" id="fileAvatar" accept="image/*" style="display:none;">
-                                </label>
-                                <label class="btn btn-secondary" style="cursor:pointer;">
-                                    🌄 Banner
-                                    <input type="file" id="fileBanner" accept="image/*" style="display:none;">
-                                </label>
-                                <label class="btn btn-secondary" style="cursor:pointer;">
-                                    🎨 Fondo
-                                    <input type="file" id="fileBg" accept="image/*" style="display:none;">
-                                </label>
-                                <button type="button" class="btn btn-danger" id="btnClearBg">Quitar fondo</button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Acordeones desplegables -->
@@ -529,6 +477,60 @@
             </section>
         </div>
     </main>
+
+    <div id="editFichaPanel" class="kixuz-modal-backdrop" role="dialog" aria-modal="true" aria-label="Editar información del personaje">
+        <div class="kixuz-modal-card">
+            <div class="row-between">
+                <h2 style="font-size:18px; color:var(--acento);">✏️ Editar información del personaje</h2>
+                <button type="button" class="btn btn-secondary" id="btnCloseEditX" style="padding:4px 9px;">✕</button>
+            </div>
+            <input type="text" id="inpNombre" placeholder="Nombre">
+            <input type="text" id="inpEspecie" placeholder="Especie / Raza">
+            <input type="text" id="inpEdad" placeholder="Edad">
+            <input type="text" id="inpGenero" placeholder="Género">
+            <input type="text" id="inpClan" placeholder="Clan / Familia principal">
+            <input type="text" id="inpUniversos" placeholder="Universos (#Tag1, #Tag2)">
+            <input type="text" id="inpParejaHandle" placeholder="Pareja (@usuario, ej. @Asmodeus)">
+            <input type="text" id="inpEstadoCivil" placeholder="Estado de pareja (ej. Casado con, En pareja con)">
+            <select id="inpEstadoRol">
+                <option value="🟢 Libre para rol">🟢 Libre para rol</option>
+                <option value="🎭 En rol">🎭 En rol</option>
+                <option value="🔴 Ocupado">🔴 Ocupado</option>
+            </select>
+            <textarea id="inpBio" rows="3" placeholder="Biografía / Historia"></textarea>
+            <textarea id="inpHabilidades" rows="2" placeholder="Habilidades (ej. Sigilo:8, Telepatía:7)"></textarea>
+            <textarea id="inpDebilidades" rows="2" placeholder="Debilidades (ej. Luz solar:6, Orgullo:5)"></textarea>
+            <div class="row-between" style="margin-top:4px;">
+                <button type="button" class="btn btn-secondary" id="btnCancelEdit">Cancelar</button>
+                <button type="button" class="btn" id="btnSaveFicha">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="photosModal" class="kixuz-modal-backdrop" role="dialog" aria-modal="true" aria-label="Fotos del personaje">
+        <div class="kixuz-modal-card">
+            <div class="row-between">
+                <h2 style="font-size:18px; color:var(--acento);">🖼️ Fotos del personaje</h2>
+                <button type="button" class="btn btn-secondary" id="btnClosePhotosModal" style="padding:4px 9px;">✕</button>
+            </div>
+            <p class="muted">Elegí qué imagen querés actualizar para este personaje:</p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <label class="btn btn-secondary" style="cursor:pointer;">
+                    🖼️ Foto de Perfil (Avatar)
+                    <input type="file" id="fileAvatar" accept="image/*" style="display:none;">
+                </label>
+                <label class="btn btn-secondary" style="cursor:pointer;">
+                    🌄 Banner
+                    <input type="file" id="fileBanner" accept="image/*" style="display:none;">
+                </label>
+                <label class="btn btn-secondary" style="cursor:pointer;">
+                    🎨 Fondo
+                    <input type="file" id="fileBg" accept="image/*" style="display:none;">
+                </label>
+                <button type="button" class="btn btn-danger" id="btnClearBg">Quitar fondo</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="firebase-config.js"></script>
     <script src="characters.js"></script>

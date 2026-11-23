@@ -25,7 +25,8 @@
         if (ac && (ac.nombre || ac.handle)) {
             return {
                 nombre: String(ac.nombre || ac.handle.replace(/^@/, '')).trim(),
-                handle: normHandle(ac.handle || ac.nombre) || '@rol'
+                handle: normHandle(ac.handle || ac.nombre) || '@rol',
+                uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
             };
         }
         try {
@@ -33,11 +34,30 @@
             if (act && (act.nombre || act.handle)) {
                 return {
                     nombre: String(act.nombre || act.handle.replace(/^@/, '')).trim(),
-                    handle: normHandle(act.handle || act.nombre) || '@rol'
+                    handle: normHandle(act.handle || act.nombre) || '@rol',
+                    uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
                 };
             }
         } catch {}
-        return { nombre: 'Personaje', handle: '@rol' };
+        return { nombre: 'Personaje', handle: '@rol', uid: '' };
+    }
+
+    function esCreadorDeChat(c) {
+        if (!c) return false;
+        const em = getEmisor();
+        const miH = normHandle(em.handle);
+        if (c.uidMaestro && em.uid && norm(c.uidMaestro) === norm(em.uid)) return true;
+        if (c.creadorHandle && miH && normHandle(c.creadorHandle) === miH) return true;
+        return false;
+    }
+
+    function esCreadorDeMensaje(m) {
+        if (!m) return false;
+        const em = getEmisor();
+        const miH = normHandle(em.handle);
+        if (m.autorUid && em.uid && norm(m.autorUid) === norm(em.uid)) return true;
+        if (m.autorHandle && miH && normHandle(m.autorHandle) === miH) return true;
+        return false;
     }
 
     function parseArrayStorage(key) {
@@ -58,11 +78,13 @@
             ? raw.mensajes
             : (Array.isArray(raw.messages) ? raw.messages : []);
 
-        const mensajes = mensajesRaw.map(m => {
+        const mensajes = mensajesRaw.map((m, mIdx) => {
             if (!m || typeof m !== 'object') return null;
             return {
+                id: String(m.id || `msg_${idx}_${mIdx}`),
                 autorNombre: String(m.autorNombre || m.senderNombre || m.autor || 'Personaje').trim(),
                 autorHandle: normHandle(m.autorHandle || m.senderHandle || m.handle || ''),
+                autorUid: String(m.autorUid || ''),
                 texto: String(m.texto ?? m.mensaje ?? m.text ?? '')
             };
         }).filter(m => m && m.texto !== '');
@@ -79,6 +101,7 @@
             usuario: hUsuario,
             tipo: raw.tipo || 'privado',
             creadorHandle: normHandle(raw.creadorHandle || raw.autorHandle || ''),
+            uidMaestro: String(raw.uidMaestro || ''),
             participantes,
             mensajes
         };
@@ -167,7 +190,7 @@
         const em = getEmisor();
         const miH = normHandle(em.handle);
         if (!miH || miH === '@rol' || miH === '@invitado') return true;
-        if (c.creadorHandle && normHandle(c.creadorHandle) === miH) return true;
+        if (esCreadorDeChat(c)) return true;
         const parts = Array.isArray(c.participantes) ? c.participantes.map(normHandle) : [];
         if (parts.length === 0) return true;
         if (parts.includes(miH)) return true;
@@ -213,7 +236,7 @@
                 padding: 1px 7px; font-size: 11px; font-weight: 800; display: none;
             }
             #kixuzChatDrawer {
-                position: fixed; top: 0; right: 0; width: 375px; max-width: 100vw; height: 100vh;
+                position: fixed; top: 0; right: 0; width: 380px; max-width: 100vw; height: 100vh;
                 z-index: 1150; background: #1a0c2e; color: var(--texto, #EDE7E0);
                 border-left: 1px solid var(--borde, rgba(108,60,224,0.45));
                 box-shadow: -12px 0 32px rgba(0, 0, 0, 0.55);
@@ -223,12 +246,12 @@
             html[data-theme="light"] #kixuzChatDrawer { background: #ffffff; color: #150A24; }
             #kixuzChatDrawer.open { transform: translateX(0); }
 
-            /* Ventana flotante aparte para crear un chat */
+            /* Sección emergente aparte para crear chats */
             #kixuzCreateChatFloatingBox {
                 display: none;
                 position: fixed;
-                right: 390px;
-                bottom: 24px;
+                right: 396px;
+                top: 16px;
                 width: 310px;
                 max-width: calc(100vw - 32px);
                 z-index: 1200;
@@ -244,7 +267,7 @@
             @media (max-width: 760px) {
                 #kixuzCreateChatFloatingBox {
                     right: 16px;
-                    bottom: 76px;
+                    top: 64px;
                 }
             }
             html[data-theme="light"] #kixuzCreateChatFloatingBox {
@@ -255,38 +278,41 @@
                 display: flex;
             }
 
-            .kixuz-chat-head {
-                padding: 12px 14px; border-bottom: 1px solid var(--borde, rgba(108,60,224,0.35));
-                display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            .kixuz-chat-top-bar {
+                padding: 12px 14px;
+                border-bottom: 1px solid var(--borde, rgba(108,60,224,0.35));
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
-            .kixuz-chat-controls {
-                padding: 10px 14px; border-bottom: 1px solid var(--borde, rgba(108,60,224,0.25));
-                display: flex; flex-direction: column; gap: 8px;
-            }
-            /* Lista vertical de conversaciones (una debajo de la otra) */
-            .kixuz-chat-list-vertical {
+            .kixuz-chat-list-wrap {
+                padding: 10px 14px;
+                border-bottom: 1px solid var(--borde, rgba(108,60,224,0.25));
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
-                max-height: 155px;
+                gap: 8px;
+                max-height: 210px;
                 overflow-y: auto;
             }
-            .kixuz-chat-row-btn {
+            /* Filas de chats más gruesas en lista vertical */
+            .kixuz-chat-item-card {
                 width: 100%;
-                text-align: left;
-                padding: 7px 10px;
-                border-radius: 9px;
-                border: 1px solid var(--borde, rgba(108,60,224,0.35));
-                background: rgba(108, 60, 224, 0.18);
+                padding: 11px 12px;
+                border-radius: 12px;
+                border: 1px solid var(--borde, rgba(108,60,224,0.38));
+                background: rgba(108, 60, 224, 0.2);
                 color: inherit;
-                font-size: 12.5px;
-                font-weight: 700;
-                cursor: pointer;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                transition: background 0.18s ease, border-color 0.18s ease;
             }
-            .kixuz-chat-row-btn.active {
+            .kixuz-chat-item-card:hover {
+                border-color: var(--acento, #2DD4C4);
+            }
+            .kixuz-chat-item-card.active {
                 background: var(--acento, #2DD4C4);
                 color: #150A24;
                 border-color: var(--acento, #2DD4C4);
@@ -299,7 +325,7 @@
             .kixuz-msg-row.mine { align-self: flex-end; align-items: flex-end; }
             .kixuz-msg-row.other { align-self: flex-start; align-items: flex-start; }
             .kixuz-msg-bubble {
-                padding: 8px 11px; border-radius: 12px; font-size: 13.5px;
+                padding: 9px 12px; border-radius: 12px; font-size: 13.5px;
                 white-space: pre-wrap; word-break: break-word; line-height: 1.45;
             }
             .kixuz-msg-row.mine .kixuz-msg-bubble {
@@ -314,22 +340,17 @@
         const bubble = document.createElement('button');
         bubble.type = 'button';
         bubble.id = 'kixuzChatBubble';
-        bubble.innerHTML = `💬 Chat <span id="kixuzChatBadge"></span>`;
+        bubble.innerHTML = `💬 <span id="kixuzChatBadge"></span>`;
 
         const drawer = document.createElement('aside');
         drawer.id = 'kixuzChatDrawer';
         drawer.innerHTML = `
-            <div class="kixuz-chat-head">
-                <strong style="font-family:'Space Grotesk',sans-serif; color:var(--acento, #2DD4C4);">💬 Chat KIXUZ</strong>
-                <div style="display:flex; gap:6px; align-items:center;">
-                    <button type="button" id="kixuzOpenCreateFloatBtn" class="btn" style="padding:5px 10px; font-size:12px;">+ Nuevo chat</button>
-                    <button type="button" id="kixuzChatClose" style="background:none; border:none; color:inherit; font-size:18px; cursor:pointer;" aria-label="Cerrar chat">✕</button>
-                </div>
+            <div class="kixuz-chat-top-bar">
+                <input type="search" id="kixuzChatSearch" placeholder="Buscar chat o @usuario..." style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:13px;">
+                <button type="button" id="kixuzOpenCreateFloatBtn" class="btn" style="padding:8px 12px; font-size:12.5px; white-space:nowrap;">+ Crear</button>
+                <button type="button" id="kixuzChatClose" style="background:none; border:none; color:inherit; font-size:18px; cursor:pointer; padding:2px 6px;" aria-label="Cerrar">✕</button>
             </div>
-            <div class="kixuz-chat-controls">
-                <input type="search" id="kixuzChatSearch" placeholder="Buscar conversación o @usuario..." style="width:100%; padding:7px 10px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:13px;">
-                <div id="kixuzChatList" class="kixuz-chat-list-vertical"></div>
-            </div>
+            <div id="kixuzChatList" class="kixuz-chat-list-wrap"></div>
             <div class="kixuz-chat-body" id="kixuzChatMessages"></div>
             <form id="kixuzChatSendForm" style="padding:10px 14px; border-top:1px solid var(--borde, rgba(108,60,224,0.35)); display:flex; gap:8px; align-items:flex-end;">
                 <textarea id="kixuzChatInput" rows="1" placeholder="Escribí un mensaje... (Shift + Enter: salto de línea)" style="flex:1; padding:8px 10px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:13px; resize:none;"></textarea>
@@ -341,18 +362,18 @@
         createFloatBox.id = 'kixuzCreateChatFloatingBox';
         createFloatBox.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="font-family:'Space Grotesk',sans-serif; font-size:13.5px; color:var(--acento, #2DD4C4);">➕ Crear conversación</strong>
+                <strong style="font-family:'Space Grotesk',sans-serif; font-size:13.5px; color:var(--acento, #2DD4C4);">➕ Nueva conversación</strong>
                 <button type="button" id="kixuzCloseCreateFloatBtn" style="background:none; border:none; color:inherit; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <form id="kixuzCreateChatForm" style="display:flex; flex-direction:column; gap:8px;">
-                <input type="text" id="kixuzNewChatTarget" list="kixuzChatCharSuggestions" placeholder="@usuario o participantes (ej. @Demian, @Lia)" style="width:100%; padding:7px 9px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
+                <input type="text" id="kixuzNewChatTarget" list="kixuzChatCharSuggestions" placeholder="@usuario o participantes (ej. @Demian, @Lia)" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
                 <datalist id="kixuzChatCharSuggestions"></datalist>
-                <select id="kixuzNewChatTipo" style="width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
+                <select id="kixuzNewChatTipo" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--borde, rgba(108,60,224,0.35)); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
                     <option value="privado">1×1 (Privado)</option>
                     <option value="grupal">Grupal</option>
                     <option value="general">General</option>
                 </select>
-                <button type="submit" id="kixuzCreateChatBtn" class="btn" style="width:100%; justify-content:center; padding:8px 12px; font-size:12.5px;">Crear chat</button>
+                <button type="submit" id="kixuzCreateChatBtn" class="btn" style="width:100%; justify-content:center; padding:8px 12px; font-size:12.5px;">Crear</button>
             </form>
         `;
 
@@ -400,13 +421,27 @@
             dl.innerHTML = sugs.map(s => `<option value="${esc(s.handle)}">${esc(s.nombre)} (${esc(s.handle)})</option>`).join('');
         }
 
+        async function eliminarChatPorId(cid) {
+            const target = chatsCache.find(x => String(x.id) === String(cid));
+            if (!target || !esCreadorDeChat(target)) return;
+            chatsCache = chatsCache.filter(x => String(x.id) !== String(cid));
+            if (String(activeChatId) === String(cid)) {
+                activeChatId = chatsCache[0]?.id || null;
+            }
+            guardarChats(chatsCache);
+            renderChatDrawer();
+            actualizarBadge();
+            if (window.KIXUZ_DB?.eliminarConversacionChat) {
+                try { await window.KIXUZ_DB.eliminarConversacionChat(cid); } catch {}
+            }
+        }
+
         function renderChatDrawer() {
             const q = norm(document.getElementById('kixuzChatSearch')?.value || '');
             const listEl = document.getElementById('kixuzChatList');
             const msgEl = document.getElementById('kixuzChatMessages');
             if (!listEl || !msgEl) return;
 
-            const em = getEmisor();
             const visibles = chatsCache.filter(c => {
                 if (!puedeVerChat(c)) return false;
                 if (!q) return true;
@@ -418,54 +453,86 @@
                 activeChatId = visibles[0].id;
             }
 
-            listEl.innerHTML = visibles.map(c => {
-                const isAct = c.id === activeChatId;
-                const countMsgs = Array.isArray(c.mensajes) ? c.mensajes.length : 0;
-                return `<button type="button" class="kixuz-chat-row-btn ${isAct ? 'active' : ''}" data-cid="${esc(c.id)}"><span>${esc(c.nombre || c.usuario || 'Chat')}</span><span style="opacity:0.75; font-size:11px;">${countMsgs}</span></button>`;
-            }).join('') || `<span class="muted">Todavía no tenés chats creados. Tocá <strong>+ Nuevo chat</strong> arriba.</span>`;
+            if (!visibles.length) {
+                listEl.innerHTML = `<span class="muted">Todavía no tenés chats. Tocá <strong>+ Crear</strong> arriba.</span>`;
+            } else {
+                listEl.innerHTML = '';
+                visibles.forEach(c => {
+                    const isAct = String(c.id) === String(activeChatId);
+                    const countMsgs = Array.isArray(c.mensajes) ? c.mensajes.length : 0;
+                    const soyCreador = esCreadorDeChat(c);
+                    const subInfo = c.tipo === 'general'
+                        ? 'General'
+                        : ((c.participantes || []).join(', ') || c.usuario || 'Privado');
 
-            listEl.querySelectorAll('[data-cid]').forEach(b => {
-                b.addEventListener('click', () => {
-                    activeChatId = b.dataset.cid;
-                    const found = chatsCache.find(x => x.id === activeChatId);
-                    if (found) marcarLeido(found);
-                    renderChatDrawer();
+                    const row = document.createElement('div');
+                    row.className = `kixuz-chat-item-card ${isAct ? 'active' : ''}`;
+                    row.innerHTML = `
+                        <div style="min-width:0; flex:1;">
+                            <div style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(c.nombre || c.usuario || 'Conversación')}</div>
+                            <div style="font-size:11.5px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(subInfo)} · ${countMsgs} msg</div>
+                        </div>
+                        ${soyCreador ? `<button type="button" class="kixuz-del-chat-btn" title="Eliminar conversación" style="background:rgba(224,60,108,0.22); border:1px solid rgba(224,60,108,0.55); color:#ff9bb4; border-radius:7px; padding:4px 7px; font-size:11.5px; cursor:pointer;">🗑️</button>` : ''}
+                    `;
+
+                    row.addEventListener('click', ev => {
+                        if (ev.target.closest('.kixuz-del-chat-btn')) return;
+                        activeChatId = c.id;
+                        marcarLeido(c);
+                        renderChatDrawer();
+                    });
+
+                    const delChatBtn = row.querySelector('.kixuz-del-chat-btn');
+                    if (delChatBtn) {
+                        delChatBtn.addEventListener('click', ev => {
+                            ev.stopPropagation();
+                            eliminarChatPorId(c.id);
+                        });
+                    }
+
+                    listEl.appendChild(row);
                 });
-            });
+            }
 
-            const actual = chatsCache.find(x => x.id === activeChatId && puedeVerChat(x));
+            const actual = chatsCache.find(x => String(x.id) === String(activeChatId) && puedeVerChat(x));
             if (!actual) {
-                msgEl.innerHTML = `<div class="muted">Creá un chat desde <strong>+ Nuevo chat</strong> o elegí uno de la lista.</div>`;
+                msgEl.innerHTML = `<div class="muted">Creá una conversación desde <strong>+ Crear</strong> o elegí una de la lista.</div>`;
                 return;
             }
 
             marcarLeido(actual);
             const msgs = Array.isArray(actual.mensajes) ? actual.mensajes : [];
-            const miH = normHandle(em.handle);
 
-            msgEl.innerHTML = msgs.map((m, idx) => {
-                const mine = Boolean(m.autorHandle && miH && normHandle(m.autorHandle) === miH);
-                return `
-                    <div class="kixuz-msg-row ${mine ? 'mine' : 'other'}">
-                        <span style="font-size:11px; opacity:0.75; margin-bottom:2px;">${esc(m.autorNombre || m.autorHandle || 'Personaje')}</span>
-                        <div class="kixuz-msg-bubble">${esc(m.texto || '')}</div>
-                        ${mine ? `<button type="button" data-midx="${idx}" class="kixuz-del-m" style="background:none; border:none; color:#ff9bb4; font-size:10.5px; cursor:pointer; margin-top:2px;">Borrar</button>` : ''}
-                    </div>
+            if (!msgs.length) {
+                msgEl.innerHTML = `<div class="muted">Sin mensajes en <strong>${esc(actual.nombre)}</strong> todavía.</div>`;
+                return;
+            }
+
+            msgEl.innerHTML = '';
+            msgs.forEach((m, idx) => {
+                const mine = esCreadorDeMensaje(m);
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `kixuz-msg-row ${mine ? 'mine' : 'other'}`;
+                msgDiv.innerHTML = `
+                    <span style="font-size:11px; opacity:0.75; margin-bottom:2px;">${esc(m.autorNombre || m.autorHandle || 'Personaje')}</span>
+                    <div class="kixuz-msg-bubble">${esc(m.texto || '')}</div>
+                    ${mine ? `<button type="button" class="kixuz-del-m" style="background:none; border:none; color:#ff9bb4; font-size:11px; cursor:pointer; margin-top:3px;">Borrar</button>` : ''}
                 `;
-            }).join('') || `<div class="muted">Sin mensajes en <strong>${esc(actual.nombre)}</strong> todavía.</div>`;
 
-            msgEl.querySelectorAll('.kixuz-del-m').forEach(db => {
-                db.addEventListener('click', async () => {
-                    const i = Number(db.dataset.midx);
-                    if (i < 0 || i >= msgs.length) return;
-                    msgs.splice(i, 1);
-                    actual.mensajes = msgs;
-                    guardarChats(chatsCache);
-                    renderChatDrawer();
-                    if (window.KIXUZ_DB?.guardarMensajesChat) {
-                        try { await window.KIXUZ_DB.guardarMensajesChat(actual.id, msgs); } catch {}
-                    }
-                });
+                const delMsgBtn = msgDiv.querySelector('.kixuz-del-m');
+                if (delMsgBtn) {
+                    delMsgBtn.addEventListener('click', async () => {
+                        if (!esCreadorDeMensaje(m)) return;
+                        actual.mensajes.splice(idx, 1);
+                        guardarChats(chatsCache);
+                        renderChatDrawer();
+                        if (window.KIXUZ_DB?.guardarMensajesChat) {
+                            try { await window.KIXUZ_DB.guardarMensajesChat(actual.id, actual.mensajes); } catch {}
+                        }
+                    });
+                }
+
+                msgEl.appendChild(msgDiv);
             });
 
             msgEl.scrollTop = msgEl.scrollHeight;
@@ -517,6 +584,7 @@
                 usuario: principalHandle,
                 tipo,
                 creadorHandle: normHandle(em.handle),
+                uidMaestro: em.uid || '',
                 participantes,
                 mensajes: []
             };
@@ -569,10 +637,11 @@
                 const em = getEmisor();
                 const autoSala = {
                     id: 'chat_' + Date.now(),
-                    nombre: 'Chat General',
+                    nombre: 'General',
                     usuario: '',
                     tipo: 'general',
                     creadorHandle: normHandle(em.handle),
+                    uidMaestro: em.uid || '',
                     participantes: [normHandle(em.handle)].filter(Boolean),
                     mensajes: []
                 };
@@ -580,14 +649,16 @@
                 activeChatId = autoSala.id;
             }
 
-            const actual = chatsCache.find(x => x.id === activeChatId);
+            const actual = chatsCache.find(x => String(x.id) === String(activeChatId));
             if (!actual) return;
 
             const em = getEmisor();
             actual.mensajes = Array.isArray(actual.mensajes) ? actual.mensajes : [];
             actual.mensajes.push({
+                id: 'msg_' + Date.now(),
                 autorNombre: em.nombre,
                 autorHandle: normHandle(em.handle),
+                autorUid: em.uid || '',
                 texto: txt
             });
 

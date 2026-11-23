@@ -622,6 +622,18 @@
             return { nombre: 'Personaje', handle: '@rol' };
         }
 
+        function esCreadorDeRegistro(item) {
+            if (!item) return false;
+            const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
+            const miUid = norm(window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || '');
+            if (item.uidMaestro && miUid && norm(item.uidMaestro) === miUid) return true;
+            const duenoH = normHandle(item.duenoHandle || '');
+            if (duenoH && activoH && activoH !== '@rol') {
+                return duenoH === activoH;
+            }
+            return false;
+        }
+
         function esMiPropioPersonaje(personaje) {
             const targetH = normHandle(personaje?.handle);
             const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
@@ -1024,7 +1036,7 @@
                 esPareja: esCoLiderazgo,
                 index,
                 lista: 'clan',
-                puedeEditar: true
+                puedeEditar: esCreadorDeRegistro(m)
             })).join('');
 
             // Rango 2: Segundo al Mando
@@ -1037,7 +1049,7 @@
                     esYo: normHandle(m.handle) === focoH,
                     index,
                     lista: 'clan',
-                    puedeEditar: true
+                    puedeEditar: esCreadorDeRegistro(m)
                 })).join('');
 
             // Rango 3 y 4: Jefes de Escuadrón y Miembros Activos dentro de cada escuadrón
@@ -1064,7 +1076,7 @@
                         esYo: normHandle(jefe.handle) === focoH,
                         index: idxJefe,
                         lista: 'clan',
-                        puedeEditar: true
+                        puedeEditar: esCreadorDeRegistro(m)
                     });
                     const miembrosSqHtml = miembrosDeEsteEscuadron.map(({ m, index }) => cardHtml({
                         nombre: m.nombre,
@@ -1073,7 +1085,7 @@
                         esYo: normHandle(m.handle) === focoH,
                         index,
                         lista: 'clan',
-                        puedeEditar: true
+                        puedeEditar: esCreadorDeRegistro(m)
                     })).join('');
 
                     sub.innerHTML = `
@@ -1105,7 +1117,7 @@
                 esYo: normHandle(m.handle) === focoH,
                 index,
                 lista: 'clan',
-                puedeEditar: true
+                puedeEditar: esCreadorDeRegistro(m)
             })).join('');
 
             const gLid = document.getElementById('gridClanLider');
@@ -1193,6 +1205,7 @@
                 id: 'fam_' + Date.now(),
                 duenoNombre: focoChar.nombre,
                 duenoHandle: duenoH,
+                uidMaestro: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || '',
                 nombre: nombreLimpio,
                 handle,
                 relacion,
@@ -1259,6 +1272,7 @@
                 dataStore.clan.push({
                     id: 'clan_self_' + Date.now(),
                     duenoHandle: normHandle(focoChar.handle),
+                    uidMaestro: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || '',
                     clanNombre,
                     nombre: yo.nombre,
                     handle: yo.handle,
@@ -1293,6 +1307,7 @@
             dataStore.clan.push({
                 id: 'clan_' + Date.now(),
                 duenoHandle: normHandle(focoChar.handle),
+                    uidMaestro: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || '',
                 clanNombre,
                 nombre: nombreFinal,
                 handle: handleFinal,
