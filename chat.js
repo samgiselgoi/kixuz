@@ -179,6 +179,7 @@
             background: rgba(108, 60, 224, 0.24); border: 1px solid rgba(108, 60, 224, 0.5);
             color: inherit; border-radius: 999px; padding: 3px 8px; font-size: 11.5px; font-weight: 600; cursor: pointer;
         }
+        .kixuz-chip-btn:hover { border-color: var(--acento, #2DD4C4); color: var(--acento, #2DD4C4); }
         .kixuz-chat-modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
         .kixuz-modal-btn-cancel { background: transparent; border: 1px solid rgba(108, 60, 224, 0.6); color: inherit; padding: 7px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12.5px; cursor: pointer; }
         .kixuz-modal-btn-create { background: var(--acento, #2DD4C4); color: #150A24; border: none; padding: 7px 14px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12.5px; cursor: pointer; }
@@ -232,6 +233,10 @@
         try { localStorage.setItem(STORAGE_LEIDOS, JSON.stringify(obj)); } catch {}
     }
 
+    let conversaciones = cargarLocal();
+    let idsEliminadosRecientemente = new Set();
+    let chatActivoId = null;
+
     function montarChatUI() {
         if (!document.body) return;
         if (!document.getElementById('kixuz-chat-styles')) {
@@ -239,10 +244,6 @@
         }
 
         document.querySelectorAll('.chat-trigger, .chat-sidebar, .kixuz-chat-trigger, .kixuz-chat-sidebar, .kixuz-chat-modal-backdrop').forEach(el => el.remove());
-
-        let conversaciones = cargarLocal();
-        let idsEliminadosRecientemente = new Set();
-        let chatActivoId = null;
 
         const trigger = document.createElement('div');
         trigger.className = 'kixuz-chat-trigger';
@@ -333,7 +334,8 @@
             return chatActivoId ? conversaciones.find(c => String(c.id) === String(chatActivoId)) || null : null;
         }
 
-        function obtenerMisClaves() {
+        // Claves EXCLUSIVAS del personaje activo actual (no de toda la cuenta maestra)
+        function obtenerClavesPersonajeActivo() {
             const set = new Set();
             const add = v => {
                 const s = normToken(v);
@@ -342,44 +344,56 @@
                 if (s.startsWith('@')) set.add(s.slice(1));
                 else set.add('@' + s.replace(/\s+/g, '_'));
             };
-            add(window.KIXUZ_DB?.usuarioActual?.uid);
-            add(window.KIXUZ_DB?.usuarioActual?.email);
-            add(window.KIXUZ_DB?.perfilCuenta?.uid);
-            add(window.KIXUZ_DB?.perfilCuenta?.apodo);
+
             add(window.KIXUZ_ACTIVE_CHAR?.handle);
             add(window.KIXUZ_ACTIVE_CHAR?.nombre);
+
             try {
                 const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                add(act?.handle); add(act?.nombre);
-                const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                if (Array.isArray(subs)) subs.forEach(p => { add(p?.handle); add(p?.nombre); });
+                if (act) {
+                    add(act.handle);
+                    add(act.nombre);
+                }
             } catch {}
+
+            const selectEl = document.getElementById('activeCharSelect');
+            if (selectEl && selectEl.value && !selectEl.value.startsWith('__')) {
+                add(selectEl.value);
+                const txt = selectEl.options[selectEl.selectedIndex]?.textContent || '';
+                const paren = txt.match(/\((@[^)]+)\)/);
+                if (paren && paren[1]) add(paren[1]);
+            }
+
             return set;
         }
 
+        // Solo los personajes explícitamente implicados en este chat pueden verlo
         function esImplicado(conv) {
             if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-            const misClaves = obtenerMisClaves();
-            const participantesExplicito = [
+
+            const misPjClaves = obtenerClavesPersonajeActivo();
+            if (!misPjClaves.size) return false;
+
+            const participantes = [
                 ...(Array.isArray(conv.participantes) ? conv.participantes : []),
                 ...(Array.isArray(conv.miembros) ? conv.miembros : [])
             ].map(normToken).filter(x => x && x !== 'todos');
 
-            if (participantesExplicito.length > 0) {
-                return participantesExplicito.some(p => misClaves.has(p) || misClaves.has(normHandle(p)));
+            if (participantes.length > 0) {
+                return participantes.some(p => misPjClaves.has(p) || misPjClaves.has(normHandle(p)));
             }
-            const creador = normToken(conv.creadorUid);
+
             const dest = normToken(conv.usuario);
-            return Boolean((creador && misClaves.has(creador)) || (dest && (misClaves.has(dest) || misClaves.has(normHandle(dest)))));
+            return Boolean(dest && (misPjClaves.has(dest) || misPjClaves.has(normHandle(dest))));
         }
 
+        // El mensaje es "mío" solo si lo envió el personaje activo actual
         function esMensajeMio(msg) {
             if (!msg) return false;
-            const misClaves = obtenerMisClaves();
-            const mUid = normToken(msg.autorUid);
+            const misPjClaves = obtenerClavesPersonajeActivo();
             const mHandle = normToken(msg.autorHandle);
             const mAutor = normToken(msg.autor);
-            return Boolean((mUid && misClaves.has(mUid)) || (mHandle && misClaves.has(mHandle)) || (mAutor && misClaves.has(mAutor)));
+            return Boolean((mHandle && misPjClaves.has(mHandle)) || (mAutor && misPjClaves.has(mAutor)));
         }
 
         function contarNoLeidosDeChat(conv) {
@@ -441,7 +455,7 @@
                 .filter(c => (c.nombre || '').toLowerCase().includes(texto) || (c.usuario || '').toLowerCase().includes(texto));
 
             if (!filtradas.length) {
-                chatListEl.innerHTML = `<div class="kixuz-chat-empty">Solo los implicados pueden leer este chat.<br>Toca <strong>+</strong> para crear una conversación privada.</div>`;
+                chatListEl.innerHTML = `<div class="kixuz-chat-empty">Solo los personajes implicados pueden leer este chat.<br>Toca <strong>+</strong> para crear una conversación.</div>`;
                 return;
             }
 
@@ -476,7 +490,7 @@
         }
 
         function actualizarCabeceraConversacion(conv) {
-            const pj = window.KIXUZ_ACTIVE_CHAR && !window.KIXUZ_ACTIVE_CHAR.esPlaceholder ? window.KIXUZ_ACTIVE_CHAR : { nombre: 'Cuenta' };
+            const pj = window.KIXUZ_ACTIVE_CHAR && !window.KIXUZ_ACTIVE_CHAR.esPlaceholder ? window.KIXUZ_ACTIVE_CHAR : { nombre: 'Personaje' };
             sidebar.querySelector('#kixuzConvTitle').textContent = conv.nombre || 'Chat';
             sidebar.querySelector('#kixuzConvSub').textContent = conv.tipo === 'grupo' ? 'Grupo · Solo implicados' : '1×1 Privado · Solo implicados';
             sidebar.querySelector('#kixuzSpeakingAs').textContent = `Como: ${pj.nombre}`;
@@ -501,7 +515,7 @@
             messagesBox.innerHTML = '';
             const conv = obtenerChatActivo();
             if (!conv || !esImplicado(conv)) {
-                messagesBox.innerHTML = `<div class="kixuz-chat-empty">Solo los implicados pueden leer esta conversación.</div>`;
+                messagesBox.innerHTML = `<div class="kixuz-chat-empty">Solo los personajes implicados pueden leer esta conversación.</div>`;
                 return;
             }
             const msgs = Array.isArray(conv.mensajes) ? conv.mensajes : [];
@@ -535,11 +549,23 @@
             const primer = partes[0] || raw;
             const usuario = normHandle(primer) || primer.toLowerCase();
             const nombreFinal = tipo === 'grupo' && partes.length > 1 ? partes.join(', ') : primer;
-            const miUid = normToken(window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid);
-            const miHandle = normHandle(window.KIXUZ_ACTIVE_CHAR?.handle);
-            const miNombre = normToken(window.KIXUZ_ACTIVE_CHAR?.nombre);
-            const participantes = Array.from(new Set([miUid, miHandle, miNombre, usuario, ...partes.map(p => normHandle(p) || normToken(p))].filter(Boolean)));
-            const nueva = { id: 'chat_' + Date.now(), nombre: nombreFinal, usuario, tipo, creadorUid: miUid || miHandle, participantes, miembros: participantes, mensajes: [] };
+
+            const misPjClaves = Array.from(obtenerClavesPersonajeActivo());
+            const participantes = Array.from(new Set([
+                ...misPjClaves,
+                usuario,
+                ...partes.map(p => normHandle(p) || normToken(p))
+            ].filter(Boolean)));
+
+            const nueva = {
+                id: 'chat_' + Date.now(),
+                nombre: nombreFinal,
+                usuario,
+                tipo,
+                participantes,
+                miembros: participantes,
+                mensajes: []
+            };
             conversaciones.unshift(nueva);
             guardarLocal();
             actualizarBadge();
@@ -552,13 +578,16 @@
             if (!conv || !esImplicado(conv)) return;
             const texto = (msgInput.value || '').trim();
             if (!texto) return;
-            const pj = window.KIXUZ_ACTIVE_CHAR || { nombre: 'Tú', handle: '@rol' };
+
+            const pj = window.KIXUZ_ACTIVE_CHAR && !window.KIXUZ_ACTIVE_CHAR.esPlaceholder
+                ? window.KIXUZ_ACTIVE_CHAR
+                : { nombre: 'Personaje', handle: '@personaje' };
+
             conv.mensajes = Array.isArray(conv.mensajes) ? conv.mensajes : [];
             conv.mensajes.push({
                 de: 'me',
                 autor: pj.nombre,
                 autorHandle: normHandle(pj.handle),
-                autorUid: normToken(window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid),
                 hora: horaCorta(),
                 texto
             });
@@ -577,7 +606,7 @@
         sidebar.querySelector('#kixuzAddMemberBtn').addEventListener('click', () => {
             const conv = obtenerChatActivo();
             if (!conv || !esImplicado(conv)) return;
-            const dato = prompt('Escribe el @usuario a agregar:');
+            const dato = prompt('Escribe el @usuario del personaje a agregar:');
             if (!dato || !dato.trim()) return;
             const h = normHandle(dato) || normToken(dato);
             conv.participantes = Array.from(new Set([...(conv.participantes || []), h]));
@@ -606,6 +635,27 @@
         searchInput.addEventListener('input', e => renderLista(e.target.value));
         sidebar.querySelector('#kixuzSendBtn').addEventListener('click', enviarMensaje);
         msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enviarMensaje(); } });
+
+        // Al cambiar de sub-personaje en el desplegable, refrescar de inmediato los chats visibles y no leídos
+        const refrescarPorCambioDePersonaje = () => {
+            if (chatActivoId) {
+                const act = obtenerChatActivo();
+                if (act && esImplicado(act)) {
+                    marcarChatComoLeido(act);
+                    actualizarCabeceraConversacion(act);
+                    renderMensajes();
+                } else {
+                    volverLista();
+                }
+            } else {
+                renderLista(searchInput.value);
+            }
+            actualizarBadge();
+        };
+
+        window.addEventListener('kixuz:personajes-actualizados', refrescarPorCambioDePersonaje);
+        window.addEventListener('kixuz:sesion-actualizada', refrescarPorCambioDePersonaje);
+        document.getElementById('activeCharSelect')?.addEventListener('change', () => setTimeout(refrescarPorCambioDePersonaje, 30));
 
         actualizarBadge();
         renderLista();
