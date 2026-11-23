@@ -58,11 +58,6 @@
             border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
         }
         html[data-theme="light"] .user-menu select { background: #fff; color: #150A24; }
-        .btn-cuenta-maestra {
-            border: 1px solid var(--acento); padding: 6px 12px; border-radius: 8px;
-            color: var(--acento) !important; font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px; font-weight: 700; text-decoration: none;
-        }
         .btn-auth-link {
             background: var(--acento); color: #150A24 !important;
             padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
@@ -115,6 +110,69 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
+        /* Switch IC / OC */
+        .mode-switch-group {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--borde);
+            border-radius: 999px;
+            padding: 2px;
+            gap: 2px;
+        }
+        .mode-btn {
+            border: none;
+            background: transparent;
+            color: var(--texto);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s;
+        }
+        .mode-btn.active.ic {
+            background: var(--acento);
+            color: #150A24;
+        }
+        .mode-btn.active.oc {
+            background: var(--bg-secundario);
+            color: #EDE7E0;
+        }
+        .mode-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+        }
+        .mode-badge.ic {
+            background: rgba(45, 212, 196, 0.18);
+            color: var(--acento);
+            border: 1px solid rgba(45, 212, 196, 0.45);
+        }
+        .mode-badge.oc {
+            background: rgba(108, 60, 224, 0.25);
+            color: #c4b0ff;
+            border: 1px solid rgba(108, 60, 224, 0.55);
+        }
+
+        /* Llama SVG animada para Kix / Kixiz */
+        @keyframes kixFlamePulse {
+            0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 2px rgba(255, 138, 43, 0.45)); }
+            50% { transform: scale(1.13) translateY(-1px); filter: drop-shadow(0 0 7px rgba(255, 102, 51, 0.85)); }
+        }
+        .kix-flame-svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+        .action-btn.liked .kix-flame-svg {
+            animation: kixFlamePulse 1.15s ease-in-out infinite;
+        }
+
         .btn-primary {
             background: var(--acento); color: #150A24; border: none;
             border-radius: 10px; padding: 9px 18px;
@@ -124,12 +182,14 @@
             background: var(--tarjeta); border: 1px solid var(--borde);
             border-radius: 16px; padding: 16px 18px;
             display: flex; flex-direction: column; gap: 10px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
+        .post-card:hover { border-color: rgba(45, 212, 196, 0.45); }
         .post-card.pinned-kixuz {
             border: 1.5px solid var(--acento);
             background: linear-gradient(135deg, rgba(108, 60, 224, 0.28), rgba(45, 212, 196, 0.12));
         }
-        .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .post-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
         .post-tag-link {
             font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
             text-decoration: none; background: rgba(108, 60, 224, 0.24);
@@ -140,9 +200,15 @@
             object-fit: contain; background: rgba(0, 0, 0, 0.22);
         }
         .action-btn {
+            display: inline-flex; align-items: center; gap: 6px;
             background: rgba(108, 60, 224, 0.18); border: 1px solid var(--borde);
             color: var(--texto); border-radius: 8px; padding: 5px 11px;
             font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .action-btn.liked {
+            border-color: #ff7b39;
+            background: rgba(255, 123, 57, 0.16);
+            color: #ffa672;
         }
     </style>
 </head>
@@ -160,7 +226,6 @@
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="cuenta-maestra.html" class="btn-cuenta-maestra">Cuenta Maestra</a>
             <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
         </div>
     </header>
@@ -169,7 +234,14 @@
         <section id="kixuzAnnouncementSlot"></section>
 
         <section class="card-box">
-            <h2 style="font-size:17px; margin-bottom:8px;">Nueva publicación</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                <h2 style="font-size:17px;">Nueva publicación</h2>
+                <div class="mode-switch-group" role="group" aria-label="Modo de publicación IC u OC">
+                    <button type="button" class="mode-btn ic active" id="postModeIC" data-mode="IC">IC</button>
+                    <button type="button" class="mode-btn oc" id="postModeOC" data-mode="OC">OC</button>
+                </div>
+            </div>
+
             <textarea id="postInput" placeholder="Escribe una escena, diálogo o crónica..."></textarea>
 
             <div class="post-options-grid">
@@ -199,9 +271,16 @@
 
     <script>
         const POSTS_STORAGE_KEY = 'kixuz_posts_v1';
+        const SVG_FLAME = `
+            <svg class="kix-flame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2.5c2.5 3.4 5.5 5.6 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.6 1.2-4.6 2.8-6.4-.2 1.8.6 3.1 1.7 3.5-.3-2.5.4-5.2 1-7.3z"></path>
+            </svg>
+        `;
+
         let postsCache = [];
         let likedPosts = new Set();
         let adjuntoDataUrl = '';
+        let postModoActual = 'IC';
 
         const esc = s => String(s || '')
             .replace(/&/g, '&amp;')
@@ -214,16 +293,29 @@
             return s ? '@' + s : '';
         };
 
+        function setPostModo(modo) {
+            postModoActual = modo === 'OC' ? 'OC' : 'IC';
+            document.getElementById('postModeIC')?.classList.toggle('active', postModoActual === 'IC');
+            document.getElementById('postModeOC')?.classList.toggle('active', postModoActual === 'OC');
+        }
+
+        document.getElementById('postModeIC')?.addEventListener('click', () => setPostModo('IC'));
+        document.getElementById('postModeOC')?.addEventListener('click', () => setPostModo('OC'));
+
         function obtenerAutorActual() {
+            if (postModoActual === 'OC') {
+                const apodo = window.KIXUZ_DB?.perfilCuenta?.apodo || window.KIXUZ_DB?.usuarioActual?.email?.split('@')[0] || 'Usuario OC';
+                return { nombre: apodo, handle: '@oc', modo: 'OC' };
+            }
             const ac = window.KIXUZ_ACTIVE_CHAR;
             if (ac && !ac.esPlaceholder && ac.handle) {
-                return { nombre: ac.nombre || ac.handle.replace(/^@/, ''), handle: normH(ac.handle) };
+                return { nombre: ac.nombre || ac.handle.replace(/^@/, ''), handle: normH(ac.handle), modo: 'IC' };
             }
             try {
                 const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                if (act?.handle) return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normH(act.handle) };
+                if (act?.handle) return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normH(act.handle), modo: 'IC' };
             } catch {}
-            return { nombre: 'Personaje', handle: '@rol' };
+            return { nombre: 'Personaje', handle: '@rol', modo: 'IC' };
         }
 
         function poblarUniversosEnPost() {
@@ -252,8 +344,7 @@
         }
 
         function cargarPostsLocales() {
-            let p1 = [];
-            let p2 = [];
+            let p1 = [], p2 = [];
             try { p1 = JSON.parse(localStorage.getItem(POSTS_STORAGE_KEY) || '[]'); } catch {}
             try { p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
 
@@ -261,6 +352,7 @@
                 id: item.id || ('legacy_' + idx),
                 autorNombre: item.author || item.autorNombre || 'Personaje',
                 autorHandle: normH(item.handle || item.autorHandle || '@rol'),
+                modo: item.modo === 'OC' ? 'OC' : 'IC',
                 contenido: item.text || item.contenido || '',
                 imagen: item.imagen || '',
                 universo: item.universe || item.universo || '',
@@ -268,13 +360,13 @@
                 alcanceValor: item.familiaClanTag || item.alcanceValor || '',
                 createdAtMs: item.createdAtMs || (Date.now() - idx * 60000),
                 kixiz: Number(item.kix ?? item.kixiz ?? 0),
-                respuestas: item.respuestas || (item.comments || []).map(c => ({ autorNombre: c.author, autorHandle: c.author, texto: c.text })),
+                respuestas: item.respuestas || (item.comments || []).map(c => ({ autorNombre: c.author, autorHandle: c.author, modo: c.modo || 'IC', texto: c.text })),
                 tiempo: item.time || item.tiempo || 'Reciente'
             }));
 
             const mapa = new Map();
             [...(Array.isArray(p1) ? p1 : []), ...normalizadosP2].forEach(p => {
-                if (p && p.id) mapa.set(String(p.id), p);
+                if (p && p.id) mapa.set(String(p.id), { ...p, modo: p.modo === 'OC' ? 'OC' : 'IC' });
             });
             return Array.from(mapa.values());
         }
@@ -350,19 +442,22 @@
             visibles.forEach(p => {
                 const count = Number(p.kixiz || 0);
                 const labelKix = count === 1 ? 'Kix' : 'Kixiz';
+                const isLiked = likedPosts.has(String(p.id));
                 const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
                 const uniTag = String(p.universo || '').trim();
                 const scope = p.alcanceTipo || 'global';
                 const famClanVal = String(p.alcanceValor || '').trim();
+                const modoPost = p.modo === 'OC' ? 'OC' : 'IC';
 
                 const card = document.createElement('article');
                 card.className = 'post-card';
                 card.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                        <div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <a href="perfil.html?char=${encodeURIComponent(p.autorHandle || '')}" style="text-decoration:none;color:var(--acento);font-weight:700;">
                                 ${esc(p.autorNombre || 'Personaje')} <span style="opacity:0.75;font-size:12px;">(${esc(p.autorHandle || '')})</span>
                             </a>
+                            <span class="mode-badge ${modoPost === 'OC' ? 'oc' : 'ic'}">${modoPost}</span>
                         </div>
                         <span style="opacity:0.65;font-size:12px;">${esc(p.tiempo || 'Reciente')}</span>
                     </div>
@@ -373,22 +468,40 @@
                     <p style="white-space:pre-wrap;font-size:14px;">${esc(p.contenido || '')}</p>
                     ${p.imagen ? `<img src="${esc(p.imagen)}" alt="Adjunto" class="post-img">` : ''}
                     <div style="display:flex;gap:8px;align-items:center;">
-                        <button type="button" class="action-btn" data-kix-id="${esc(p.id)}">${esc(labelKix)} (${count})</button>
+                        <button type="button" class="action-btn ${isLiked ? 'liked' : ''}" data-kix-id="${esc(p.id)}">${SVG_FLAME}<span>${esc(labelKix)} (${count})</span></button>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:6px;">
-                        ${respuestas.map(r => `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;"><strong>${esc(r.autorNombre || r.autorHandle)}:</strong> ${esc(r.texto)}</div>`).join('')}
-                        <form class="comment-form" style="display:flex;gap:6px;margin-top:4px;">
-                            <input type="text" placeholder="Responder..." style="padding:7px 10px;font-size:12.5px;">
+                        ${respuestas.map(r => {
+                            const rModo = r.modo === 'OC' ? 'OC' : 'IC';
+                            return `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;"><span><strong>${esc(r.autorNombre || r.autorHandle)}:</strong> ${esc(r.texto)}</span><span class="mode-badge ${rModo === 'OC' ? 'oc' : 'ic'}">${rModo}</span></div>`;
+                        }).join('')}
+                        <form class="comment-form" style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">
+                            <input type="text" placeholder="Responder..." style="flex:1;min-width:160px;padding:7px 10px;font-size:12.5px;">
+                            <div class="mode-switch-group" data-comment-mode="IC">
+                                <button type="button" class="mode-btn ic active" data-cmode="IC">IC</button>
+                                <button type="button" class="mode-btn oc" data-cmode="OC">OC</button>
+                            </div>
                             <button type="submit" class="action-btn">Responder</button>
                         </form>
                     </div>
                 `;
 
+                const cForm = card.querySelector('.comment-form');
+                const cSwitch = cForm.querySelector('.mode-switch-group');
+                cSwitch.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const m = btn.dataset.cmode;
+                        cSwitch.dataset.commentMode = m;
+                        cSwitch.querySelector('[data-cmode="IC"]').classList.toggle('active', m === 'IC');
+                        cSwitch.querySelector('[data-cmode="OC"]').classList.toggle('active', m === 'OC');
+                    });
+                });
+
                 card.querySelector('[data-kix-id]').addEventListener('click', async () => {
                     const idStr = String(p.id);
-                    const isLiked = likedPosts.has(idStr);
-                    const delta = isLiked ? -1 : 1;
-                    if (isLiked) likedPosts.delete(idStr);
+                    const yaLiked = likedPosts.has(idStr);
+                    const delta = yaLiked ? -1 : 1;
+                    if (yaLiked) likedPosts.delete(idStr);
                     else likedPosts.add(idStr);
                     p.kixiz = Math.max(0, Number(p.kixiz || 0) + delta);
                     guardarPostsLocales(postsCache);
@@ -398,13 +511,16 @@
                     }
                 });
 
-                card.querySelector('.comment-form').addEventListener('submit', async e => {
+                cForm.addEventListener('submit', async e => {
                     e.preventDefault();
                     const inp = e.target.querySelector('input');
                     const texto = (inp.value || '').trim();
                     if (!texto) return;
-                    const autor = obtenerAutorActual();
-                    const resp = { autorNombre: autor.nombre, autorHandle: autor.handle, texto };
+                    const cModo = cSwitch.dataset.commentMode === 'OC' ? 'OC' : 'IC';
+                    const autor = cModo === 'OC'
+                        ? { nombre: window.KIXUZ_DB?.perfilCuenta?.apodo || 'Usuario OC', handle: '@oc' }
+                        : obtenerAutorActual();
+                    const resp = { autorNombre: autor.nombre, autorHandle: autor.handle, modo: cModo, texto };
                     p.respuestas = Array.isArray(p.respuestas) ? [...p.respuestas, resp] : [resp];
                     inp.value = '';
                     guardarPostsLocales(postsCache);
@@ -443,6 +559,7 @@
                 id: 'post_' + ahoraMs,
                 autorNombre: autor.nombre,
                 autorHandle: autor.handle,
+                modo: postModoActual,
                 contenido,
                 imagen: adjuntoDataUrl,
                 universo,

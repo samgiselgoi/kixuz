@@ -1,386 +1,719 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es">
 <head>
-  <title>KIXUZ — Familia y Clan</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #150A24;
-      --card: #1F1135;
-      --card-2: #281644;
-      --border: rgba(108, 60, 224, 0.35);
-      --primary: #6C3CE0;
-      --accent: #2DD4C4;
-      --texto: #EDE7E0;
-      --muted: rgba(237, 231, 224, 0.65);
-    }
-    html[data-theme="light"] {
-      --bg: #F5F2FA;
-      --card: #FFFFFF;
-      --card-2: #EFE9FA;
-      --border: rgba(108, 60, 224, 0.25);
-      --texto: #150A24;
-      --muted: rgba(21, 10, 36, 0.65);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--texto);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      transition: background 0.25s, color 0.25s;
-    }
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(21, 10, 36, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 12px 26px;
-    }
-    html[data-theme="light"] header {
-      background: rgba(255, 255, 255, 0.92);
-    }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--texto);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.04em;
-      flex-shrink: 0;
-    }
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #150A24;
-      font-weight: 800;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .char-select {
-      height: 38px;
-      padding: 0 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--texto);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
-    }
-    .container {
-      max-width: 1040px;
-      margin: 26px auto;
-      padding: 0 18px 60px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 18px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 38px;
-      padding: 0 16px;
-      border-radius: 10px;
-      border: none;
-      background: var(--primary);
-      color: #EDE7E0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 13.5px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s, opacity 0.2s;
-    }
-    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-accent { background: var(--accent); color: #150A24; }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--texto);
-    }
-    .input, .textarea, .select {
-      width: 100%;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--texto);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      outline: none;
-    }
-    .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(108, 60, 224, 0.24);
-      border: 1px solid var(--border);
-      color: var(--accent);
-    }
-    .post-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-    .post-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .post-author {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .avatar-circle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      color: #150A24;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-    }
-    .post-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-    }
-    .action-chip {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      color: var(--texto);
-      border-radius: 999px;
-      padding: 5px 12px;
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .action-chip.liked {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .comments-box {
-      margin-top: 10px;
-      padding-left: 12px;
-      border-left: 2px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .comment-item {
-      font-size: 13px;
-      background: var(--card-2);
-      padding: 7px 10px;
-      border-radius: 8px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Familia y Clanes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(34, 17, 61, 0.88);
+            --borde: rgba(108, 60, 224, 0.45);
+        }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --bg-secundario: #6C3CE0;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.94);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        header {
+            background: rgba(21, 10, 36, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        html[data-theme="light"] header { background: rgba(244, 241, 250, 0.92); }
+        .logo { display: inline-flex; align-items: center; text-decoration: none; }
+        .nav-links { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--texto); text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px;
+            padding: 6px 10px; border-radius: 8px;
+        }
+        .nav-links a:hover, .nav-links a.active { background: rgba(108, 60, 224, 0.25); color: var(--acento); }
+        .user-menu { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .user-menu select {
+            background: rgba(0, 0, 0, 0.35); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+        }
+        html[data-theme="light"] .user-menu select { background: #fff; color: #150A24; }
+        .btn-auth-link {
+            background: var(--acento); color: #150A24 !important;
+            padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 700; text-decoration: none;
+        }
+
+        main {
+            max-width: 1020px;
+            margin: 28px auto 90px;
+            padding: 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
+
+        .tabs-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+        .tab-btn {
+            background: rgba(108, 60, 224, 0.2); border: 1px solid var(--borde);
+            color: var(--texto); padding: 8px 16px; border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        input, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.34);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+        }
+        html[data-theme="light"] input, html[data-theme="light"] select { background: #fff; color: #150A24; }
+
+        .btn-accent {
+            background: var(--acento); color: #150A24; border: none;
+            border-radius: 10px; padding: 9px 15px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
+        }
+        .btn-ghost {
+            background: rgba(108, 60, 224, 0.22); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 11px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer;
+        }
+        .btn-danger {
+            background: rgba(224, 60, 108, 0.18); color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5); border-radius: 8px; padding: 6px 11px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+
+        /* Tarjetas de miembros y generaciones */
+        .gen-block {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(108, 60, 224, 0.3);
+        }
+        .gen-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 12px;
+        }
+        .member-card {
+            background: rgba(21, 10, 36, 0.72);
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.22s ease, border-color 0.22s ease;
+        }
+        html[data-theme="light"] .member-card { background: #F9F7FD; }
+        .member-card:hover { transform: translateY(-3px); border-color: var(--acento); }
+        .member-link {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--acento);
+            text-decoration: none;
+        }
+        .member-link:hover { text-decoration: underline; }
+        .pill-rol {
+            display: inline-block;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(108, 60, 224, 0.26);
+            color: var(--texto);
+            width: fit-content;
+        }
+        .req-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(45, 212, 196, 0.1);
+            border: 1px solid var(--acento);
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <a href="index.html" class="brand" aria-label="KIXUZ Inicio">
-      <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;">
-    </a>
-    <nav class="nav-links" aria-label="Navegación principal">
-      <a href="index.html" title="Inicio">Inicio</a>
-      <a href="perfil.html" title="Mi Personaje">Mi Personaje</a>
-      <a href="universo.html">Universos</a>
-      <a href="familia.html">Familia / Clan</a>
-    </nav>
-    <div class="user-menu">
-      <select id="activeCharSelect" class="char-select" aria-label="Personaje activo">
-        <option value="@theo">Theo Kwon (@theo)</option>
-        <option value="@cypher">Cypher (@cypher)</option>
-        <option value="@elara_vance">Elara Vance (@elara_vance)</option>
-        <option value="@liam_miller">Liam Miller (@liam_miller)</option>
-      </select>
-      <a href="registro.html" class="btn btn-accent">Entrar</a>
-    </div>
-  </header>
-  <main class="container">
-    <section class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div>
-          <h1 style="font-family:'Space Grotesk',sans-serif;font-size:22px;">Árbol Familiar & Jerarquía del Clan</h1>
-          <p style="color:var(--muted);font-size:14px;margin-top:4px;">Gestiona lazos de sangre, alianzas y rangos entre personajes.</p>
+    <header>
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px;">
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="perfil.html">Mi Perfil</a>
+            <a href="universo.html">Universos</a>
+            <a href="familia.html" class="active">Familia / Clan</a>
+            <a href="crear-personaje.html">+ Personaje</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button type="button" class="btn" id="tabFamiliaBtn">Árbol Familiar</button>
-          <button type="button" class="btn btn-ghost" id="tabClanBtn">Jerarquía del Clan</button>
-        </div>
-      </div>
-    </section>
+    </header>
 
-    <section class="card">
-      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:12px;">Nuevo vínculo / rango</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
-        <input id="relTarget" class="input" placeholder="@usuario vinculado (ej. @cypher)" />
-        <input id="relLabel" class="input" placeholder="Vínculo o rango (ej. Hermano, Comandante)" />
-        <button id="addRelBtn" type="button" class="btn btn-accent">Guardar vínculo</button>
-      </div>
-    </section>
-
-    <section id="relList"></section>
-  </main>
-
-  <script>
-    let vistaActual = 'familia';
-    const defaultRels = [
-      { id: 'r1', tipo: 'familia', origen: '@theo', destino: '@elara_vance', rol: 'Aliada jurada' },
-      { id: 'r2', tipo: 'clan', origen: '@theo', destino: '@cypher', rol: 'Estratega de Red' }
-    ];
-
-    function getRels() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('kixuz_relaciones') || 'null');
-        return Array.isArray(saved) && saved.length ? saved : defaultRels;
-      } catch(e) { return defaultRels; }
-    }
-
-    function saveRels(list) {
-      localStorage.setItem('kixuz_relaciones', JSON.stringify(list));
-    }
-
-    function renderRels() {
-      const list = getRels().filter(r => r.tipo === vistaActual);
-      const container = document.getElementById('relList');
-      container.innerHTML = list.length
-        ? list.map(r => `
-          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <div>
-              <strong style="font-family:'Space Grotesk',sans-serif;">${r.origen} ↔ ${r.destino}</strong>
-              <div style="margin-top:4px;"><span class="badge">${r.rol}</span></div>
+    <main>
+        <section class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                    <h1 id="famPageTitle" style="font-size:22px;">Familia y Clanes</h1>
+                    <p id="famPageSub" style="font-size:13.5px;opacity:0.78;margin-top:4px;">Una única familia con generaciones enlazadas y todos los clanes que desees.</p>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" class="btn-ghost" id="addGenBtn">+ Nueva Generación</button>
+                </div>
             </div>
-            <button type="button" class="btn btn-ghost" onclick="deleteRel('${r.id}')">Eliminar</button>
-          </div>
-        `).join('')
-        : `<div class="card" style="color:var(--muted);">No hay vínculos registrados en esta pestaña.</div>`;
-    }
 
-    window.deleteRel = function(id) {
-      saveRels(getRels().filter(r => r.id !== id));
-      renderRels();
-    };
+            <div class="tabs-row">
+                <button type="button" class="tab-btn active" id="tabFamilia">Familia (Única)</button>
+                <button type="button" class="tab-btn" id="tabClanes">Clanes</button>
+            </div>
+        </section>
 
-    document.getElementById('tabFamiliaBtn').addEventListener('click', () => {
-      vistaActual = 'familia';
-      document.getElementById('tabFamiliaBtn').className = 'btn';
-      document.getElementById('tabClanBtn').className = 'btn btn-ghost';
-      renderRels();
-    });
+        <!-- Solicitudes dirigidas exclusivamente al destinatario -->
+        <section class="panel" id="inboxRequestsPanel" style="display:none;">
+            <h2 style="font-size:16px;">Solicitudes recibidas</h2>
+            <div id="inboxRequestsList"></div>
+        </section>
 
-    document.getElementById('tabClanBtn').addEventListener('click', () => {
-      vistaActual = 'clan';
-      document.getElementById('tabClanBtn').className = 'btn';
-      document.getElementById('tabFamiliaBtn').className = 'btn btn-ghost';
-      renderRels();
-    });
+        <!-- Vista Familia -->
+        <section id="viewFamilia">
+            <div class="panel">
+                <h2 style="font-size:17px;">Agregar miembro a la Familia</h2>
+                <form id="addFamilyForm" class="form-grid">
+                    <input type="text" id="famNombre" placeholder="Nombre del miembro" required>
+                    <input type="text" id="famHandle" placeholder="@usuario (ej. @kaelen)" required>
+                    <select id="famRelacion" aria-label="Parentesco">
+                        <option value="Madre">Madre</option>
+                        <option value="Padre">Padre</option>
+                        <option value="Hijo/a">Hijo/a</option>
+                        <option value="Hermano/a">Hermano/a</option>
+                        <option value="Abuelo/a">Abuelo/a</option>
+                        <option value="Pareja">Pareja</option>
+                    </select>
+                    <select id="famGenSelect" aria-label="Generación"></select>
+                    <select id="famEnvioModo" aria-label="Agregar directo o enviar solicitud">
+                        <option value="directo">Agregar directo a mi ficha</option>
+                        <option value="solicitud">Enviar solicitud al @usuario</option>
+                    </select>
+                    <button type="submit" class="btn-accent">Guardar en Familia</button>
+                </form>
+            </div>
 
-    document.getElementById('addRelBtn').addEventListener('click', () => {
-      const destino = document.getElementById('relTarget').value.trim();
-      const rol = document.getElementById('relLabel').value.trim();
-      if (!destino || !rol) return;
-      const origen = document.getElementById('activeCharSelect').value;
-      const list = getRels();
-      list.unshift({ id: 'r_' + Date.now(), tipo: vistaActual, origen, destino, rol });
-      saveRels(list);
-      document.getElementById('relTarget').value = '';
-      document.getElementById('relLabel').value = '';
-      renderRels();
-    });
+            <div id="familiaGenerationsContainer"></div>
+        </section>
 
-    renderRels();
-  </script>
-  <script>
-    (function() {
-      const sel = document.getElementById('activeCharSelect');
-      if (!sel) return;
-      try {
-        const extra = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-        extra.forEach(p => {
-          if (p && p.handle && !Array.from(sel.options).some(o => o.value === p.handle)) {
-            const opt = document.createElement('option');
-            opt.value = p.handle;
-            opt.textContent = `${p.nombre} (${p.handle})`;
-            sel.appendChild(opt);
-          }
-        });
-      } catch(e) {}
-      const saved = localStorage.getItem('kixuz_active_char');
-      if (saved && Array.from(sel.options).some(o => o.value === saved)) {
-        sel.value = saved;
-      }
-      function syncBadge() {
-        const badge = document.getElementById('postingAsBadge');
-        if (badge) {
-          const opt = sel.options[sel.selectedIndex];
-          badge.textContent = `Publicando como ${opt ? opt.textContent : sel.value}`;
-        }
-      }
-      syncBadge();
-      sel.addEventListener('change', () => {
-        localStorage.setItem('kixuz_active_char', sel.value);
-        syncBadge();
-        window.dispatchEvent(new CustomEvent('kixuz:charChanged', { detail: sel.value }));
-      });
-    })();
-  </script>
-  <script src="theme.js"></script>
-  <script src="buscador-global.js"></script>
-  <script src="navbar-ui.js"></script>
-  <script src="notificaciones.js"></script>
-  <script src="chat.js"></script>
-  <script src="characters.js"></script>
+        <!-- Vista Clanes -->
+        <section id="viewClanes" style="display:none;">
+            <div class="panel">
+                <h2 style="font-size:17px;">Agregar miembro a un Clan</h2>
+                <form id="addClanForm" class="form-grid">
+                    <input type="text" id="clanNombreClan" placeholder="Nombre del Clan (ej. Clan Eclipse)" required>
+                    <input type="text" id="clanMiembroNombre" placeholder="Nombre del personaje" required>
+                    <input type="text" id="clanMiembroHandle" placeholder="@usuario" required>
+                    <input type="text" id="clanRango" placeholder="Rango o rol (ej. Líder, Guardia)">
+                    <select id="clanEnvioModo" aria-label="Agregar directo o enviar solicitud">
+                        <option value="directo">Agregar directo al Clan</option>
+                        <option value="solicitud">Enviar solicitud al @usuario</option>
+                    </select>
+                    <button type="submit" class="btn-accent">Guardar en Clan</button>
+                </form>
+            </div>
+
+            <div id="clanesCardsContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const KEY_FAM_CLAN = 'kixuz_familia_clan_v1';
+            const KEY_SOLICITUDES = 'kixuz_solicitudes_vinculo_v1';
+
+            const esc = s => String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+            const normH = h => {
+                const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            const RELACION_RECIPROCA = {
+                'madre': 'Hijo/a',
+                'padre': 'Hijo/a',
+                'hijo/a': 'Madre / Padre',
+                'hijo': 'Madre / Padre',
+                'hija': 'Madre / Padre',
+                'hermano/a': 'Hermano/a',
+                'hermano': 'Hermano/a',
+                'hermana': 'Hermana / Hermano',
+                'abuelo/a': 'Nieto/a',
+                'nieto/a': 'Abuelo/a',
+                'pareja': 'Pareja'
+            };
+
+            function getRelacionReciproca(rel) {
+                const key = String(rel || '').trim().toLowerCase();
+                return RELACION_RECIPROCA[key] || (rel || 'Vínculo familiar');
+            }
+
+            function getDuenoActual() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('char')) return normH(params.get('char'));
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                if (ac && !ac.esPlaceholder && ac.handle) return normH(ac.handle);
+                try {
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act?.handle) return normH(act.handle);
+                } catch {}
+                return '@rol';
+            }
+
+            function leerEstado() {
+                try {
+                    const raw = JSON.parse(localStorage.getItem(KEY_FAM_CLAN) || '{}');
+                    const gens = Array.isArray(raw.generaciones) && raw.generaciones.length
+                        ? raw.generaciones
+                        : [
+                            { id: 'gen_1', titulo: '1.ª Generación (Ancestros / Abuelos)' },
+                            { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
+                            { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
+                        ];
+                    return {
+                        generaciones: gens,
+                        familia: Array.isArray(raw.familia) ? raw.familia : [],
+                        clan: Array.isArray(raw.clan) ? raw.clan : []
+                    };
+                } catch {
+                    return {
+                        generaciones: [
+                            { id: 'gen_1', titulo: '1.ª Generación (Ancestros / Abuelos)' },
+                            { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
+                            { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
+                        ],
+                        familia: [],
+                        clan: []
+                    };
+                }
+            }
+
+            function guardarEstado(st) {
+                try { localStorage.setItem(KEY_FAM_CLAN, JSON.stringify(st)); } catch {}
+            }
+
+            function leerSolicitudes() {
+                try {
+                    const arr = JSON.parse(localStorage.getItem(KEY_SOLICITUDES) || '[]');
+                    return Array.isArray(arr) ? arr : [];
+                } catch { return []; }
+            }
+
+            function guardarSolicitudes(arr) {
+                try { localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(arr)); } catch {}
+            }
+
+            function agregarVinculoReciproco(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId }) {
+                const owner = normH(duenoHandle);
+                const target = normH(destinoHandle);
+                if (!owner || !target) return;
+
+                if (categoria === 'familia') {
+                    const gId = genId || st.generaciones[1]?.id || st.generaciones[0]?.id || 'gen_2';
+                    st.familia.push({
+                        id: 'fam_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                        duenoHandle: owner,
+                        nombre: destinoNombre || target.replace(/^@/, ''),
+                        handle: target,
+                        relacion: relacion || 'Familiar',
+                        genId: gId
+                    });
+
+                    // Reciprocidad: en el perfil del destino queda registrado el vínculo inverso hacia el dueño
+                    const ownerNombre = owner.replace(/^@/, '');
+                    const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
+                    st.familia.push({
+                        id: 'fam_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                        duenoHandle: target,
+                        nombre: ownerNombre,
+                        handle: owner,
+                        relacion: getRelacionReciproca(relacion),
+                        genId: genInversa
+                    });
+                } else {
+                    const cNom = (clanNombre || 'Clan').trim();
+                    st.clan.push({
+                        id: 'clan_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                        duenoHandle: owner,
+                        clanNombre: cNom,
+                        nombre: destinoNombre || target.replace(/^@/, ''),
+                        handle: target,
+                        rango: relacion || 'Miembro'
+                    });
+                    st.clan.push({
+                        id: 'clan_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                        duenoHandle: target,
+                        clanNombre: cNom,
+                        nombre: owner.replace(/^@/, ''),
+                        handle: owner,
+                        rango: relacion || 'Miembro'
+                    });
+                }
+            }
+
+            function poblarSelectorGeneraciones() {
+                const sel = document.getElementById('famGenSelect');
+                if (!sel) return;
+                const st = leerEstado();
+                sel.innerHTML = st.generaciones.map((g, idx) =>
+                    `<option value="${esc(g.id)}" ${idx === 1 ? 'selected' : ''}>${esc(g.titulo)}</option>`
+                ).join('');
+            }
+
+            function renderSolicitudes() {
+                const panel = document.getElementById('inboxRequestsPanel');
+                const listEl = document.getElementById('inboxRequestsList');
+                if (!panel || !listEl) return;
+
+                const actual = getDuenoActual();
+                // Solo ve las solicitudes enviadas explícitamente a este @usuario
+                const mias = leerSolicitudes().filter(s => s.estado === 'pendiente' && normH(s.paraHandle) === actual);
+
+                if (!mias.length) {
+                    panel.style.display = 'none';
+                    return;
+                }
+
+                panel.style.display = 'block';
+                listEl.innerHTML = mias.map(s => `
+                    <div class="req-card" data-req-id="${esc(s.id)}">
+                        <div>
+                            <strong style="color:var(--acento);">${esc(s.deHandle)}</strong> te envió solicitud para <strong>${s.categoria === 'clan' ? 'Clan (' + esc(s.clanNombre || '') + ')' : 'Familia'}</strong> como <strong>${esc(s.relacion || 'Vínculo')}</strong>.
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            <button type="button" class="btn-accent" data-accept-req="${esc(s.id)}">Aceptar</button>
+                            <button type="button" class="btn-danger" data-reject-req="${esc(s.id)}">Rechazar</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                listEl.querySelectorAll('[data-accept-req]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const reqId = btn.dataset.acceptReq;
+                        const all = leerSolicitudes();
+                        const req = all.find(x => String(x.id) === String(reqId));
+                        if (!req) return;
+                        req.estado = 'aceptada';
+                        guardarSolicitudes(all);
+
+                        const st = leerEstado();
+                        agregarVinculoReciproco(st, {
+                            categoria: req.categoria,
+                            duenoHandle: req.deHandle,
+                            destinoNombre: req.paraHandle.replace(/^@/, ''),
+                            destinoHandle: req.paraHandle,
+                            relacion: req.relacion,
+                            clanNombre: req.clanNombre,
+                            genId: req.genId
+                        });
+                        guardarEstado(st);
+                        renderAll();
+                    });
+                });
+
+                listEl.querySelectorAll('[data-reject-req]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const reqId = btn.dataset.rejectReq;
+                        const all = leerSolicitudes().map(x => String(x.id) === String(reqId) ? { ...x, estado: 'rechazada' } : x);
+                        guardarSolicitudes(all);
+                        renderSolicitudes();
+                    });
+                });
+            }
+
+            function renderFamilia() {
+                const container = document.getElementById('familiaGenerationsContainer');
+                if (!container) return;
+                const st = leerEstado();
+                const owner = getDuenoActual();
+                const miembrosOwner = st.familia.filter(m => normH(m.duenoHandle) === owner);
+
+                container.innerHTML = st.generaciones.map(gen => {
+                    const enGen = miembrosOwner.filter(m => (m.genId || 'gen_2') === gen.id);
+                    return `
+                        <div class="panel gen-block">
+                            <div class="gen-head">
+                                <h3 style="font-size:15.5px;">${esc(gen.titulo)}</h3>
+                                <span style="font-size:12px;opacity:0.72;">${enGen.length} ${enGen.length === 1 ? 'miembro' : 'miembros'}</span>
+                            </div>
+                            <div class="cards-grid">
+                                ${enGen.length
+                                    ? enGen.map(m => `
+                                        <div class="member-card">
+                                            <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="member-link">${esc(m.nombre)}</a>
+                                            <div style="font-size:12.5px;opacity:0.8;">${esc(m.handle)}</div>
+                                            <span class="pill-rol">${esc(m.relacion)}</span>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;">
+                                                <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="btn-ghost" style="text-decoration:none;">Ver perfil</a>
+                                                <button type="button" class="btn-danger" data-del-fam="${esc(m.id)}">Quitar</button>
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                    : `<p style="font-size:13px;opacity:0.68;">Sin integrantes en esta generación todavía.</p>`}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.querySelectorAll('[data-del-fam]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.delFam;
+                        const next = leerEstado();
+                        next.familia = next.familia.filter(x => String(x.id) !== String(id));
+                        guardarEstado(next);
+                        renderFamilia();
+                    });
+                });
+            }
+
+            function renderClanes() {
+                const container = document.getElementById('clanesCardsContainer');
+                if (!container) return;
+                const st = leerEstado();
+                const owner = getDuenoActual();
+                const misClanes = st.clan.filter(m => normH(m.duenoHandle) === owner);
+
+                const agrupados = new Map();
+                misClanes.forEach(m => {
+                    const nombreClan = m.clanNombre || 'Clan';
+                    if (!agrupados.has(nombreClan)) agrupados.set(nombreClan, []);
+                    agrupados.get(nombreClan).push(m);
+                });
+
+                if (!agrupados.size) {
+                    container.innerHTML = `<div class="panel" style="opacity:0.75;font-size:13.5px;">Aún no agregaste miembros a ningún clan.</div>`;
+                    return;
+                }
+
+                container.innerHTML = Array.from(agrupados.entries()).map(([nombreClan, lista]) => `
+                    <div class="panel gen-block">
+                        <div class="gen-head">
+                            <h3 style="font-size:16px;">${esc(nombreClan)}</h3>
+                            <span style="font-size:12px;opacity:0.72;">${lista.length} ${lista.length === 1 ? 'miembro' : 'miembros'}</span>
+                        </div>
+                        <div class="cards-grid">
+                            ${lista.map(m => `
+                                <div class="member-card">
+                                    <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="member-link">${esc(m.nombre)}</a>
+                                    <div style="font-size:12.5px;opacity:0.8;">${esc(m.handle)}</div>
+                                    <span class="pill-rol">${esc(m.rango || 'Miembro')}</span>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;">
+                                        <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="btn-ghost" style="text-decoration:none;">Ver perfil</a>
+                                        <button type="button" class="btn-danger" data-del-clan="${esc(m.id)}">Quitar</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                container.querySelectorAll('[data-del-clan]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.delClan;
+                        const next = leerEstado();
+                        next.clan = next.clan.filter(x => String(x.id) !== String(id));
+                        guardarEstado(next);
+                        renderClanes();
+                    });
+                });
+            }
+
+            function renderAll() {
+                poblarSelectorGeneraciones();
+                renderSolicitudes();
+                renderFamilia();
+                renderClanes();
+            }
+
+            // Pestañas Familia / Clanes
+            document.getElementById('tabFamilia').addEventListener('click', () => {
+                document.getElementById('tabFamilia').classList.add('active');
+                document.getElementById('tabClanes').classList.remove('active');
+                document.getElementById('viewFamilia').style.display = 'block';
+                document.getElementById('viewClanes').style.display = 'none';
+            });
+
+            document.getElementById('tabClanes').addEventListener('click', () => {
+                document.getElementById('tabClanes').classList.add('active');
+                document.getElementById('tabFamilia').classList.remove('active');
+                document.getElementById('viewClanes').style.display = 'block';
+                document.getElementById('viewFamilia').style.display = 'none';
+            });
+
+            if (window.location.hash === '#clan') {
+                document.getElementById('tabClanes').click();
+            }
+
+            // Agregar nueva generación adicional más allá de las 3 iniciales
+            document.getElementById('addGenBtn').addEventListener('click', () => {
+                const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación o Linaje Mayor):');
+                if (!titulo || !titulo.trim()) return;
+                const st = leerEstado();
+                st.generaciones.push({ id: 'gen_' + Date.now(), titulo: titulo.trim() });
+                guardarEstado(st);
+                renderAll();
+            });
+
+            // Guardar en Familia
+            document.getElementById('addFamilyForm').addEventListener('submit', e => {
+                e.preventDefault();
+                const nombre = document.getElementById('famNombre').value.trim();
+                const handle = normH(document.getElementById('famHandle').value);
+                const relacion = document.getElementById('famRelacion').value;
+                const genId = document.getElementById('famGenSelect').value;
+                const modoEnvio = document.getElementById('famEnvioModo').value;
+                const owner = getDuenoActual();
+                if (!nombre || !handle) return;
+
+                if (modoEnvio === 'solicitud') {
+                    const reqs = leerSolicitudes();
+                    reqs.unshift({
+                        id: 'req_' + Date.now(),
+                        categoria: 'familia',
+                        deHandle: owner,
+                        paraHandle: handle,
+                        relacion,
+                        genId,
+                        estado: 'pendiente'
+                    });
+                    guardarSolicitudes(reqs);
+                    alert(`Solicitud enviada a ${handle}. Solo ese usuario podrá verla y responderla.`);
+                } else {
+                    const st = leerEstado();
+                    agregarVinculoReciproco(st, {
+                        categoria: 'familia',
+                        duenoHandle: owner,
+                        destinoNombre: nombre,
+                        destinoHandle: handle,
+                        relacion,
+                        genId
+                    });
+                    guardarEstado(st);
+                }
+
+                e.target.reset();
+                renderAll();
+            });
+
+            // Guardar en Clan
+            document.getElementById('addClanForm').addEventListener('submit', e => {
+                e.preventDefault();
+                const clanNombre = document.getElementById('clanNombreClan').value.trim();
+                const nombre = document.getElementById('clanMiembroNombre').value.trim();
+                const handle = normH(document.getElementById('clanMiembroHandle').value);
+                const rango = document.getElementById('clanRango').value.trim() || 'Miembro';
+                const modoEnvio = document.getElementById('clanEnvioModo').value;
+                const owner = getDuenoActual();
+                if (!clanNombre || !nombre || !handle) return;
+
+                if (modoEnvio === 'solicitud') {
+                    const reqs = leerSolicitudes();
+                    reqs.unshift({
+                        id: 'req_' + Date.now(),
+                        categoria: 'clan',
+                        deHandle: owner,
+                        paraHandle: handle,
+                        clanNombre,
+                        relacion: rango,
+                        estado: 'pendiente'
+                    });
+                    guardarSolicitudes(reqs);
+                    alert(`Solicitud para ${clanNombre} enviada a ${handle}.`);
+                } else {
+                    const st = leerEstado();
+                    agregarVinculoReciproco(st, {
+                        categoria: 'clan',
+                        duenoHandle: owner,
+                        destinoNombre: nombre,
+                        destinoHandle: handle,
+                        relacion: rango,
+                        clanNombre
+                    });
+                    guardarEstado(st);
+                }
+
+                e.target.reset();
+                renderAll();
+            });
+
+            window.addEventListener('DOMContentLoaded', renderAll);
+            window.addEventListener('kixuz:personajes-actualizados', renderAll);
+        })();
+    </script>
+
+    <script src="chat.js"></script>
+    <script src="theme.js"></script>
+    <script src="characters.js"></script>
+    <script src="buscador-global.js"></script>
+    <script src="navbar-ui.js"></script>
+    <script src="notificaciones.js"></script>
+    <script src="amigos.js"></script>
+    <script type="module" src="firebase-config.js"></script>
 </body>
 </html>
