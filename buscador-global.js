@@ -1,159 +1,270 @@
 (() => {
     const style = document.createElement('style');
-    style.id = 'kixuz-search-styles';
+    style.id = 'kixuz-search-all-styles';
     style.textContent = `
         .kixuz-search-wrap {
-            position: relative; display: inline-flex; align-items: center; flex-shrink: 0; z-index: 9510;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
         }
         .kixuz-search-toggle {
-            width: 38px; height: 38px; border-radius: 10px;
-            border: 1px solid rgba(108, 60, 224, 0.45); background: rgba(108, 60, 224, 0.16);
-            color: var(--texto, #EDE7E0); display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s;
+            height: 36px;
+            padding: 0 11px;
+            border-radius: 10px;
+            border: 1px solid rgba(108, 60, 224, 0.45);
+            background: rgba(108, 60, 224, 0.16);
+            color: var(--texto, #EDE7E0);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
         }
-        .kixuz-search-toggle:hover, .kixuz-search-wrap.expanded .kixuz-search-toggle {
-            background: rgba(108, 60, 224, 0.34); border-color: var(--acento, #2DD4C4); color: var(--acento, #2DD4C4);
+        .kixuz-search-toggle:hover,
+        .kixuz-search-wrap.open .kixuz-search-toggle {
+            border-color: var(--acento, #2DD4C4);
+            color: var(--acento, #2DD4C4);
         }
-        .kixuz-search-popover {
-            display: none; position: absolute; top: calc(100% + 10px); right: 0; width: 335px;
-            max-width: calc(100vw - 24px); background: #1B0E30; border: 1px solid var(--acento, #2DD4C4);
-            border-radius: 14px; box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75); padding: 10px; z-index: 99999;
+        .kixuz-search-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 340px;
+            max-width: calc(100vw - 24px);
+            background: #1B0E30;
+            border: 1px solid var(--acento, #2DD4C4);
+            border-radius: 14px;
+            padding: 10px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.72);
+            z-index: 99999;
         }
-        .kixuz-search-wrap.expanded .kixuz-search-popover { display: block; }
-        html[data-theme="light"] .kixuz-search-popover { background: #FFFFFF; box-shadow: 0 14px 32px rgba(21, 10, 36, 0.18); }
-        .kixuz-search-box {
-            position: relative; display: flex; align-items: center; width: 100%; height: 38px;
-            background: rgba(12, 6, 22, 0.85); border: 1px solid rgba(108, 60, 224, 0.6);
-            border-radius: 999px; padding: 0 34px 0 14px;
+        .kixuz-search-wrap.open .kixuz-search-panel {
+            display: block;
         }
-        html[data-theme="light"] .kixuz-search-box { background: #F4F1FA; }
-        .kixuz-search-box:focus-within { border-color: var(--acento, #2DD4C4); }
+        html[data-theme="light"] .kixuz-search-panel {
+            background: #FFFFFF;
+            box-shadow: 0 14px 30px rgba(21, 10, 36, 0.18);
+        }
         .kixuz-search-input {
-            width: 100%; border: none; background: transparent; color: var(--texto, #EDE7E0);
-            font-family: 'Inter', sans-serif; font-size: 13.5px; outline: none;
+            width: 100%;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(108, 60, 224, 0.6);
+            background: rgba(12, 6, 22, 0.85);
+            color: var(--texto, #EDE7E0);
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            outline: none;
         }
-        html[data-theme="light"] .kixuz-search-input { color: #150A24; }
-        .kixuz-search-clear {
-            position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-            width: 22px; height: 22px; border-radius: 50%; border: none;
-            background: rgba(108, 60, 224, 0.35); color: var(--texto, #EDE7E0);
-            display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+        html[data-theme="light"] .kixuz-search-input {
+            background: #F4F1FA;
+            color: #150A24;
         }
-        .kixuz-search-clear.visible { display: flex; }
-        .kixuz-search-results {
-            margin-top: 8px; max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;
+        .kixuz-search-list {
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
-        .kixuz-res-item {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            padding: 8px 10px; border-radius: 9px; text-decoration: none !important;
-            color: var(--texto, #EDE7E0) !important; transition: background 0.18s;
+        .kixuz-search-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: var(--texto, #EDE7E0);
+            transition: background 0.16s ease;
         }
-        html[data-theme="light"] .kixuz-res-item { color: #150A24 !important; }
-        .kixuz-res-item:hover { background: rgba(108, 60, 224, 0.28); }
-        .kixuz-res-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; }
-        .kixuz-res-handle { font-size: 11.5px; color: var(--acento, #2DD4C4); font-weight: 600; }
-        .kixuz-res-badge {
-            font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-            background: rgba(108, 60, 224, 0.3); color: var(--texto, #EDE7E0); flex-shrink: 0;
+        html[data-theme="light"] .kixuz-search-row {
+            color: #150A24;
         }
-        html[data-theme="light"] .kixuz-res-badge { background: rgba(108, 60, 224, 0.12); color: #4C24B5; }
+        .kixuz-search-row:hover {
+            background: rgba(108, 60, 224, 0.28);
+        }
+        .kixuz-search-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .kixuz-search-sub {
+            font-size: 11.5px;
+            color: var(--acento, #2DD4C4);
+        }
+        .kixuz-search-tag {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(108, 60, 224, 0.3);
+            flex-shrink: 0;
+        }
     `;
-    if (!document.getElementById('kixuz-search-styles')) document.head.appendChild(style);
+    if (!document.getElementById('kixuz-search-all-styles')) {
+        document.head.appendChild(style);
+    }
 
-    const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const esc = s => String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
     const norm = s => String(s || '').trim().toLowerCase();
     const normHandle = h => {
         const s = norm(h).replace(/^@+/, '').replace(/\s+/g, '_');
         return s ? '@' + s : '';
     };
 
-    let catalogo = [];
+    let resultadosCache = [];
 
-    async function cargarCatalogo() {
-        const mapa = new Map();
-        const agregar = (p, etiqueta = 'Visitante') => {
+    async function construirIndice() {
+        const items = [];
+        const vistos = new Set();
+
+        const pushItem = (key, item) => {
+            if (!key || vistos.has(key)) return;
+            vistos.add(key);
+            items.push(item);
+        };
+
+        // 1. Personajes / usuarios (locales + públicos)
+        const charMap = new Map();
+        const addChar = (p, badge = 'Usuario') => {
             if (!p) return;
-            const nombre = String(p.nombre || p.autorNombre || p.author || p.apodo || '').trim();
             const handle = normHandle(p.handle || p.autorHandle || p.usuario || '');
+            const nombre = String(p.nombre || p.autorNombre || p.author || '').trim() || (handle ? handle.slice(1) : '');
             if (!nombre && !handle) return;
             const k = handle || norm(nombre);
-            const prev = mapa.get(k) || {};
-            mapa.set(k, {
-                nombre: nombre || prev.nombre || handle.replace(/^@/, ''),
-                handle: handle || prev.handle || ('@' + norm(nombre).replace(/\s+/g, '_')),
+            const prev = charMap.get(k) || {};
+            charMap.set(k, {
+                nombre: nombre || prev.nombre,
+                handle: handle || prev.handle,
                 clan: p.clan || prev.clan || '',
-                etiqueta: prev.etiqueta === 'Propio' ? 'Propio' : etiqueta,
-                url: `perfil.html?char=${encodeURIComponent(handle || prev.handle || ('@' + norm(nombre).replace(/\s+/g, '_')))}`
+                badge: prev.badge || badge
             });
         };
 
         try {
             const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-            if (Array.isArray(subs)) subs.forEach(p => agregar(p, 'Propio'));
-        } catch {}
-
-        try {
+            if (Array.isArray(subs)) subs.forEach(p => addChar(p, 'Personaje'));
             const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-            if (act) agregar(act, 'Propio');
+            if (act) addChar(act, 'Personaje');
+            const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+            const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+            [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(post => {
+                addChar({ nombre: post.autorNombre || post.author, handle: post.autorHandle || post.handle }, 'Usuario');
+            });
         } catch {}
 
-        try {
-            const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-            if (Array.isArray(fam.familia)) fam.familia.forEach(m => agregar({ nombre: m.nombre, handle: m.handle }, 'Visitante'));
-            if (Array.isArray(fam.clan)) fam.clan.forEach(m => agregar({ nombre: m.nombre, handle: m.handle, clan: m.clanNombre }, 'Visitante'));
-        } catch {}
-
-        try {
-            const posts = [
-                ...JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]'),
-                ...JSON.parse(localStorage.getItem('kixuz_posts') || '[]')
-            ];
-            posts.forEach(p => agregar(p, 'Visitante'));
-        } catch {}
-
-        // Personajes creados por otras cuentas maestras (Firestore / catálogo global)
         if (window.KIXUZ_DB?.listarPersonajesPublicos) {
             try {
                 const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
-                (pub || []).forEach(p => agregar(p, 'Otra Cuenta'));
-            } catch {}
-        }
-        if (window.KIXUZ_DB?.listarUsuariosPublicos) {
-            try {
-                const usrs = await window.KIXUZ_DB.listarUsuariosPublicos();
-                (usrs || []).forEach(u => agregar(u, 'Cuenta'));
+                (pub || []).forEach(p => addChar(p, 'Usuario'));
             } catch {}
         }
 
-        catalogo = Array.from(mapa.values());
+        charMap.forEach(c => {
+            pushItem(`char_${c.handle || norm(c.nombre)}`, {
+                tipo: 'char',
+                titulo: c.nombre,
+                subtitulo: `${c.handle}${c.clan ? ' · ' + c.clan : ''}`,
+                badge: c.badge,
+                url: `perfil.html?char=${encodeURIComponent(c.handle)}`
+            });
+        });
+
+        // 2. Familia / Clan
+        try {
+            const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+            (fam.familia || []).forEach(m => {
+                if (!m) return;
+                pushItem(`fam_${m.id || m.handle}_${m.relacion || ''}`, {
+                    tipo: 'familia',
+                    titulo: m.nombre || m.handle || 'Familia',
+                    subtitulo: `Familia · ${m.relacion || 'Vínculo'} (${m.handle || ''})`,
+                    badge: 'Familia',
+                    url: `familia.html?char=${encodeURIComponent(normHandle(m.duenoHandle || m.handle))}`
+                });
+            });
+            (fam.clan || []).forEach(m => {
+                if (!m) return;
+                const cNom = m.clanNombre || 'Clan';
+                pushItem(`clan_${m.id || cNom}_${m.handle || ''}`, {
+                    tipo: 'clan',
+                    titulo: `${cNom}${m.nombre ? ' · ' + m.nombre : ''}`,
+                    subtitulo: `${m.rango || 'Miembro'}${m.handle ? ' · ' + m.handle : ''}`,
+                    badge: 'Clan',
+                    url: `familia.html?char=${encodeURIComponent(normHandle(m.duenoHandle || m.handle))}#clan`
+                });
+            });
+        } catch {}
+
+        // 3. Universos
+        const uniSet = new Set(['#Kixuz']);
+        if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
+            try {
+                window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => {
+                    if (u?.tag) uniSet.add(u.tag.startsWith('#') ? u.tag : '#' + u.tag.replace(/^#+/, ''));
+                });
+            } catch {}
+        }
+        charMap.forEach(c => {
+            if (Array.isArray(c.universos)) {
+                c.universos.forEach(u => {
+                    if (u) uniSet.add(String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, ''));
+                });
+            }
+        });
+        try {
+            const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+            const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+            [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(post => {
+                const u = post.universo || post.universe || '';
+                if (u) uniSet.add(String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, ''));
+            });
+        } catch {}
+
+        uniSet.forEach(tag => {
+            const slug = tag.replace(/^#/, '');
+            pushItem(`uni_${slug.toLowerCase()}`, {
+                tipo: 'universo',
+                titulo: tag,
+                subtitulo: 'Explorar universo',
+                badge: 'Universo',
+                url: `universo.html?u=${encodeURIComponent(slug)}`
+            });
+        });
+
+        resultadosCache = items;
     }
 
-    function initBuscador() {
+    function initSearch() {
         const header = document.querySelector('header');
         if (!header || document.getElementById('kixuzSearchWrap')) return;
-
-        header.querySelectorAll('.kixuz-top-search-strip, .kixuz-inline-search-box').forEach(el => el.remove());
 
         const wrap = document.createElement('div');
         wrap.id = 'kixuzSearchWrap';
         wrap.className = 'kixuz-search-wrap';
         wrap.innerHTML = `
-            <button type="button" class="kixuz-search-toggle" id="kixuzSearchToggle" title="Buscar personajes y cuentas" aria-label="Buscar">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <button type="button" class="kixuz-search-toggle" id="kixuzSearchToggle" aria-label="Buscar">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="7"></circle>
                     <line x1="20" y1="20" x2="16.35" y2="16.35"></line>
                 </svg>
+                <span>Buscar</span>
             </button>
-            <div class="kixuz-search-popover" id="kixuzSearchPopover">
-                <div class="kixuz-search-box">
-                    <input type="text" class="kixuz-search-input" id="kixuzSearchInput" placeholder="Buscar personaje de cualquier cuenta..." autocomplete="off">
-                    <button type="button" class="kixuz-search-clear" id="kixuzSearchClear" aria-label="Limpiar">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="kixuz-search-results" id="kixuzSearchResults"></div>
+            <div class="kixuz-search-panel" id="kixuzSearchPanel">
+                <input type="text" class="kixuz-search-input" id="kixuzSearchInput" placeholder="Buscar @usuario, nombre, familia, clan, #universo..." autocomplete="off">
+                <div class="kixuz-search-list" id="kixuzSearchList"></div>
             </div>
         `;
 
@@ -163,70 +274,63 @@
 
         const toggle = document.getElementById('kixuzSearchToggle');
         const input = document.getElementById('kixuzSearchInput');
-        const clearBtn = document.getElementById('kixuzSearchClear');
-        const resultsBox = document.getElementById('kixuzSearchResults');
+        const listEl = document.getElementById('kixuzSearchList');
 
-        function renderResultados(q) {
-            const term = norm(q).replace(/^@+/, '');
-            clearBtn.classList.toggle('visible', q.trim().length > 0);
+        function render(q = '') {
+            const rawQ = String(q || '').trim();
+            const term = norm(rawQ).replace(/^@+/, '').replace(/^#+/, '');
 
-            const matches = term
-                ? catalogo.filter(item =>
-                    norm(item.nombre).includes(term) ||
-                    norm(item.handle).replace(/^@+/, '').includes(term) ||
-                    norm(item.clan).includes(term)
+            const filtrados = term
+                ? resultadosCache.filter(item =>
+                    norm(item.titulo).replace(/^[@#]+/, '').includes(term) ||
+                    norm(item.subtitulo).replace(/^[@#]+/, '').includes(term) ||
+                    norm(item.badge).includes(term)
                 )
-                : catalogo.slice(0, 10);
+                : resultadosCache.slice(0, 10);
 
-            let html = matches.slice(0, 10).map(item => `
-                <a href="${item.url}" class="kixuz-res-item">
+            let html = filtrados.slice(0, 10).map(item => `
+                <a href="${esc(item.url)}" class="kixuz-search-row">
                     <div>
-                        <div class="kixuz-res-name">${esc(item.nombre)}</div>
-                        <div class="kixuz-res-handle">${esc(item.handle)}${item.clan ? ' · ' + esc(item.clan) : ''}</div>
+                        <div class="kixuz-search-title">${esc(item.titulo)}</div>
+                        <div class="kixuz-search-sub">${esc(item.subtitulo)}</div>
                     </div>
-                    <span class="kixuz-res-badge">${esc(item.etiqueta)}</span>
+                    <span class="kixuz-search-tag">${esc(item.badge)}</span>
                 </a>
             `).join('');
 
-            const directH = term ? normHandle(q) : '';
-            if (directH && !matches.some(m => normHandle(m.handle) === directH)) {
+            const handleDirecto = normHandle(rawQ);
+            if (handleDirecto && !filtrados.some(f => norm(f.subtitulo).includes(handleDirecto))) {
                 html += `
-                    <a href="perfil.html?char=${encodeURIComponent(directH)}" class="kixuz-res-item">
+                    <a href="perfil.html?char=${encodeURIComponent(handleDirecto)}" class="kixuz-search-row">
                         <div>
-                            <div class="kixuz-res-name">Visitar ${esc(directH)}</div>
-                            <div class="kixuz-res-handle">Entrar al perfil como visitante</div>
+                            <div class="kixuz-search-title">Ir a ${esc(handleDirecto)}</div>
+                            <div class="kixuz-search-sub">Abrir ficha del usuario</div>
                         </div>
-                        <span class="kixuz-res-badge">Ir →</span>
+                        <span class="kixuz-search-tag">Perfil</span>
                     </a>
                 `;
             }
 
-            resultsBox.innerHTML = html || `<div style="padding:10px;font-size:12px;opacity:0.75;text-align:center;">Escribí un nombre o @usuario para visitar su perfil</div>`;
+            listEl.innerHTML = html || `<div style="padding:10px;font-size:12px;opacity:0.75;text-align:center;">Sin resultados para "${esc(rawQ)}"</div>`;
         }
 
-        toggle.addEventListener('click', async (e) => {
+        toggle.addEventListener('click', async e => {
             e.stopPropagation();
-            const abierto = wrap.classList.toggle('expanded');
-            if (abierto) {
-                await cargarCatalogo();
-                renderResultados(input.value);
-                setTimeout(() => input.focus(), 30);
+            const isOpen = wrap.classList.toggle('open');
+            if (isOpen) {
+                await construirIndice();
+                render(input.value);
+                setTimeout(() => input.focus(), 20);
             }
         });
 
-        input.addEventListener('input', () => renderResultados(input.value));
-        clearBtn.addEventListener('click', () => {
-            input.value = '';
-            renderResultados('');
-            input.focus();
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!wrap.contains(e.target)) wrap.classList.remove('expanded');
+        input.addEventListener('input', () => render(input.value));
+        document.addEventListener('click', e => {
+            if (!wrap.contains(e.target)) wrap.classList.remove('open');
         });
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBuscador);
-    else initBuscador();
-    window.addEventListener('load', initBuscador);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSearch);
+    else initSearch();
+    window.addEventListener('load', initSearch);
 })();
