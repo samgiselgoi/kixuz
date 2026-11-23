@@ -1,117 +1,419 @@
-(() => {
-    const STORAGE_LIST = 'kixuz_subpersonajes';
-    const STORAGE_ACTIVE = 'kixuz_personaje_activo';
-    const MASTER_VALUE = '__cuenta_maestra__';
-    const CREATE_VALUE = '__crear_personaje__';
-
-    const norm = v => String(v || '').trim().toLowerCase();
-    const normHandle = h => {
-        const s = norm(h).replace(/^@+/, '').replace(/\s+/g, '_');
-        return s ? '@' + s : '';
-    };
-
-    function leerPersonajes() {
-        try {
-            const raw = JSON.parse(localStorage.getItem(STORAGE_LIST) || '[]');
-            if (!Array.isArray(raw)) return [];
-            const mapa = new Map();
-            raw.forEach(p => {
-                if (!p) return;
-                const h = normHandle(p.handle || '');
-                const nom = String(p.nombre || '').trim();
-                if (!h && !nom) return;
-                const key = h || norm(nom);
-                mapa.set(key, { ...p, nombre: nom || h.slice(1), handle: h || ('@' + norm(nom).replace(/\s+/g, '_')) });
-            });
-            // Orden alfabético y numérico
-            return Array.from(mapa.values()).sort((a, b) =>
-                String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es', { numeric: true, sensitivity: 'base' })
-            );
-        } catch {
-            return [];
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Mi Cuenta Maestra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(34, 18, 58, 0.9);
+            --borde: rgba(108, 60, 224, 0.38);
         }
-    }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --bg-secundario: #6C3CE0;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.94);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-principal);
+            color: var(--texto);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        header {
+            background: rgba(21, 10, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        html[data-theme="light"] header { background: rgba(255, 255, 255, 0.92); }
+        .logo { display: inline-flex; align-items: center; text-decoration: none; }
+        .nav-links { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .nav-links a {
+            color: var(--texto); text-decoration: none; padding: 6px 10px;
+            border-radius: 8px; font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+        }
+        .user-menu { display: flex; align-items: center; gap: 8px; }
+        .user-menu select {
+            background: rgba(0, 0, 0, 0.35); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+        }
+        .btn-auth-link {
+            background: var(--acento); color: #150A24 !important;
+            padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 700; text-decoration: none;
+        }
+        main {
+            max-width: 1040px;
+            margin: 28px auto 90px;
+            padding: 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .panel {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
+        .row-between {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .btn {
+            background: var(--acento); color: #150A24; border: none; border-radius: 10px;
+            padding: 9px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+            font-size: 13px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-ghost {
+            background: rgba(108, 60, 224, 0.22); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 11px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px;
+            cursor: pointer; text-decoration: none;
+        }
+        .btn-danger {
+            background: rgba(224, 60, 108, 0.18); color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5); border-radius: 8px; padding: 6px 11px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+        .profile-item-card {
+            background: rgba(21, 10, 36, 0.78);
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        html[data-theme="light"] .profile-item-card { background: #F8F5FC; }
+        .pill {
+            display: inline-block; width: fit-content; font-size: 11px; font-weight: 700;
+            padding: 2px 9px; border-radius: 999px;
+            background: rgba(45, 212, 196, 0.16); color: var(--acento);
+            border: 1px solid rgba(45, 212, 196, 0.4);
+        }
+        .pill.other {
+            background: rgba(108, 60, 224, 0.24);
+            color: #c7b5ff;
+            border-color: rgba(108, 60, 224, 0.5);
+        }
+        .search-registry-input {
+            width: 100%;
+            margin-top: 12px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(0, 0, 0, 0.34);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+        }
+        html[data-theme="light"] .search-registry-input {
+            background: #FFFFFF;
+            color: #150A24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px;">
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="perfil.html">Mi Perfil</a>
+            <a href="universo.html">Universos</a>
+            <a href="familia.html">Familia / Clan</a>
+            <a href="crear-personaje.html">+ Personaje</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
+        </div>
+    </header>
 
-    function obtenerActivo(lista) {
-        try {
-            const raw = JSON.parse(localStorage.getItem(STORAGE_ACTIVE) || 'null');
-            if (raw && raw.handle) {
-                const found = lista.find(p => normHandle(p.handle) === normHandle(raw.handle));
-                if (found) return found;
+    <main>
+        <section class="panel">
+            <div class="row-between">
+                <div>
+                    <h1 style="font-size:22px;">Mi Cuenta Maestra</h1>
+                    <p id="masterAccountInfo" style="font-size:13.5px;opacity:0.8;margin-top:4px;">Gestión de tus sub-personajes y contabilidad general de personajes registrados en la página.</p>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <a href="crear-personaje.html" class="btn">+ Crear personaje</a>
+                    <button type="button" id="btnRefreshRegistry" class="btn-ghost">Actualizar lista</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mis sub-personajes de esta cuenta -->
+        <section class="panel">
+            <div class="row-between">
+                <h2 style="font-size:18px;">Mis personajes en esta cuenta</h2>
+                <span id="myCharsCount" class="pill">0 propios</span>
+            </div>
+            <div id="myCharsGrid" class="cards-grid"></div>
+        </section>
+
+        <!-- Contabilidad total de personajes registrados en toda la página (propios + de otros) -->
+        <section class="panel" id="masterRegistryPanel">
+            <div class="row-between">
+                <div>
+                    <h2 style="font-size:18px;">Contabilidad de personajes registrados en la página</h2>
+                    <p style="font-size:12.5px;opacity:0.75;margin-top:2px;">Visible únicamente dentro de Mi Cuenta Maestra (incluye tus personajes y los creados por otras cuentas).</p>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <span id="totalRegistryBadge" class="pill">Total: 0</span>
+                    <span id="othersRegistryBadge" class="pill other">Otras cuentas: 0</span>
+                </div>
+            </div>
+            <input type="text" id="registrySearchInput" class="search-registry-input" placeholder="Filtrar contabilidad por nombre, @usuario, clan o universo...">
+            <div id="allRegisteredCharsGrid" class="cards-grid"></div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const KEY_LISTA = 'kixuz_subpersonajes';
+            const KEY_ACTIVO = 'kixuz_personaje_activo';
+            let todosRegistradosCache = [];
+
+            const esc = s => String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+            const normH = v => {
+                const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            function leerMisPersonajesLocales() {
+                try {
+                    const raw = JSON.parse(localStorage.getItem(KEY_LISTA) || '[]');
+                    if (!Array.isArray(raw)) return [];
+                    const mapa = new Map();
+                    raw.forEach(p => {
+                        if (!p) return;
+                        const h = normH(p.handle || '');
+                        const nom = String(p.nombre || '').trim();
+                        if (!h && !nom) return;
+                        const k = h || nom.toLowerCase();
+                        mapa.set(k, { ...p, nombre: nom || h.slice(1), handle: h || ('@' + nom.toLowerCase().replace(/\s+/g, '_')) });
+                    });
+                    return Array.from(mapa.values());
+                } catch {
+                    return [];
+                }
             }
-        } catch {}
-        return lista[0] || { nombre: 'Sin personaje', handle: '@nuevo', esPlaceholder: true };
-    }
 
-    function sincronizarDesplegable() {
-        const lista = leerPersonajes();
-        const activo = obtenerActivo(lista);
-        window.KIXUZ_ACTIVE_CHAR = activo;
+            function renderMisPersonajes() {
+                const grid = document.getElementById('myCharsGrid');
+                const countBadge = document.getElementById('myCharsCount');
+                if (!grid) return;
 
-        document.querySelectorAll('#activeCharSelect, .user-menu select, select.dropdown').forEach(select => {
-            select.innerHTML = '';
+                const propios = leerMisPersonajesLocales();
+                if (countBadge) countBadge.textContent = `${propios.length} ${propios.length === 1 ? 'propio' : 'propios'}`;
 
-            // 1. Cuenta Maestra primero
-            const optMaster = document.createElement('option');
-            optMaster.value = MASTER_VALUE;
-            optMaster.textContent = 'Cuenta Maestra';
-            select.appendChild(optMaster);
+                let activoHandle = '';
+                try {
+                    const act = JSON.parse(localStorage.getItem(KEY_ACTIVO) || 'null');
+                    activoHandle = normH(act?.handle);
+                } catch {}
 
-            // 2. Cada personaje ordenado alfabética y numéricamente
-            lista.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.handle;
-                opt.textContent = `${p.nombre} (${p.handle})`;
-                select.appendChild(opt);
-            });
+                if (!propios.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;font-size:13.5px;opacity:0.75;">Aún no tenés personajes creados en esta cuenta. Tocá <strong>+ Crear personaje</strong> para empezar.</div>`;
+                    return;
+                }
 
-            // 3. Agregar personaje al final del mismo desplegable
-            const optCreate = document.createElement('option');
-            optCreate.value = CREATE_VALUE;
-            optCreate.textContent = '+ Agregar personaje';
-            select.appendChild(optCreate);
+                grid.innerHTML = propios.map(p => {
+                    const esAct = activoHandle && normH(p.handle) === activoHandle;
+                    return `
+                        <article class="profile-item-card">
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <span class="pill">Mío</span>
+                                ${esAct ? `<span class="pill">Activo</span>` : ''}
+                            </div>
+                            <strong style="font-family:'Space Grotesk',sans-serif;font-size:15.5px;color:var(--acento);">${esc(p.nombre)}</strong>
+                            <div style="font-size:12.5px;opacity:0.85;">${esc(p.handle)}${p.clan ? ' · ' + esc(p.clan) : ''}</div>
+                            <div style="display:flex;gap:6px;margin-top:auto;padding-top:6px;flex-wrap:wrap;">
+                                <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="btn-ghost">Abrir perfil</a>
+                                <button type="button" class="btn-ghost" data-activate-char="${esc(p.handle)}">Activar</button>
+                                <button type="button" class="btn-danger" data-delete-char="${esc(p.handle)}">Eliminar</button>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
 
-            const page = window.location.pathname.split('/').pop() || '';
-            if (page === 'cuenta-maestra.html') {
-                select.value = MASTER_VALUE;
-            } else if (activo && !activo.esPlaceholder) {
-                select.value = activo.handle;
-            } else {
-                select.value = MASTER_VALUE;
-            }
-
-            if (!select.dataset.kixuzUnifiedBound) {
-                select.dataset.kixuzUnifiedBound = '1';
-                select.addEventListener('change', e => {
-                    const val = e.target.value;
-                    if (val === MASTER_VALUE) {
-                        window.location.href = 'cuenta-maestra.html';
-                        return;
-                    }
-                    if (val === CREATE_VALUE) {
-                        window.location.href = 'crear-personaje.html';
-                        return;
-                    }
-                    const actualLista = leerPersonajes();
-                    const elegido = actualLista.find(p => normHandle(p.handle) === normHandle(val));
-                    if (elegido) {
-                        try { localStorage.setItem(STORAGE_ACTIVE, JSON.stringify(elegido)); } catch {}
-                        window.KIXUZ_ACTIVE_CHAR = elegido;
-                        window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
-                        if (window.location.pathname.endsWith('perfil.html')) {
-                            window.location.href = `perfil.html?char=${encodeURIComponent(elegido.handle)}`;
+                grid.querySelectorAll('[data-activate-char]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const h = normH(btn.dataset.activateChar);
+                        const elegido = leerMisPersonajesLocales().find(x => normH(x.handle) === h);
+                        if (elegido) {
+                            localStorage.setItem(KEY_ACTIVO, JSON.stringify(elegido));
+                            window.KIXUZ_ACTIVE_CHAR = elegido;
+                            window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+                            renderMisPersonajes();
                         }
-                    }
+                    });
+                });
+
+                grid.querySelectorAll('[data-delete-char]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const h = normH(btn.dataset.deleteChar);
+                        if (!confirm(`¿Seguro que querés eliminar el personaje ${h}?`)) return;
+                        const restantes = leerMisPersonajesLocales().filter(x => normH(x.handle) !== h);
+                        localStorage.setItem(KEY_LISTA, JSON.stringify(restantes));
+                        if (restantes.length) localStorage.setItem(KEY_ACTIVO, JSON.stringify(restantes[0]));
+                        else localStorage.removeItem(KEY_ACTIVO);
+                        if (window.KIXUZ_DB?.eliminarSubpersonaje) {
+                            try { await window.KIXUZ_DB.eliminarSubpersonaje(h); } catch {}
+                        }
+                        window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+                        cargarContabilidadCompleta();
+                    });
                 });
             }
-        });
-    }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', sincronizarDesplegable);
-    } else {
-        sincronizarDesplegable();
-    }
-    window.addEventListener('kixuz:personajes-actualizados', sincronizarDesplegable);
-    window.addEventListener('load', sincronizarDesplegable);
-})();
+            function pintarContabilidad(filtro = '') {
+                const grid = document.getElementById('allRegisteredCharsGrid');
+                if (!grid) return;
+                const q = String(filtro || '').trim().toLowerCase();
+
+                const filtrados = q
+                    ? todosRegistradosCache.filter(p =>
+                        (p.nombre || '').toLowerCase().includes(q) ||
+                        (p.handle || '').toLowerCase().includes(q) ||
+                        (p.clan || '').toLowerCase().includes(q) ||
+                        (p.universosTexto || '').toLowerCase().includes(q)
+                    )
+                    : todosRegistradosCache;
+
+                if (!filtrados.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;font-size:13.5px;opacity:0.75;">No hay personajes que coincidan con la búsqueda.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = filtrados.map((p, idx) => `
+                    <article class="profile-item-card">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+                            <span class="pill ${p.esPropio ? '' : 'other'}">${p.esPropio ? 'Mío' : 'Otra cuenta'}</span>
+                            <span style="font-size:11px;opacity:0.65;">#${idx + 1}</span>
+                        </div>
+                        <strong style="font-family:'Space Grotesk',sans-serif;font-size:15.5px;color:var(--acento);">${esc(p.nombre)}</strong>
+                        <div style="font-size:12.5px;opacity:0.88;">${esc(p.handle)}</div>
+                        ${p.clan ? `<div style="font-size:11.5px;opacity:0.75;">Clan/Familia: ${esc(p.clan)}</div>` : ''}
+                        ${p.universosTexto ? `<div style="font-size:11.5px;opacity:0.75;">Universos: ${esc(p.universosTexto)}</div>` : ''}
+                        <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="btn-ghost" style="text-align:center;margin-top:auto;">Ver ficha</a>
+                    </article>
+                `).join('');
+            }
+
+            async function cargarContabilidadCompleta() {
+                renderMisPersonajes();
+
+                const infoEl = document.getElementById('masterAccountInfo');
+                const miUid = window.KIXUZ_DB?.usuarioActual?.uid || '';
+                const miEmail = window.KIXUZ_DB?.usuarioActual?.email || '';
+                if (infoEl && miEmail) {
+                    infoEl.textContent = `Sesión iniciada como ${miEmail} · Contabilidad general de personajes registrados en la página.`;
+                }
+
+                const propios = leerMisPersonajesLocales();
+                const propiosHandles = new Set(propios.map(p => normH(p.handle)));
+                const mapa = new Map();
+
+                const registrarEnMapa = (p, forzarPropio = false) => {
+                    if (!p) return;
+                    const h = normH(p.handle || p.autorHandle || '');
+                    const nom = String(p.nombre || p.autorNombre || '').trim() || (h ? h.slice(1) : '');
+                    if (!h && !nom) return;
+                    const key = h || nom.toLowerCase();
+                    const esPropio = forzarPropio || propiosHandles.has(h) || (miUid && p.uidMaestro === miUid);
+                    const unis = Array.isArray(p.universos) ? p.universos.join(', ') : (p.universo || '');
+                    const prev = mapa.get(key) || {};
+                    mapa.set(key, {
+                        nombre: nom || prev.nombre,
+                        handle: h || prev.handle,
+                        clan: p.clan || prev.clan || '',
+                        universosTexto: unis || prev.universosTexto || '',
+                        esPropio: Boolean(esPropio || prev.esPropio)
+                    });
+                };
+
+                propios.forEach(p => registrarEnMapa(p, true));
+
+                // Consultar TODOS los personajes registrados en Firestore (propios y de otros)
+                if (window.KIXUZ_DB?.listarPersonajesPublicos) {
+                    try {
+                        const remotos = await window.KIXUZ_DB.listarPersonajesPublicos();
+                        if (Array.isArray(remotos)) {
+                            remotos.forEach(p => registrarEnMapa(p, false));
+                        }
+                    } catch {}
+                }
+
+                todosRegistradosCache = Array.from(mapa.values()).sort((a, b) =>
+                    String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es', { numeric: true, sensitivity: 'base' })
+                );
+
+                const total = todosRegistradosCache.length;
+                const deOtros = todosRegistradosCache.filter(x => !x.esPropio).length;
+
+                const totalBadge = document.getElementById('totalRegistryBadge');
+                const othersBadge = document.getElementById('othersRegistryBadge');
+                if (totalBadge) totalBadge.textContent = `Total registrados: ${total}`;
+                if (othersBadge) othersBadge.textContent = `De otras cuentas: ${deOtros}`;
+
+                pintarContabilidad(document.getElementById('registrySearchInput')?.value || '');
+            }
+
+            document.getElementById('registrySearchInput')?.addEventListener('input', e => {
+                pintarContabilidad(e.target.value);
+            });
+
+            document.getElementById('btnRefreshRegistry')?.addEventListener('click', cargarContabilidadCompleta);
+
+            window.addEventListener('DOMContentLoaded', cargarContabilidadCompleta);
+            window.addEventListener('kixuz:personajes-actualizados', cargarContabilidadCompleta);
+            window.addEventListener('kixuz:sesion-actualizada', cargarContabilidadCompleta);
+            window.addEventListener('load', () => setTimeout(cargarContabilidadCompleta, 700));
+        })();
+    </script>
+
+    <script src="chat.js"></script>
+    <script src="theme.js"></script>
+    <script src="characters.js"></script>
+    <script src="buscador-global.js"></script>
+    <script src="navbar-ui.js"></script>
+    <script src="notificaciones.js"></script>
+    <script src="amigos.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+</body>
+</html>
