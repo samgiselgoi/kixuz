@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <title>KIXUZ — Familia y Clan</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #150A24;
+      --card: #1F1135;
+      --card-2: #281644;
+      --border: rgba(108, 60, 224, 0.35);
+      --primary: #6C3CE0;
+      --accent: #2DD4C4;
+      --texto: #EDE7E0;
+      --muted: rgba(237, 231, 224, 0.65);
+    }
+    html[data-theme="light"] {
+      --bg: #F5F2FA;
+      --card: #FFFFFF;
+      --card-2: #EFE9FA;
+      --border: rgba(108, 60, 224, 0.25);
+      --texto: #150A24;
+      --muted: rgba(21, 10, 36, 0.65);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      transition: background 0.25s, color 0.25s;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(21, 10, 36, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 26px;
+    }
+    html[data-theme="light"] header {
+      background: rgba(255, 255, 255, 0.92);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #150A24;
+      font-weight: 800;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .char-select {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 26px auto;
+      padding: 0 18px 60px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #EDE7E0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-accent { background: var(--accent); color: #150A24; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--texto);
+    }
+    .input, .textarea, .select {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+    .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(108, 60, 224, 0.24);
+      border: 1px solid var(--border);
+      color: var(--accent);
+    }
+    .post-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .post-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+      color: #150A24;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .action-chip {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--texto);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .action-chip.liked {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .comments-box {
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .comment-item {
+      font-size: 13px;
+      background: var(--card-2);
+      padding: 7px 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="brand" aria-label="KIXUZ Inicio">
+      <span class="brand-logo">K</span>
+      <span>KIXUZ</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="index.html" title="Inicio">Inicio</a>
+      <a href="perfil.html" title="Mi Personaje">Mi Personaje</a>
+      <a href="universo.html">Universos</a>
+      <a href="familia.html">Familia / Clan</a>
+    </nav>
+    <div class="user-menu">
+      <select id="activeCharSelect" class="char-select" aria-label="Personaje activo">
+        <option value="@theo">Theo Kwon (@theo)</option>
+        <option value="@cypher">Cypher (@cypher)</option>
+        <option value="@elara_vance">Elara Vance (@elara_vance)</option>
+        <option value="@liam_miller">Liam Miller (@liam_miller)</option>
+      </select>
+      <a href="registro.html" class="btn btn-accent">Entrar</a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1 style="font-family:'Space Grotesk',sans-serif;font-size:22px;">Árbol Familiar & Jerarquía del Clan</h1>
+          <p style="color:var(--muted);font-size:14px;margin-top:4px;">Gestiona lazos de sangre, alianzas y rangos entre personajes.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn" id="tabFamiliaBtn">Árbol Familiar</button>
+          <button type="button" class="btn btn-ghost" id="tabClanBtn">Jerarquía del Clan</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:12px;">Nuevo vínculo / rango</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+        <input id="relTarget" class="input" placeholder="@usuario vinculado (ej. @cypher)" />
+        <input id="relLabel" class="input" placeholder="Vínculo o rango (ej. Hermano, Comandante)" />
+        <button id="addRelBtn" type="button" class="btn btn-accent">Guardar vínculo</button>
+      </div>
+    </section>
+
+    <section id="relList"></section>
+  </main>
+
+  <script>
+    let vistaActual = 'familia';
+    const defaultRels = [
+      { id: 'r1', tipo: 'familia', origen: '@theo', destino: '@elara_vance', rol: 'Aliada jurada' },
+      { id: 'r2', tipo: 'clan', origen: '@theo', destino: '@cypher', rol: 'Estratega de Red' }
+    ];
+
+    function getRels() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('kixuz_relaciones') || 'null');
+        return Array.isArray(saved) && saved.length ? saved : defaultRels;
+      } catch(e) { return defaultRels; }
+    }
+
+    function saveRels(list) {
+      localStorage.setItem('kixuz_relaciones', JSON.stringify(list));
+    }
+
+    function renderRels() {
+      const list = getRels().filter(r => r.tipo === vistaActual);
+      const container = document.getElementById('relList');
+      container.innerHTML = list.length
+        ? list.map(r => `
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div>
+              <strong style="font-family:'Space Grotesk',sans-serif;">${r.origen} ↔ ${r.destino}</strong>
+              <div style="margin-top:4px;"><span class="badge">${r.rol}</span></div>
+            </div>
+            <button type="button" class="btn btn-ghost" onclick="deleteRel('${r.id}')">Eliminar</button>
+          </div>
+        `).join('')
+        : `<div class="card" style="color:var(--muted);">No hay vínculos registrados en esta pestaña.</div>`;
+    }
+
+    window.deleteRel = function(id) {
+      saveRels(getRels().filter(r => r.id !== id));
+      renderRels();
+    };
+
+    document.getElementById('tabFamiliaBtn').addEventListener('click', () => {
+      vistaActual = 'familia';
+      document.getElementById('tabFamiliaBtn').className = 'btn';
+      document.getElementById('tabClanBtn').className = 'btn btn-ghost';
+      renderRels();
+    });
+
+    document.getElementById('tabClanBtn').addEventListener('click', () => {
+      vistaActual = 'clan';
+      document.getElementById('tabClanBtn').className = 'btn';
+      document.getElementById('tabFamiliaBtn').className = 'btn btn-ghost';
+      renderRels();
+    });
+
+    document.getElementById('addRelBtn').addEventListener('click', () => {
+      const destino = document.getElementById('relTarget').value.trim();
+      const rol = document.getElementById('relLabel').value.trim();
+      if (!destino || !rol) return;
+      const origen = document.getElementById('activeCharSelect').value;
+      const list = getRels();
+      list.unshift({ id: 'r_' + Date.now(), tipo: vistaActual, origen, destino, rol });
+      saveRels(list);
+      document.getElementById('relTarget').value = '';
+      document.getElementById('relLabel').value = '';
+      renderRels();
+    });
+
+    renderRels();
+  </script>
+  <script>
+    (function() {
+      const sel = document.getElementById('activeCharSelect');
+      if (!sel) return;
+      try {
+        const extra = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+        extra.forEach(p => {
+          if (p && p.handle && !Array.from(sel.options).some(o => o.value === p.handle)) {
+            const opt = document.createElement('option');
+            opt.value = p.handle;
+            opt.textContent = `${p.nombre} (${p.handle})`;
+            sel.appendChild(opt);
+          }
+        });
+      } catch(e) {}
+      const saved = localStorage.getItem('kixuz_active_char');
+      if (saved && Array.from(sel.options).some(o => o.value === saved)) {
+        sel.value = saved;
+      }
+      function syncBadge() {
+        const badge = document.getElementById('postingAsBadge');
+        if (badge) {
+          const opt = sel.options[sel.selectedIndex];
+          badge.textContent = `Publicando como ${opt ? opt.textContent : sel.value}`;
+        }
+      }
+      syncBadge();
+      sel.addEventListener('change', () => {
+        localStorage.setItem('kixuz_active_char', sel.value);
+        syncBadge();
+        window.dispatchEvent(new CustomEvent('kixuz:charChanged', { detail: sel.value }));
+      });
+    })();
+  </script>
+  <script src="theme.js"></script>
+  <script src="buscador-global.js"></script>
+  <script src="navbar-ui.js"></script>
+  <script src="notificaciones.js"></script>
+</body>
+</html>

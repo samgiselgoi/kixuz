@@ -1,551 +1,423 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Inicio y Muro</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-principal: #150A24;
-            --bg-secundario: #6C3CE0;
-            --acento: #2DD4C4;
-            --texto: #EDE7E0;
-            --tarjeta: rgba(34, 18, 58, 0.92);
-            --borde: rgba(108, 60, 224, 0.4);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-principal);
-            color: var(--texto);
-            min-height: 100vh;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 900;
-            background: rgba(21, 10, 36, 0.96);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--borde);
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            flex-wrap: wrap;
-            transition: transform 0.24s ease;
-        }
-        header.header-hidden { transform: translateY(-100%); }
-        .logo { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
-        .logo img { height: 32px; width: auto; }
-        .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .nav-links a {
-            color: var(--texto);
-            text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 13px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(108, 60, 224, 0.28);
-            color: var(--acento);
-        }
-        .user-menu { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-        #activeCharSelect {
-            background: rgba(0, 0, 0, 0.35);
-            color: var(--texto);
-            border: 1px solid var(--borde);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 12.5px;
-            max-width: 220px;
-        }
-        .btn-auth-link {
-            background: var(--acento);
-            color: #150A24 !important;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 12.5px;
-            font-weight: 700;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        main {
-            max-width: 980px;
-            margin: 24px auto;
-            padding: 0 16px 75px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-        .card {
-            background: var(--tarjeta);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 18px 20px;
-        }
-        .btn {
-            background: var(--acento);
-            color: #150A24;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 14px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-secondary {
-            background: rgba(108, 60, 224, 0.28);
-            color: var(--texto);
-            border: 1px solid var(--borde);
-        }
-        .btn-danger {
-            background: rgba(224, 60, 108, 0.2);
-            color: #ff9bb4;
-            border: 1px solid rgba(224, 60, 108, 0.5);
-        }
-        .tag-pill {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            background: rgba(45, 212, 196, 0.16);
-            color: var(--acento);
-            border: 1px solid rgba(45, 212, 196, 0.4);
-            text-decoration: none;
-        }
-        .muted { opacity: 0.75; font-size: 13px; }
-        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        input, textarea, select {
-            width: 100%;
-            padding: 9px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--texto);
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-        }
-        textarea { resize: vertical; }
-        .post-card {
-            background: var(--tarjeta);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 16px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .post-content {
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-        .comment-box {
-            background: rgba(21, 10, 36, 0.65);
-            border: 1px solid rgba(108, 60, 224, 0.28);
-            border-radius: 10px;
-            padding: 8px 11px;
-            font-size: 13.5px;
-        }
-        .tab-btn {
-            padding: 8px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(21, 10, 36, 0.65);
-            color: var(--texto);
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .tab-btn.active {
-            background: var(--acento);
-            color: #150A24;
-            border-color: var(--acento);
-        }
-    </style>
+  <title>KIXUZ — Muro Principal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #150A24;
+      --card: #1F1135;
+      --card-2: #281644;
+      --border: rgba(108, 60, 224, 0.35);
+      --primary: #6C3CE0;
+      --accent: #2DD4C4;
+      --texto: #EDE7E0;
+      --muted: rgba(237, 231, 224, 0.65);
+    }
+    html[data-theme="light"] {
+      --bg: #F5F2FA;
+      --card: #FFFFFF;
+      --card-2: #EFE9FA;
+      --border: rgba(108, 60, 224, 0.25);
+      --texto: #150A24;
+      --muted: rgba(21, 10, 36, 0.65);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      transition: background 0.25s, color 0.25s;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(21, 10, 36, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 26px;
+    }
+    html[data-theme="light"] header {
+      background: rgba(255, 255, 255, 0.92);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #150A24;
+      font-weight: 800;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .char-select {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 26px auto;
+      padding: 0 18px 60px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #EDE7E0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-accent { background: var(--accent); color: #150A24; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--texto);
+    }
+    .input, .textarea, .select {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+    .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(108, 60, 224, 0.24);
+      border: 1px solid var(--border);
+      color: var(--accent);
+    }
+    .post-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .post-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+      color: #150A24;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .action-chip {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--texto);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .action-chip.liked {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .comments-box {
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .comment-item {
+      font-size: 13px;
+      background: var(--card-2);
+      padding: 7px 10px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-            <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
-        </a>
-        <nav class="nav-links">
-            <a href="index.html" class="active">🏠 Inicio</a>
-            <a href="perfil.html">🎭 Mi Perfil</a>
-            <a href="universo.html">🌌 Universos</a>
-            <a href="familia.html">🌳 Familia / Clan</a>
-        </nav>
-        <div class="user-menu">
-            <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro">🔑 Entrar</a>
-        </div>
-    </header>
-    <main>
-        <section class="card">
-            <div class="row-between" style="margin-bottom:10px;">
-                <div>
-                    <div id="postingAsLabel" class="muted" style="margin-top:3px;">Publicando con personaje activo</div>
-                </div>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <select id="postAlcanceTipo" style="width:auto; padding:7px 10px; font-size:13px;">
-                        <option value="general">🌐 Inicio y Muro</option>
-                        <option value="universo">🌌 Solo Universo</option>
-                        <option value="familia">🏰 Solo Familia / Clan</option>
-                    </select>
-                    <select id="postAlcanceDestino" style="display:none; width:auto; padding:7px 10px; font-size:13px;"></select>
-                </div>
+  <header>
+    <a href="index.html" class="brand" aria-label="KIXUZ Inicio">
+      <span class="brand-logo">K</span>
+      <span>KIXUZ</span>
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="index.html" title="Inicio">Inicio</a>
+      <a href="perfil.html" title="Mi Personaje">Mi Personaje</a>
+      <a href="universo.html">Universos</a>
+      <a href="familia.html">Familia / Clan</a>
+    </nav>
+    <div class="user-menu">
+      <select id="activeCharSelect" class="char-select" aria-label="Personaje activo">
+        <option value="@theo">Theo Kwon (@theo)</option>
+        <option value="@cypher">Cypher (@cypher)</option>
+        <option value="@elara_vance">Elara Vance (@elara_vance)</option>
+        <option value="@liam_miller">Liam Miller (@liam_miller)</option>
+      </select>
+      <a href="registro.html" class="btn btn-accent">Entrar</a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-size:18px;">Nueva escena en el muro</h2>
+        <span id="postingAsBadge" class="badge">Publicando como Theo Kwon (@theo)</span>
+      </div>
+      <textarea id="postContent" class="textarea" rows="3" placeholder="Escribe una acción, diálogo o crónica... Usa #Universo para etiquetar"></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:10px;flex-wrap:wrap;">
+        <select id="postUniverse" class="select" style="max-width:220px;">
+          <option value="#NexoCentral">#NexoCentral</option>
+          <option value="#Sector4">#Sector4</option>
+          <option value="#Aethelgard">#Aethelgard</option>
+        </select>
+        <button id="publishBtn" type="button" class="btn btn-accent">Publicar escena</button>
+      </div>
+    </section>
+
+    <section id="feedContainer"></section>
+  </main>
+
+  <script>
+    const defaultPosts = [
+      {
+        id: 'p1',
+        author: 'Cypher',
+        handle: '@cypher',
+        universe: '#Sector4',
+        time: 'Hace 12 min',
+        text: 'Las luces de neón del Sector 4 parpadean mientras reviso las coordenadas encriptadas en la terminal.',
+        kix: 7,
+        liked: false,
+        comments: [{ author: '@elara_vance', text: 'Voy en camino al punto de encuentro.' }]
+      },
+      {
+        id: 'p2',
+        author: 'Theo Kwon',
+        handle: '@theo',
+        universe: '#NexoCentral',
+        time: 'Hace 38 min',
+        text: 'El consejo de la Orden del Eclipse se reúne esta noche. Nadie entra sin contraseña.',
+        kix: 12,
+        liked: false,
+        comments: []
+      }
+    ];
+
+    function getPosts() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('kixuz_posts') || 'null');
+        return Array.isArray(saved) && saved.length ? saved : defaultPosts;
+      } catch(e) { return defaultPosts; }
+    }
+
+    function savePosts(posts) {
+      localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+    }
+
+    function renderFeed() {
+      const feed = document.getElementById('feedContainer');
+      const posts = getPosts();
+      feed.innerHTML = posts.map(p => `
+        <article class="post-card">
+          <div class="post-header">
+            <div class="post-author">
+              <div class="avatar-circle">${p.author.charAt(0).toUpperCase()}</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;">${p.author} <a href="perfil.html?char=${encodeURIComponent(p.handle)}" style="color:var(--accent);text-decoration:none;font-size:13px;">${p.handle}</a></div>
+                <div style="font-size:12px;color:var(--muted);">${p.time}</div>
+              </div>
             </div>
-            <form id="postForm">
-                <textarea id="postContentInput" rows="3" placeholder="Escribí una escena, publicación o novedad... (Shift + Enter: salto de línea)" required></textarea>
-                <div class="row-between" style="margin-top:10px;">
-                    <span class="muted">Shift + Enter agrega salto de línea sin enviar.</span>
-                    <button type="submit" class="btn">Publicar</button>
-                </div>
-            </form>
-        </section>
-        <section class="card" style="padding:12px 18px;">
-            <div class="row-between">
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <button type="button" class="tab-btn active" data-sort="recientes">🕒 Más recientes</button>
-                    <button type="button" class="tab-btn" data-sort="kixiz">🔥 Más Kixiz</button>
-                </div>
-                <select id="filterUniverseSelect" style="max-width:240px; padding:7px 10px; font-size:13px;">
-                    <option value="">Todos los universos</option>
-                </select>
-            </div>
-        </section>
-        <section id="feedPosts" style="display:flex; flex-direction:column; gap:14px;"></section>
-    </main>
-    <script type="module" src="firebase-config.js"></script>
-    <script src="characters.js"></script>
-    <script src="theme.js"></script>
-    <script src="universos-core.js"></script>
-    <script src="kixuz-72h-aviso.js"></script>
-    <script src="kixuz-admin-master.js"></script>
-    <script src="chat.js"></script>
-    <script src="barra-buscador.js"></script>
-    <script>
-        (() => {
-            const POSTS_KEY = 'kixuz_posts_v1';
-            const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-            const norm = v => String(v || '').trim().toLowerCase();
-            const normHandle = v => {
-                const s = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
-                return s ? '@' + s : '';
-            };
+            <a href="universo.html?u=${encodeURIComponent(p.universe.replace('#',''))}" class="badge" style="text-decoration:none;">${p.universe}</a>
+          </div>
+          <p style="line-height:1.55;font-size:14.5px;white-space:pre-line;">${p.text}</p>
+          <div class="post-actions">
+            <button type="button" class="action-chip ${p.liked ? 'liked' : ''}" onclick="toggleKix('${p.id}')">🔥 Kix (${p.kix})</button>
+            <button type="button" class="action-chip" onclick="promptComment('${p.id}')">💬 Comentar (${p.comments.length})</button>
+          </div>
+          ${p.comments.length ? `<div class="comments-box">${p.comments.map(c => `<div class="comment-item"><strong style="color:var(--accent);">${c.author}:</strong> ${c.text}</div>`).join('')}</div>` : ''}
+        </article>
+      `).join('');
+    }
 
-            let postsCache = [];
-            let ordenActual = 'recientes';
+    window.toggleKix = function(id) {
+      const posts = getPosts();
+      const post = posts.find(x => x.id === id);
+      if (!post) return;
+      post.liked = !post.liked;
+      post.kix += post.liked ? 1 : -1;
+      savePosts(posts);
+      renderFeed();
+    };
 
-            function getAutor() {
-                const ac = window.KIXUZ_ACTIVE_CHAR;
-                if (ac && ac.nombre) {
-                    return {
-                        nombre: String(ac.nombre).trim(),
-                        handle: normHandle(ac.handle) || normHandle(ac.nombre) || '@rol',
-                        uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
-                    };
-                }
-                return { nombre: 'Invitado', handle: '@invitado', uid: '' };
-            }
+    window.promptComment = function(id) {
+      const txt = prompt('Escribe tu respuesta en rol:');
+      if (!txt || !txt.trim()) return;
+      const sel = document.getElementById('activeCharSelect');
+      const handle = sel ? sel.value : '@theo';
+      const posts = getPosts();
+      const post = posts.find(x => x.id === id);
+      if (!post) return;
+      post.comments.push({ author: handle, text: txt.trim() });
+      savePosts(posts);
+      renderFeed();
+    };
 
-            function puedeBorrar(uid = '', handle = '') {
-                if (window.KIXUZ_DB?.puedeEliminar) return window.KIXUZ_DB.puedeEliminar(uid, handle);
-                const a = getAutor();
-                return Boolean(handle && normHandle(handle) === normHandle(a.handle));
-            }
+    document.getElementById('publishBtn').addEventListener('click', () => {
+      const content = document.getElementById('postContent').value.trim();
+      if (!content) return;
+      const sel = document.getElementById('activeCharSelect');
+      const opt = sel.options[sel.selectedIndex];
+      const author = opt ? opt.textContent.split(' (')[0] : 'Theo Kwon';
+      const handle = sel.value;
+      const universe = document.getElementById('postUniverse').value;
+      const posts = getPosts();
+      posts.unshift({
+        id: 'p_' + Date.now(),
+        author,
+        handle,
+        universe,
+        time: 'Ahora mismo',
+        text: content,
+        kix: 0,
+        liked: false,
+        comments: []
+      });
+      savePosts(posts);
+      document.getElementById('postContent').value = '';
+      renderFeed();
+    });
 
-            function leerPosts() {
-                try {
-                    const arr = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
-                    return Array.isArray(arr) ? arr : [];
-                } catch { return []; }
-            }
-
-            function guardarPosts(arr) {
-                try { localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 150))); } catch {}
-            }
-
-            function poblarSelectores() {
-                const selDestino = document.getElementById('postAlcanceDestino');
-                const selFiltroUni = document.getElementById('filterUniverseSelect');
-                const tipo = document.getElementById('postAlcanceTipo').value;
-
-                const unisSet = new Set();
-                try {
-                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
-                    unis.forEach(u => {
-                        const t = String(u.tag || u.nombre || '').trim();
-                        if (t) unisSet.add(t.startsWith('#') ? t : '#' + t);
-                    });
-                } catch {}
-
-                if (selFiltroUni) {
-                    const prev = selFiltroUni.value;
-                    selFiltroUni.innerHTML = '<option value="">Todos los universos</option>';
-                    Array.from(unisSet).forEach(u => {
-                        const opt = document.createElement('option');
-                        opt.value = u;
-                        opt.textContent = u;
-                        selFiltroUni.appendChild(opt);
-                    });
-                    selFiltroUni.value = prev;
-                }
-
-                if (selDestino) {
-                    if (tipo === 'general') {
-                        selDestino.style.display = 'none';
-                        selDestino.innerHTML = '';
-                    } else if (tipo === 'universo') {
-                        selDestino.style.display = 'inline-block';
-                        selDestino.innerHTML = Array.from(unisSet).map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('') || '<option value="">Sin universos</option>';
-                    } else if (tipo === 'familia') {
-                        selDestino.style.display = 'inline-block';
-                        const famSet = new Set();
-                        if (window.KIXUZ_ACTIVE_CHAR?.clan) famSet.add(window.KIXUZ_ACTIVE_CHAR.clan);
-                        try {
-                            const d = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-                            (Array.isArray(d.clan) ? d.clan : []).forEach(c => { if (c.clanNombre) famSet.add(c.clanNombre); });
-                        } catch {}
-                        selDestino.innerHTML = Array.from(famSet).map(f => `<option value="${esc(f)}">${esc(f)}</option>`).join('') || '<option value="">Sin familia/clan</option>';
-                    }
-                }
-            }
-
-            function actualizarUI() {
-                const autor = getAutor();
-                document.getElementById('postingAsLabel').textContent = `Publicando como: ${autor.nombre} (${autor.handle})`;
-                poblarSelectores();
-            }
-
-            function renderFeed() {
-                const feed = document.getElementById('feedPosts');
-                if (!feed) return;
-                const filtroUni = norm((document.getElementById('filterUniverseSelect')?.value || '').replace(/^#+/, ''));
-
-                let visibles = postsCache.filter(p => {
-                    if (window.KIXUZ_UNIVERSOS?.puedeVerPublicacion && !window.KIXUZ_UNIVERSOS.puedeVerPublicacion(p)) return false;
-                    if (filtroUni) {
-                        const uPost = norm((p.universo || p.alcanceDestino || '').replace(/^#+/, ''));
-                        if (uPost !== filtroUni) return false;
-                    }
-                    return true;
-                });
-
-                if (ordenActual === 'kixiz') {
-                    visibles.sort((a, b) => Number(b.kixiz || 0) - Number(a.kixiz || 0));
-                }
-
-                if (!visibles.length) {
-                    feed.innerHTML = `<div class="card muted" style="text-align:center;">No hay publicaciones visibles con este filtro.</div>`;
-                    return;
-                }
-
-                feed.innerHTML = '';
-                visibles.forEach(p => {
-                    const art = document.createElement('article');
-                    art.className = 'post-card';
-                    const delPost = puedeBorrar(p.autorUid, p.autorHandle);
-                    const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
-                    const hLink = encodeURIComponent(p.autorHandle || p.autorNombre || '');
-                    const kixCount = Number(p.kixiz || 0);
-                    const kixLabel = kixCount === 1 ? 'Kix' : 'Kixiz';
-
-                    let alcanceBadge = '';
-                    if (p.alcanceTipo === 'universo' && p.alcanceDestino) {
-                        alcanceBadge = `<a href="universo.html" class="tag-pill">🌌 ${esc(p.alcanceDestino)}</a>`;
-                    } else if (p.alcanceTipo === 'familia' && p.alcanceDestino) {
-                        alcanceBadge = `<a href="familia.html" class="tag-pill">🏰 ${esc(p.alcanceDestino)}</a>`;
-                    } else if (p.universo) {
-                        alcanceBadge = `<a href="universo.html" class="tag-pill">${esc(p.universo)}</a>`;
-                    }
-
-                    art.innerHTML = `
-                        <div class="row-between">
-                            <div>
-                                <a href="perfil.html?char=${hLink}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(p.autorNombre || 'Personaje')}</a>
-                                <span class="muted">${esc(p.autorHandle || '')}</span>
-                            </div>
-                            <div style="display:flex; gap:6px; align-items:center;">
-                                ${alcanceBadge}
-                                ${delPost ? `<button type="button" class="btn btn-danger btn-del-post" style="padding:4px 9px; font-size:12px;">🗑️</button>` : ''}
-                            </div>
-                        </div>
-                        <div class="post-content">${esc(p.contenido || '')}</div>
-                        <div class="row-between">
-                            <button type="button" class="btn btn-secondary btn-kix" style="padding:6px 12px; font-size:12.5px;">🔥 ${kixLabel} (${kixCount})</button>
-                            <span class="muted">${respuestas.length} comentario(s)</span>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:7px;">
-                            ${respuestas.map((r, idx) => {
-                                const delR = puedeBorrar(r.autorUid, r.autorHandle);
-                                const rLink = encodeURIComponent(r.autorHandle || r.autorNombre || '');
-                                return `
-                                    <div class="comment-box">
-                                        <div class="row-between" style="margin-bottom:3px;">
-                                            <a href="perfil.html?char=${rLink}" style="font-size:12.5px; font-weight:700; color:var(--acento); text-decoration:none;">${esc(r.autorNombre || 'Personaje')} <span class="muted">${esc(r.autorHandle || '')}</span></a>
-                                            ${delR ? `<button type="button" class="btn btn-danger btn-del-reply" data-idx="${idx}" style="padding:2px 7px; font-size:11px;">Borrar</button>` : ''}
-                                        </div>
-                                        <div style="white-space:pre-wrap; word-break:break-word;">${esc(r.texto || '')}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                            <form class="reply-form" style="display:flex; gap:8px; align-items:flex-end; margin-top:4px;">
-                                <textarea class="reply-input" rows="1" placeholder="Comentar... (Shift + Enter: salto de línea)" style="flex:1; min-height:38px;"></textarea>
-                                <button type="submit" class="btn btn-secondary" style="padding:8px 12px;">Enviar</button>
-                            </form>
-                        </div>
-                    `;
-
-                    art.querySelector('.btn-kix').addEventListener('click', async () => {
-                        p.kixiz = Number(p.kixiz || 0) + 1;
-                        guardarPosts(postsCache);
-                        renderFeed();
-                        if (window.KIXUZ_DB?.darKix) {
-                            try { await window.KIXUZ_DB.darKix(p.id, 1); } catch {}
-                        }
-                    });
-
-                    const delBtn = art.querySelector('.btn-del-post');
-                    if (delBtn) {
-                        delBtn.addEventListener('click', async () => {
-                            if (!puedeBorrar(p.autorUid, p.autorHandle)) return;
-                            postsCache = postsCache.filter(x => String(x.id) !== String(p.id));
-                            guardarPosts(postsCache);
-                            renderFeed();
-                            if (window.KIXUZ_DB?.eliminarPost) {
-                                try { await window.KIXUZ_DB.eliminarPost(p.id); } catch {}
-                            }
-                        });
-                    }
-
-                    art.querySelectorAll('.btn-del-reply').forEach(b => {
-                        b.addEventListener('click', async () => {
-                            const i = Number(b.dataset.idx);
-                            const arr = Array.isArray(p.respuestas) ? [...p.respuestas] : [];
-                            if (i < 0 || i >= arr.length) return;
-                            if (!puedeBorrar(arr[i].autorUid, arr[i].autorHandle)) return;
-                            arr.splice(i, 1);
-                            p.respuestas = arr;
-                            guardarPosts(postsCache);
-                            renderFeed();
-                        });
-                    });
-
-                    const rForm = art.querySelector('.reply-form');
-                    const rInp = art.querySelector('.reply-input');
-                    rInp.addEventListener('keydown', e => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            rForm.requestSubmit();
-                        }
-                    });
-                    rForm.addEventListener('submit', async ev => {
-                        ev.preventDefault();
-                        const txt = String(rInp.value || '').replace(/^\n+|\n+$/g, '');
-                        if (!txt.trim()) return;
-                        const autor = getAutor();
-                        const rep = { autorNombre: autor.nombre, autorHandle: autor.handle, autorUid: autor.uid, texto: txt };
-                        p.respuestas = Array.isArray(p.respuestas) ? [...p.respuestas, rep] : [rep];
-                        rInp.value = '';
-                        guardarPosts(postsCache);
-                        renderFeed();
-                    });
-
-                    feed.appendChild(art);
-                });
-            }
-
-            document.getElementById('postAlcanceTipo').addEventListener('change', poblarSelectores);
-
-            const ta = document.getElementById('postContentInput');
-            ta.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    document.getElementById('postForm').requestSubmit();
-                }
-            });
-
-            document.getElementById('postForm').addEventListener('submit', async e => {
-                e.preventDefault();
-                const contenido = String(ta.value || '').replace(/^\n+|\n+$/g, '');
-                if (!contenido.trim()) return;
-
-                const autor = getAutor();
-                const alcanceTipo = document.getElementById('postAlcanceTipo').value;
-                const alcanceDestino = document.getElementById('postAlcanceDestino').value || '';
-
-                const nuevo = {
-                    id: 'local_' + Date.now(),
-                    autorNombre: autor.nombre,
-                    autorHandle: autor.handle,
-                    autorUid: autor.uid,
-                    muroHandle: autor.handle,
-                    contenido,
-                    universo: alcanceTipo === 'universo' ? alcanceDestino : '',
-                    alcanceTipo,
-                    alcanceDestino,
-                    kixiz: 0,
-                    respuestas: []
-                };
-
-                postsCache = [nuevo, ...postsCache];
-                guardarPosts(postsCache);
-                ta.value = '';
-                poblarSelectores();
-                renderFeed();
-
-                if (window.KIXUZ_DB?.publicarPost) {
-                    try {
-                        const resId = await window.KIXUZ_DB.publicarPost(nuevo);
-                        if (typeof resId === 'string' && resId) {
-                            nuevo.id = resId;
-                            guardarPosts(postsCache);
-                        }
-                    } catch {}
-                }
-            });
-
-            document.querySelectorAll('[data-sort]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    ordenActual = btn.dataset.sort;
-                    renderFeed();
-                });
-            });
-
-            document.getElementById('filterUniverseSelect').addEventListener('change', renderFeed);
-
-            window.addEventListener('DOMContentLoaded', () => {
-                postsCache = leerPosts();
-                actualizarUI();
-                renderFeed();
-            });
-            window.addEventListener('kixuz:personajes-actualizados', () => { actualizarUI(); renderFeed(); });
-            window.addEventListener('kixuz:sesion-actualizada', () => { actualizarUI(); renderFeed(); });
-        })();
-    </script>
+    renderFeed();
+  </script>
+  <script>
+    (function() {
+      const sel = document.getElementById('activeCharSelect');
+      if (!sel) return;
+      try {
+        const extra = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+        extra.forEach(p => {
+          if (p && p.handle && !Array.from(sel.options).some(o => o.value === p.handle)) {
+            const opt = document.createElement('option');
+            opt.value = p.handle;
+            opt.textContent = `${p.nombre} (${p.handle})`;
+            sel.appendChild(opt);
+          }
+        });
+      } catch(e) {}
+      const saved = localStorage.getItem('kixuz_active_char');
+      if (saved && Array.from(sel.options).some(o => o.value === saved)) {
+        sel.value = saved;
+      }
+      function syncBadge() {
+        const badge = document.getElementById('postingAsBadge');
+        if (badge) {
+          const opt = sel.options[sel.selectedIndex];
+          badge.textContent = `Publicando como ${opt ? opt.textContent : sel.value}`;
+        }
+      }
+      syncBadge();
+      sel.addEventListener('change', () => {
+        localStorage.setItem('kixuz_active_char', sel.value);
+        syncBadge();
+        window.dispatchEvent(new CustomEvent('kixuz:charChanged', { detail: sel.value }));
+      });
+    })();
+  </script>
+  <script src="theme.js"></script>
+  <script src="buscador-global.js"></script>
+  <script src="navbar-ui.js"></script>
+  <script src="notificaciones.js"></script>
 </body>
 </html>
