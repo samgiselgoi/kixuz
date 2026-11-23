@@ -12,24 +12,29 @@
             --bg-secundario: #6C3CE0;
             --acento: #2DD4C4;
             --texto: #EDE7E0;
-            --tarjeta: rgba(34, 18, 58, 0.92);
-            --borde: rgba(108, 60, 224, 0.4);
+            --tarjeta: rgba(108, 60, 224, 0.14);
+            --borde: rgba(108, 60, 224, 0.45);
         }
-        * { box-sizing: border-box; }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.92);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
             background: var(--bg-principal);
             color: var(--texto);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            line-height: 1.55;
         }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
         header {
             position: relative;
             z-index: 900;
-            background: rgba(21, 10, 36, 0.95);
+            background: rgba(21, 10, 36, 0.94);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--borde);
             padding: 10px 20px;
@@ -39,60 +44,56 @@
             gap: 10px;
             flex-wrap: nowrap;
         }
-        @media (max-width: 980px) {
-            header { flex-wrap: wrap; }
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
+        @media (max-width: 980px) { header { flex-wrap: wrap; } }
+        .nav-links { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
         .nav-links a {
             color: var(--texto);
             text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13.5px;
             padding: 6px 10px;
             border-radius: 8px;
-            font-size: 14px;
             white-space: nowrap;
         }
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(108, 60, 224, 0.28);
-            color: var(--acento);
+        .nav-links a:hover, .nav-links a.active { background: rgba(108, 60, 224, 0.25); color: var(--acento); }
+        .user-menu { display: flex; align-items: center; gap: 8px; }
+        .user-menu select {
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 6px 9px;
+            font-size: 12.5px;
         }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        #activeCharSelect {
+        .btn-auth-link {
+            background: var(--acento);
+            color: #150A24 !important;
             padding: 6px 10px;
             border-radius: 8px;
-            border: 1px solid var(--borde);
-            background: rgba(15, 8, 28, 0.9);
-            color: var(--texto);
-            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
         }
-        main {
-            max-width: 980px;
-            margin: 24px auto;
-            padding: 0 16px 75px;
+        .page-wrap {
+            max-width: 1040px;
+            margin: 26px auto 80px;
+            padding: 0 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
         }
-        .card {
+        .panel-box {
             background: var(--tarjeta);
             border: 1px solid var(--borde);
             border-radius: 16px;
-            padding: 18px 20px;
+            padding: 20px 22px;
         }
         .btn {
             background: var(--acento);
             color: #150A24;
             border: none;
             border-radius: 10px;
-            padding: 8px 14px;
+            padding: 8px 15px;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 13px;
@@ -103,7 +104,7 @@
             gap: 6px;
         }
         .btn-secondary {
-            background: rgba(108, 60, 224, 0.28);
+            background: rgba(108, 60, 224, 0.25);
             color: var(--texto);
             border: 1px solid var(--borde);
         }
@@ -115,72 +116,68 @@
         .tag-pill {
             display: inline-block;
             padding: 3px 10px;
-            border-radius: 999px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
             background: rgba(45, 212, 196, 0.16);
             color: var(--acento);
-            border: 1px solid rgba(45, 212, 196, 0.4);
-            text-decoration: none;
+            border: 1px solid rgba(45, 212, 196, 0.45);
         }
-        .muted { opacity: 0.75; font-size: 13px; }
-        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-        input, textarea, select {
-            width: 100%;
-            padding: 9px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--texto);
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
         }
-        textarea { resize: vertical; }
-        .post-card {
-            background: var(--tarjeta);
+        .uni-card {
+            background: rgba(21, 10, 36, 0.72);
             border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 16px 18px;
+            border-radius: 14px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             gap: 10px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
         }
-        .post-content {
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-        .comment-box {
-            background: rgba(21, 10, 36, 0.65);
-            border: 1px solid rgba(108, 60, 224, 0.28);
+        .uni-card:hover { transform: translateY(-4px); border-color: var(--acento); }
+        input, textarea, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.34);
+            color: var(--texto);
+            border: 1px solid var(--borde);
             border-radius: 10px;
-            padding: 8px 11px;
+            padding: 9px 12px;
+            font-family: 'Inter', sans-serif;
             font-size: 13.5px;
         }
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
         .tab-btn {
-            padding: 8px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(21, 10, 36, 0.65);
+            background: rgba(108, 60, 224, 0.2);
             color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 8px 14px;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
         }
-        .tab-btn.active {
-            background: var(--acento);
-            color: #150A24;
-            border-color: var(--acento);
+        .tab-btn.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
+        .post-item {
+            background: rgba(21, 10, 36, 0.68);
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
         }
-</style>
+        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .muted { opacity: 0.78; font-size: 13px; }
+    </style>
 </head>
 <body>
     <header>
-        <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
             <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
         </a>
         <nav class="nav-links">
@@ -192,54 +189,115 @@
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
+            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro">🔑</a>
         </div>
     </header>
-    <main>
-        <section class="card">
-            <h1 style="margin:0 0 6px; font-family:'Space Grotesk',sans-serif; font-size:22px;">🌌 Universos de KIXUZ</h1>
-            <p class="muted" style="margin:0;">Unite a un universo para participar en sus publicaciones exclusivas o solicitá crear uno nuevo para que Kixuz lo apruebe.</p>
-        </section>
-        <section class="card">
-            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">+ Solicitar Crear Universo</h2>
-            <form id="reqUniForm" style="display:flex; flex-direction:column; gap:10px;">
-                <div class="grid-2">
-                    <div>
-                        <label class="muted">Nombre del Universo *</label>
-                        <input type="text" id="uniNombreInput" required placeholder="Ej. Crónicas de Nocturna">
-                    </div>
-                    <div>
-                        <label class="muted">Etiqueta (#Tag) *</label>
-                        <input type="text" id="uniTagInput" required placeholder="Ej. #Nocturna">
-                    </div>
-                </div>
+
+    <main class="page-wrap">
+        <!-- Vista Directorio de Universos (Grupos / #Hashtags) -->
+        <div id="directorioView" style="display:flex; flex-direction:column; gap:18px;">
+            <section class="panel-box row-between">
                 <div>
-                    <label class="muted">Descripción / Reglas del universo</label>
-                    <textarea id="uniDescInput" rows="2" placeholder="Ambientación, temática y reglas..."></textarea>
+                    <h1 style="font-size:24px; color:var(--acento);">🌌 Universos y Mundos (#Grupos)</h1>
+                    <p class="muted">Entrá a un universo para ver su muro, mapas/imágenes y miembros, o solicitá crear uno nuevo.</p>
                 </div>
-                <div><button type="submit" class="btn">Enviar solicitud de universo</button></div>
-            </form>
-        </section>
-        <section class="card" id="kixuzUniAdminPanel" style="display:none; border-color:var(--acento);">
-            <h2 style="margin:0 0 10px; font-family:'Space Grotesk',sans-serif; font-size:18px; color:var(--acento);">👑 Solicitudes pendientes (Aprobación Kixuz)</h2>
-            <div id="uniPendientesAdminList"></div>
-        </section>
-        <section>
-            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">Universos activos</h2>
-            <div id="universosList"></div>
-        </section>
+                <button type="button" class="btn" id="btnToggleReqUni">+ Crear Universo</button>
+            </section>
+
+            <section class="panel-box" id="reqUniPanel" style="display:none;">
+                <h2 style="font-size:17px; color:var(--acento); margin-bottom:10px;">Solicitar Creación de Universo</h2>
+                <p class="muted" style="margin-bottom:10px;">La solicitud será revisada y aprobada por la cuenta maestra <strong>Kixuz</strong>.</p>
+                <form id="reqUniForm" style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                        <input type="text" id="uniNombre" required placeholder="Nombre del Universo (ej. Crónicas de Nocturna)">
+                        <input type="text" id="uniTag" required placeholder="Etiqueta #Hashtag (ej. #Nocturna)">
+                    </div>
+                    <textarea id="uniDesc" rows="2" placeholder="Descripción y ambientación del universo..."></textarea>
+                    <textarea id="uniReglas" rows="2" placeholder="Reglas y lore base..."></textarea>
+                    <div><button type="submit" class="btn">Enviar solicitud</button></div>
+                </form>
+            </section>
+
+            <section class="panel-box" id="kixuzSolicitudesBox" style="display:none; border-color:var(--acento);">
+                <h2 style="font-size:17px; color:var(--acento); margin-bottom:10px;">👑 Bandeja de Solicitudes de Universos (Kixuz)</h2>
+                <div id="kixuzSolicitudesList"></div>
+            </section>
+
+            <section class="grid-cards" id="universosGrid"></section>
+        </div>
+
+        <!-- Vista Grupo / #Hashtag abierto -->
+        <div id="grupoView" style="display:none; flex-direction:column; gap:18px;">
+            <section class="panel-box">
+                <div class="row-between">
+                    <div>
+                        <button type="button" class="btn btn-secondary" id="btnVolverDirectorio" style="margin-bottom:10px;">← Volver a Universos</button>
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <h1 id="grpTitle" style="font-size:24px; color:var(--acento);">Universo</h1>
+                            <span id="grpTag" class="tag-pill">#Tag</span>
+                        </div>
+                        <p id="grpDesc" class="muted" style="margin-top:6px;"></p>
+                    </div>
+                    <div id="grpJoinWrap"></div>
+                </div>
+            </section>
+
+            <div class="tabs">
+                <button type="button" class="tab-btn active" data-gtab="muro">📜 Muro del Universo</button>
+                <button type="button" class="tab-btn" data-gtab="mapas">🗺️ Mapas e Imágenes</button>
+                <button type="button" class="tab-btn" data-gtab="miembros">👥 Miembros y Reglas</button>
+            </div>
+
+            <section class="panel-box" id="gtabMuro">
+                <form id="grpPostForm" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+                    <div class="row-between">
+                        <span class="muted" id="grpPostingLabel">Publicando en el universo...</span>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <select id="grpIcOoc" style="width:auto; padding:5px 9px; font-size:12.5px;">
+                                <option value="IC">🎭 IC (En Rol)</option>
+                                <option value="OOC">💬 OOC (Fuera de Rol)</option>
+                            </select>
+                            <label class="btn btn-secondary" style="padding:5px 10px; font-size:12px; cursor:pointer;">
+                                🖼️ Imagen
+                                <input type="file" id="grpPostImgInput" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                    </div>
+                    <textarea id="grpPostText" rows="3" placeholder="Escribí una escena o publicación para este universo... (Shift + Enter: salto de línea)" required></textarea>
+                    <div style="text-align:right;"><button type="submit" class="btn">Publicar en Universo</button></div>
+                </form>
+                <div id="grpFeedList"></div>
+            </section>
+
+            <section class="panel-box" id="gtabMapas" style="display:none;">
+                <div class="row-between" style="margin-bottom:12px;">
+                    <h2 style="font-size:18px; color:var(--acento);">🗺️ Mapas e Imágenes del Universo</h2>
+                    <label class="btn" style="cursor:pointer;">
+                        + Subir Mapa / Imagen
+                        <input type="file" id="grpUploadMapa" accept="image/*" style="display:none;">
+                    </label>
+                </div>
+                <div id="grpMapasGrid" class="grid-cards"></div>
+            </section>
+
+            <section class="panel-box" id="gtabMiembros" style="display:none;">
+                <h2 style="font-size:18px; color:var(--acento); margin-bottom:8px;">📜 Reglas y Lore</h2>
+                <p id="grpReglasText" style="white-space:pre-wrap; margin-bottom:16px;"></p>
+                <h2 style="font-size:18px; color:var(--acento); margin-bottom:8px;">👥 Miembros del Universo</h2>
+                <div id="grpMiembrosList"></div>
+            </section>
+        </div>
     </main>
+
     <script type="module" src="firebase-config.js"></script>
     <script src="characters.js"></script>
     <script src="theme.js"></script>
+    <script src="universos-core.js"></script>
     <script src="kixuz-72h-aviso.js"></script>
     <script src="kixuz-admin-master.js"></script>
     <script src="chat.js"></script>
-
     <script>
         (() => {
-            const UNIS_KEY = 'kixuz_universos_v1';
-            const SOLS_KEY = 'kixuz_solicitudes_universo_v1';
             const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             const norm = v => String(v || '').trim().toLowerCase();
             const normHandle = v => {
@@ -247,99 +305,71 @@
                 return s ? '@' + s : '';
             };
 
-            function esKixuz() {
-                if (window.KIXUZ_DB?.esAdmin) return true;
-                const p = window.KIXUZ_DB?.perfilCuenta || {};
-                let loc = {};
-                try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
-                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || norm(p.nombreMaestro) === 'kixuz';
+            let uniAbierto = null;
+            let postImgB64 = '';
+
+            function comprimirImg(file, maxW = 900, quality = 0.78) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const scale = Math.min(1, maxW / (img.width || maxW));
+                            const canvas = document.createElement('canvas');
+                            canvas.width = Math.max(1, Math.round((img.width || maxW) * scale));
+                            canvas.height = Math.max(1, Math.round((img.height || maxW) * scale));
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', quality));
+                        };
+                        img.onerror = reject;
+                        img.src = ev.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
             }
 
-            function leerUniversos() {
-                try {
-                    const arr = JSON.parse(localStorage.getItem(UNIS_KEY) || '[]');
-                    return Array.isArray(arr) ? arr : [];
-                } catch { return []; }
-            }
+            function renderDirectorio() {
+                const esAdmin = window.KIXUZ_UNIVERSOS?.esCuentaKixuz ? window.KIXUZ_UNIVERSOS.esCuentaKixuz() : false;
+                const activos = window.KIXUZ_UNIVERSOS?.obtenerUniversosVisibles ? window.KIXUZ_UNIVERSOS.obtenerUniversosVisibles() : [];
+                const grid = document.getElementById('universosGrid');
 
-            function guardarUniversos(arr) {
-                try { localStorage.setItem(UNIS_KEY, JSON.stringify(arr)); } catch {}
-            }
-
-            function leerSolicitudes() {
-                try {
-                    const arr = JSON.parse(localStorage.getItem(SOLS_KEY) || '[]');
-                    return Array.isArray(arr) ? arr : [];
-                } catch { return []; }
-            }
-
-            function guardarSolicitudes(arr) {
-                try { localStorage.setItem(SOLS_KEY, JSON.stringify(arr)); } catch {}
-            }
-
-            function renderUniversos() {
-                const activo = window.KIXUZ_ACTIVE_CHAR;
-                const miHandle = normHandle(activo?.handle || '');
-                const listaEl = document.getElementById('universosList');
-                const unis = leerUniversos();
-
-                if (!unis.length) {
-                    listaEl.innerHTML = '<div class="muted">Todavía no hay universos aprobados. ¡Solicitá crear el primero!</div>';
+                if (!activos.length) {
+                    grid.innerHTML = `<div class="panel-box muted">No hay universos creados todavía. Usá el botón <strong>+ Crear Universo</strong> para enviar una solicitud.</div>`;
                 } else {
-                    listaEl.innerHTML = '';
-                    unis.forEach(u => {
-                        const miembros = Array.isArray(u.miembros) ? u.miembros.map(normHandle) : [];
-                        const soyMiembro = miHandle && miembros.includes(miHandle);
+                    grid.innerHTML = '';
+                    activos.forEach(u => {
+                        const miembros = Array.isArray(u.miembros) ? u.miembros : [];
                         const card = document.createElement('div');
-                        card.className = 'card';
-                        card.style.marginBottom = '10px';
+                        card.className = 'uni-card';
                         card.innerHTML = `
+                            <div>
+                                <div class="row-between">
+                                    <h3 style="color:var(--acento); font-size:17px;">${esc(u.nombre)}</h3>
+                                    <span class="tag-pill">${esc(u.tag)}</span>
+                                </div>
+                                <p class="muted" style="margin-top:8px;">${esc(u.descripcion || 'Universo de rol en KIXUZ.')}</p>
+                            </div>
                             <div class="row-between">
-                                <div>
-                                    <strong style="font-size:17px; color:var(--acento);">${esc(u.nombre)}</strong>
-                                    <span class="tag-pill" style="margin-left:6px;">${esc(u.tag)}</span>
-                                    <div class="muted" style="margin-top:4px;">${esc(u.descripcion || 'Universo de rol en KIXUZ.')}</div>
-                                    <div class="muted" style="margin-top:4px;">Miembros (${miembros.length}): ${miembros.map(m => `<a href="perfil.html?char=${encodeURIComponent(m)}" style="color:var(--acento); text-decoration:none;">${esc(m)}</a>`).join(', ') || 'Ninguno aún'}</div>
-                                </div>
-                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                    ${miHandle ? `<button type="button" class="btn ${soyMiembro ? 'btn-secondary' : ''} btn-toggle-uni">${soyMiembro ? '✓ Unido (Salir)' : '+ Unirme'}</button>` : ''}
-                                    ${esKixuz() ? `<button type="button" class="btn btn-danger btn-del-uni">🗑️</button>` : ''}
-                                </div>
+                                <span class="muted">👥 ${miembros.length} miembro(s)</span>
+                                <button type="button" class="btn btn-open-uni">Entrar al Universo →</button>
                             </div>
                         `;
-                        const toggleBtn = card.querySelector('.btn-toggle-uni');
-                        if (toggleBtn) {
-                            toggleBtn.addEventListener('click', () => {
-                                const set = new Set(miembros);
-                                if (set.has(miHandle)) set.delete(miHandle);
-                                else set.add(miHandle);
-                                u.miembros = Array.from(set);
-                                guardarUniversos(unis);
-                                renderUniversos();
-                            });
-                        }
-                        const delBtn = card.querySelector('.btn-del-uni');
-                        if (delBtn) {
-                            delBtn.addEventListener('click', () => {
-                                if (!esKixuz()) return;
-                                guardarUniversos(unis.filter(x => norm(x.tag) !== norm(u.tag)));
-                                renderUniversos();
-                            });
-                        }
-                        listaEl.appendChild(card);
+                        card.querySelector('.btn-open-uni').addEventListener('click', () => abrirGrupo(u.tag));
+                        grid.appendChild(card);
                     });
                 }
 
-                const adminPanel = document.getElementById('kixuzUniAdminPanel');
-                if (adminPanel) {
-                    adminPanel.style.display = esKixuz() ? 'block' : 'none';
-                    const solsEl = document.getElementById('uniPendientesAdminList');
-                    const pendientes = leerSolicitudes().filter(s => norm(s.estado || 'pendiente') === 'pendiente');
-                    solsEl.innerHTML = pendientes.length ? '' : '<div class="muted">No hay solicitudes pendientes.</div>';
+                const solBox = document.getElementById('kixuzSolicitudesBox');
+                const solList = document.getElementById('kixuzSolicitudesList');
+                if (esAdmin) {
+                    const pendientes = (window.KIXUZ_UNIVERSOS?.leerSolicitudes() || []).filter(s => norm(s.estado || 'pendiente') === 'pendiente');
+                    solBox.style.display = 'block';
+                    solList.innerHTML = pendientes.length ? '' : '<div class="muted">No hay solicitudes pendientes.</div>';
                     pendientes.forEach(s => {
                         const row = document.createElement('div');
                         row.className = 'row-between';
-                        row.style.cssText = 'padding:10px 12px; border:1px solid var(--borde); border-radius:12px; margin-bottom:8px; background:rgba(21,10,36,0.65);';
+                        row.style.cssText = 'padding:10px 0; border-bottom:1px solid rgba(108,60,224,0.22);';
                         row.innerHTML = `
                             <div>
                                 <strong>${esc(s.nombre)}</strong> <span class="tag-pill">${esc(s.tag)}</span>
@@ -351,85 +381,257 @@
                             </div>
                         `;
                         row.querySelector('.btn-ap').addEventListener('click', async () => {
-                            const todasSols = leerSolicitudes().filter(x => String(x.id) !== String(s.id));
-                            guardarSolicitudes(todasSols);
-                            const actuales = leerUniversos();
-                            if (!actuales.some(x => norm(x.tag) === norm(s.tag))) {
-                                actuales.push({
+                            const sols = window.KIXUZ_UNIVERSOS.leerSolicitudes().filter(x => String(x.id) !== String(s.id));
+                            window.KIXUZ_UNIVERSOS.guardarSolicitudes(sols);
+                            const todos = window.KIXUZ_UNIVERSOS.leerUniversos();
+                            if (!todos.some(x => norm(x.tag) === norm(s.tag))) {
+                                todos.push({
                                     nombre: s.nombre,
                                     tag: s.tag,
                                     descripcion: s.descripcion,
+                                    reglas: s.reglas || '',
                                     creadoPorHandle: s.solicitanteHandle,
-                                    miembros: s.solicitanteHandle ? [normHandle(s.solicitanteHandle)] : []
+                                    miembros: s.solicitanteHandle ? [normHandle(s.solicitanteHandle)] : [],
+                                    mapas: []
                                 });
-                                guardarUniversos(actuales);
+                                window.KIXUZ_UNIVERSOS.guardarUniversos(todos);
                             }
                             if (window.KIXUZ_DB?.aprobarSolicitudUniverso) {
                                 try { await window.KIXUZ_DB.aprobarSolicitudUniverso(s); } catch {}
                             }
-                            renderUniversos();
+                            renderDirectorio();
                         });
                         row.querySelector('.btn-de').addEventListener('click', async () => {
-                            guardarSolicitudes(leerSolicitudes().filter(x => String(x.id) !== String(s.id)));
+                            const sols = window.KIXUZ_UNIVERSOS.leerSolicitudes().filter(x => String(x.id) !== String(s.id));
+                            window.KIXUZ_UNIVERSOS.guardarSolicitudes(sols);
                             if (window.KIXUZ_DB?.rechazarSolicitudUniverso) {
                                 try { await window.KIXUZ_DB.rechazarSolicitudUniverso(s); } catch {}
                             }
-                            renderUniversos();
+                            renderDirectorio();
                         });
-                        solsEl.appendChild(row);
+                        solList.appendChild(row);
                     });
+                } else {
+                    solBox.style.display = 'none';
                 }
             }
 
-            document.getElementById('reqUniForm').addEventListener('submit', async e => {
-                e.preventDefault();
-                const nombre = document.getElementById('uniNombreInput').value.trim();
-                let tag = document.getElementById('uniTagInput').value.trim() || nombre;
-                if (!tag.startsWith('#')) tag = '#' + tag.replace(/\s+/g, '');
-                const descripcion = document.getElementById('uniDescInput').value.trim();
+            function abrirGrupo(tag) {
+                const todos = window.KIXUZ_UNIVERSOS?.leerUniversos() || [];
+                const u = todos.find(x => norm(x.tag) === norm(tag));
+                if (!u) return;
+                if (norm(u.tag) === '#kixuz' && !window.KIXUZ_UNIVERSOS?.esCuentaKixuz()) return;
 
-                if (!nombre) return;
-                if (norm(tag) === '#kixuz' && !esKixuz()) {
-                    alert('El universo #Kixuz es exclusivo de la cuenta maestra Kixuz.');
+                uniAbierto = u;
+                document.getElementById('directorioView').style.display = 'none';
+                document.getElementById('grupoView').style.display = 'flex';
+                renderGrupo();
+            }
+
+            function renderGrupo() {
+                if (!uniAbierto) return;
+                const todos = window.KIXUZ_UNIVERSOS.leerUniversos();
+                const u = todos.find(x => norm(x.tag) === norm(uniAbierto.tag)) || uniAbierto;
+                uniAbierto = u;
+
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                const miH = normHandle(ac?.handle || '');
+                const miembros = Array.isArray(u.miembros) ? u.miembros.map(normHandle) : [];
+                const soyMiembro = miH && miembros.includes(miH);
+
+                document.getElementById('grpTitle').textContent = u.nombre;
+                document.getElementById('grpTag').textContent = u.tag;
+                document.getElementById('grpDesc').textContent = u.descripcion || '';
+                document.getElementById('grpReglasText').textContent = u.reglas || 'Sin reglas adicionales definidas.';
+                document.getElementById('grpPostingLabel').textContent = ac
+                    ? `Publicando como ${ac.nombre} (${miH}) en ${u.tag}`
+                    : `Publicando en ${u.tag}`;
+
+                const joinWrap = document.getElementById('grpJoinWrap');
+                if (miH) {
+                    joinWrap.innerHTML = `<button type="button" class="btn ${soyMiembro ? 'btn-secondary' : ''}" id="btnToggleMembership">${soyMiembro ? '✓ Miembro (Salir)' : '+ Unirme al Universo'}</button>`;
+                    document.getElementById('btnToggleMembership').addEventListener('click', () => {
+                        const set = new Set(miembros);
+                        if (set.has(miH)) set.delete(miH);
+                        else set.add(miH);
+                        u.miembros = Array.from(set);
+                        window.KIXUZ_UNIVERSOS.guardarUniversos(todos);
+                        renderGrupo();
+                    });
+                }
+
+                // Muro del Universo
+                const feedEl = document.getElementById('grpFeedList');
+                let posts = [];
+                try { posts = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]'); } catch { posts = []; }
+                const uniPosts = posts.filter(p => norm(p.universo || p.alcanceDestino) === norm(u.tag));
+                feedEl.innerHTML = uniPosts.length ? '' : '<div class="muted">Todavía no hay publicaciones en este universo.</div>';
+                uniPosts.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'post-item';
+                    div.innerHTML = `
+                        <div class="row-between">
+                            <a href="perfil.html?char=${encodeURIComponent(p.autorHandle)}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(p.autorNombre)} <span class="muted">${esc(p.autorHandle)}</span></a>
+                            <span class="tag-pill">${esc(p.modoRol || 'IC')}</span>
+                        </div>
+                        <div style="white-space:pre-wrap; margin-top:8px;">${esc(p.contenido)}</div>
+                        ${p.imagen ? `<img src="${esc(p.imagen)}" alt="Imagen" style="max-width:100%; border-radius:10px; margin-top:8px;">` : ''}
+                    `;
+                    feedEl.appendChild(div);
+                });
+
+                // Mapas e imágenes
+                const mapasGrid = document.getElementById('grpMapasGrid');
+                const mapas = Array.isArray(u.mapas) ? u.mapas : [];
+                mapasGrid.innerHTML = mapas.length ? '' : '<div class="muted">Todavía no hay mapas ni imágenes cargadas en este universo.</div>';
+                mapas.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'uni-card';
+                    card.innerHTML = `
+                        <img src="${esc(m.src)}" alt="${esc(m.titulo || 'Mapa')}" style="width:100%; height:180px; object-fit:cover; border-radius:8px;">
+                        <div class="muted">${esc(m.titulo || 'Mapa del universo')} · por ${esc(m.autor || '')}</div>
+                    `;
+                    mapasGrid.appendChild(card);
+                });
+
+                // Miembros
+                const memEl = document.getElementById('grpMiembrosList');
+                memEl.innerHTML = miembros.length
+                    ? miembros.map(m => `<a href="perfil.html?char=${encodeURIComponent(m)}" class="tag-pill" style="margin:3px; text-decoration:none;">${esc(m)}</a>`).join('')
+                    : '<div class="muted">Sin miembros unidos aún.</div>';
+            }
+
+            document.getElementById('btnToggleReqUni').addEventListener('click', () => {
+                const p = document.getElementById('reqUniPanel');
+                p.style.display = p.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById('btnVolverDirectorio').addEventListener('click', () => {
+                uniAbierto = null;
+                document.getElementById('grupoView').style.display = 'none';
+                document.getElementById('directorioView').style.display = 'flex';
+                renderDirectorio();
+            });
+
+            document.querySelectorAll('[data-gtab]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-gtab]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const t = btn.dataset.gtab;
+                    document.getElementById('gtabMuro').style.display = t === 'muro' ? 'block' : 'none';
+                    document.getElementById('gtabMapas').style.display = t === 'mapas' ? 'block' : 'none';
+                    document.getElementById('gtabMiembros').style.display = t === 'miembros' ? 'block' : 'none';
+                });
+            });
+
+            document.getElementById('reqUniForm').addEventListener('submit', e => {
+                e.preventDefault();
+                const nombre = document.getElementById('uniNombre').value.trim();
+                let tag = document.getElementById('uniTag').value.trim() || nombre;
+                if (!tag.startsWith('#')) tag = '#' + tag.replace(/\s+/g, '');
+                const descripcion = document.getElementById('uniDesc').value.trim();
+                const reglas = document.getElementById('uniReglas').value.trim();
+
+                if (norm(tag) === '#kixuz' && !window.KIXUZ_UNIVERSOS?.esCuentaKixuz()) {
+                    alert('El universo #Kixuz está reservado para la cuenta maestra Kixuz.');
                     return;
                 }
 
-                const activo = window.KIXUZ_ACTIVE_CHAR;
-                const sol = {
-                    id: 'sol_' + Date.now(),
-                    nombre,
-                    tag,
-                    descripcion,
-                    solicitanteHandle: activo?.handle || '@usuario',
-                    estado: 'pendiente'
-                };
-
-                if (esKixuz()) {
-                    const unis = leerUniversos();
-                    unis.push({
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                if (window.KIXUZ_UNIVERSOS?.esCuentaKixuz()) {
+                    const todos = window.KIXUZ_UNIVERSOS.leerUniversos();
+                    todos.push({
                         nombre,
                         tag,
                         descripcion,
+                        reglas,
                         creadoPorHandle: '@Kixuz',
-                        miembros: activo?.handle ? [normHandle(activo.handle)] : []
+                        miembros: ac?.handle ? [normHandle(ac.handle)] : [],
+                        mapas: []
                     });
-                    guardarUniversos(unis);
+                    window.KIXUZ_UNIVERSOS.guardarUniversos(todos);
                 } else {
-                    const sols = leerSolicitudes();
-                    sols.unshift(sol);
-                    guardarSolicitudes(sols);
-                    alert('Solicitud enviada. Cuando Kixuz la apruebe aparecerá en el directorio.');
+                    const sols = window.KIXUZ_UNIVERSOS.leerSolicitudes();
+                    sols.unshift({
+                        id: 'sol_' + Date.now(),
+                        nombre,
+                        tag,
+                        descripcion,
+                        reglas,
+                        solicitanteHandle: ac?.handle || '@usuario',
+                        estado: 'pendiente'
+                    });
+                    window.KIXUZ_UNIVERSOS.guardarSolicitudes(sols);
+                    alert('Solicitud enviada a Kixuz para su aprobación.');
                 }
 
                 document.getElementById('reqUniForm').reset();
-                renderUniversos();
+                document.getElementById('reqUniPanel').style.display = 'none';
+                renderDirectorio();
             });
 
-            window.addEventListener('DOMContentLoaded', renderUniversos);
-            window.addEventListener('kixuz:personaje-cambiado', renderUniversos);
-            window.addEventListener('kixuz:sesion-actualizada', renderUniversos);
+            document.getElementById('grpPostImgInput').addEventListener('change', async e => {
+                const f = e.target.files?.[0];
+                if (f) postImgB64 = await comprimirImg(f, 820, 0.78);
+            });
+
+            document.getElementById('grpPostForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                if (!uniAbierto) return;
+                const txt = document.getElementById('grpPostText').value.trim();
+                if (!txt) return;
+                const ac = window.KIXUZ_ACTIVE_CHAR || { nombre: 'Personaje', handle: '@rol' };
+                const modoRol = document.getElementById('grpIcOoc').value;
+                const nuevo = {
+                    id: 'local_' + Date.now(),
+                    autorNombre: ac.nombre,
+                    autorHandle: normHandle(ac.handle),
+                    contenido: txt,
+                    universo: uniAbierto.tag,
+                    alcanceTipo: 'universo',
+                    alcanceDestino: uniAbierto.tag,
+                    modoRol,
+                    imagen: postImgB64,
+                    kixiz: 0,
+                    respuestas: []
+                };
+                let posts = [];
+                try { posts = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]'); } catch { posts = []; }
+                posts.unshift(nuevo);
+                try { localStorage.setItem('kixuz_posts_v1', JSON.stringify(posts)); } catch {}
+                if (window.KIXUZ_DB?.publicarPost) {
+                    try { await window.KIXUZ_DB.publicarPost(nuevo); } catch {}
+                }
+                document.getElementById('grpPostText').value = '';
+                postImgB64 = '';
+                renderGrupo();
+            });
+
+            document.getElementById('grpUploadMapa').addEventListener('change', async e => {
+                const f = e.target.files?.[0];
+                if (!f || !uniAbierto) return;
+                const src = await comprimirImg(f, 1080, 0.8);
+                const titulo = prompt('Título del mapa o imagen:', f.name.replace(/\.[^.]+$/, '')) || 'Mapa';
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                const todos = window.KIXUZ_UNIVERSOS.leerUniversos();
+                const u = todos.find(x => norm(x.tag) === norm(uniAbierto.tag));
+                if (u) {
+                    u.mapas = Array.isArray(u.mapas) ? u.mapas : [];
+                    u.mapas.unshift({ src, titulo, autor: ac?.handle || '@rol' });
+                    window.KIXUZ_UNIVERSOS.guardarUniversos(todos);
+                    renderGrupo();
+                }
+            });
+
+            window.addEventListener('DOMContentLoaded', () => {
+                const params = new URLSearchParams(window.location.search || '');
+                const uParam = params.get('u');
+                if (uParam) abrirGrupo(uParam);
+                else renderDirectorio();
+            });
+            window.addEventListener('kixuz:personaje-cambiado', () => uniAbierto ? renderGrupo() : renderDirectorio());
+            window.addEventListener('kixuz:sesion-actualizada', () => uniAbierto ? renderGrupo() : renderDirectorio());
         })();
     </script>
-
 </body>
 </html>
