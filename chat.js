@@ -4,6 +4,7 @@
     const STORAGE_KEY = 'kixuz_chat_conversaciones_v5';
     const ALL_CHAT_KEYS = [
         'kixuz_chats_v1',
+        'kixuz_chats_v2',
         'kixuz_chat_conversaciones_v1',
         'kixuz_chat_conversaciones_v3',
         'kixuz_chat_conversaciones_v4',
@@ -122,25 +123,15 @@
             padding: 10px 12px; border-radius: 12px; max-width: 84%; word-wrap: break-word;
             display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
         }
-        /* Intervenciones propias a la derecha */
         .kixuz-msg.me {
-            align-self: flex-end;
-            background-color: rgba(108, 60, 224, 0.44);
-            border: 1px solid rgba(45, 212, 196, 0.35);
-            border-bottom-right-radius: 3px;
-            text-align: left;
+            align-self: flex-end; background-color: rgba(108, 60, 224, 0.44);
+            border: 1px solid rgba(45, 212, 196, 0.35); border-bottom-right-radius: 3px; text-align: left;
         }
-        /* Intervenciones de otros implicados a la izquierda */
         .kixuz-msg.other {
-            align-self: flex-start;
-            background-color: rgba(255, 255, 255, 0.07);
-            border-bottom-left-radius: 3px;
-            border-left: 3px solid var(--acento, #2DD4C4);
-            text-align: left;
+            align-self: flex-start; background-color: rgba(255, 255, 255, 0.07);
+            border-bottom-left-radius: 3px; border-left: 3px solid var(--acento, #2DD4C4); text-align: left;
         }
-        html[data-theme="light"] .kixuz-msg.other {
-            background-color: rgba(108, 60, 224, 0.1);
-        }
+        html[data-theme="light"] .kixuz-msg.other { background-color: rgba(108, 60, 224, 0.1); }
         .kixuz-msg-time { display: block; font-size: 10.5px; opacity: 0.65; margin-top: 3px; }
         .kixuz-msg-del { background: none; border: none; color: #ff9bb4; font-size: 11px; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
         .kixuz-chat-input {
@@ -235,17 +226,6 @@
                 }
             });
         });
-
-        try {
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (!key || ALL_CHAT_KEYS.includes(key) || !key.toLowerCase().includes('chat')) continue;
-                leerArregloSeguro(key).forEach((item, idx) => {
-                    const normConv = normalizarConversacion(item, 900 + idx);
-                    if (normConv && !mapa.has(normConv.id)) mapa.set(normConv.id, normConv);
-                });
-            }
-        } catch {}
 
         const combinadas = Array.from(mapa.values());
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas)); } catch {}
@@ -381,20 +361,12 @@
                 subs.forEach(p => { add(p?.handle); add(p?.nombre); });
             }
         } catch {}
-        if (window.KIXUZ_DB?.obtenerMisIdentificadores) {
-            try {
-                window.KIXUZ_DB.obtenerMisIdentificadores().forEach(add);
-            } catch {}
-        }
         return set;
     }
 
-    // Solo los implicados en la conversación pueden verla
+    // Solo los implicados en el chat pueden leerlo
     function esImplicado(conv) {
         if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-        if (window.KIXUZ_DB?.esImplicadoEnChat) {
-            return Boolean(window.KIXUZ_DB.esImplicadoEnChat(conv));
-        }
         const parts = [
             ...(Array.isArray(conv.participantes) ? conv.participantes : []),
             ...(Array.isArray(conv.miembros) ? conv.miembros : []),
@@ -402,11 +374,11 @@
             conv.usuario
         ].map(x => String(x || '').trim().toLowerCase()).filter(Boolean);
 
-        if (parts.includes('todos')) return false;
+        if (parts.includes('todos')) return true;
         if (!parts.length) return String(conv.id).startsWith('chat_');
 
         const misClaves = obtenerMisClaves();
-        if (!misClaves.size) return String(conv.id).startsWith('chat_');
+        if (!misClaves.size) return false;
         return parts.some(p => misClaves.has(p));
     }
 
@@ -478,9 +450,6 @@
         actualizarBadge();
         if (chatActivoId === strId) { chatActivoId = null; volverLista(); }
         else renderLista(searchInput.value);
-        if (window.KIXUZ_DB?.eliminarConversacionChat && !strId.startsWith('chat_')) {
-            window.KIXUZ_DB.eliminarConversacionChat(strId).catch(() => {});
-        }
     }
 
     function renderLista(filtro = '') {
@@ -491,7 +460,7 @@
             .filter(c => (c.nombre || '').toLowerCase().includes(texto) || (c.usuario || '').toLowerCase().includes(texto));
 
         if (!filtradas.length) {
-            chatListEl.innerHTML = `<div class="kixuz-chat-empty">No hay conversaciones privadas visibles para este usuario.<br>Toca <strong>+</strong> para crear una.</div>`;
+            chatListEl.innerHTML = `<div class="kixuz-chat-empty">Solo los implicados pueden leer este chat.<br>Toca <strong>+</strong> para crear uno.</div>`;
             return;
         }
 
@@ -545,7 +514,10 @@
     function renderMensajes() {
         messagesBox.innerHTML = '';
         const conv = obtenerChatActivo();
-        if (!conv) return;
+        if (!conv || !esImplicado(conv)) {
+            messagesBox.innerHTML = `<div class="kixuz-chat-empty">Solo los implicados pueden leer esta conversación.</div>`;
+            return;
+        }
         const msgs = Array.isArray(conv.mensajes) ? conv.mensajes : [];
         if (!msgs.length) {
             messagesBox.innerHTML = `<div class="kixuz-chat-empty">Envía el primer mensaje.</div>`;
@@ -605,29 +577,11 @@
         actualizarBadge();
         cerrarModalCrear();
         abrirConversacion(nueva);
-
-        if (window.KIXUZ_DB?.crearConversacionChat) {
-            window.KIXUZ_DB.crearConversacionChat({
-                nombre: nombreFinal,
-                usuario,
-                tipo,
-                participantesExtra: participantes
-            }).then(creada => {
-                if (creada && creada.id && creada.id !== nueva.id) {
-                    const prevMsgs = nueva.mensajes || [];
-                    const nubeMsgs = creada.mensajes || [];
-                    const merged = { ...creada, mensajes: nubeMsgs.length >= prevMsgs.length ? nubeMsgs : prevMsgs };
-                    conversaciones = conversaciones.map(c => String(c.id) === String(nueva.id) ? merged : c);
-                    if (chatActivoId === String(nueva.id)) chatActivoId = String(merged.id);
-                    guardarLocal();
-                }
-            }).catch(() => {});
-        }
     }
 
     async function agregarPersonaAlChat() {
         const conv = obtenerChatActivo();
-        if (!conv) return;
+        if (!conv || !esImplicado(conv)) return;
         const dato = prompt('Escribe el @usuario a agregar:');
         if (!dato || !dato.trim()) return;
         const h = dato.trim().toLowerCase().startsWith('@') ? dato.trim().toLowerCase() : '@' + dato.trim().toLowerCase().replace(/\s+/g, '_');
@@ -639,8 +593,9 @@
 
     function enviarMensaje() {
         const conv = obtenerChatActivo();
+        if (!conv || !esImplicado(conv)) return;
         const texto = (msgInput.value || '').trim();
-        if (!texto || !conv) return;
+        if (!texto) return;
         const pj = window.KIXUZ_ACTIVE_CHAR || { nombre: 'Tú', handle: '@rol' };
         conv.mensajes = Array.isArray(conv.mensajes) ? conv.mensajes : [];
         conv.mensajes.push({
@@ -657,10 +612,6 @@
         renderMensajes();
         renderLista(searchInput.value);
         actualizarBadge();
-
-        if (window.KIXUZ_DB?.guardarMensajesChat && !String(conv.id).startsWith('chat_')) {
-            window.KIXUZ_DB.guardarMensajesChat(conv.id, conv.mensajes).catch(() => {});
-        }
     }
 
     function volverLista() {
@@ -685,48 +636,8 @@
     searchInput.addEventListener('input', e => renderLista(e.target.value));
     sidebar.querySelector('#kixuzSendBtn').addEventListener('click', enviarMensaje);
     msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enviarMensaje(); } });
-    msgInput.addEventListener('focus', () => {
-        setTimeout(() => { try { msgInput.scrollIntoView({ block: 'nearest' }); } catch {} }, 250);
-    });
-
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            if (sidebar.classList.contains('active')) {
-                sidebar.style.height = `${window.visualViewport.height}px`;
-            }
-        });
-    }
 
     window.addEventListener('kixuz:sesion-actualizada', () => { actualizarBadge(); renderLista(searchInput.value); });
-    window.addEventListener('load', () => {
-        if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharChats) {
-            window.KIXUZ_DB.escucharChats(chatsNube => {
-                const mapa = new Map();
-                conversaciones.forEach(c => { if (c?.id && !idsEliminadosRecientemente.has(String(c.id))) mapa.set(String(c.id), c); });
-                (chatsNube || []).forEach((rawNube, idx) => {
-                    const cn = normalizarConversacion(rawNube, idx);
-                    if (!cn || idsEliminadosRecientemente.has(String(cn.id))) return;
-                    const localExisting = mapa.get(String(cn.id));
-                    if (localExisting) {
-                        const lMsgs = Array.isArray(localExisting.mensajes) ? localExisting.mensajes : [];
-                        const nMsgs = Array.isArray(cn.mensajes) ? cn.mensajes : [];
-                        mapa.set(String(cn.id), { ...localExisting, ...cn, mensajes: nMsgs.length >= lMsgs.length ? nMsgs : lMsgs });
-                    } else {
-                        mapa.set(String(cn.id), cn);
-                    }
-                });
-                conversaciones = Array.from(mapa.values());
-                guardarLocal();
-                actualizarBadge();
-                if (chatActivoId) {
-                    const act = obtenerChatActivo();
-                    if (act && esImplicado(act)) { marcarChatComoLeido(act); actualizarBadge(); actualizarCabeceraConversacion(act); renderMensajes(); }
-                    else volverLista();
-                } else renderLista(searchInput.value);
-            });
-        }
-    });
-
     actualizarBadge();
     renderLista();
 })();
