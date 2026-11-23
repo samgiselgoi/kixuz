@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
-  <title>KIXUZ — Ficha de Personaje</title>
+  <title>KIXUZ — Perfil de Personaje</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,82 +46,144 @@
     }
     html[data-theme="light"] header { background: rgba(255, 255, 255, 0.92); }
     .brand { display: inline-flex; align-items: center; text-decoration: none; flex-shrink: 0; }
-    .char-select {
+    .dropdown {
       height: 38px; padding: 0 12px; border-radius: 10px;
       border: 1px solid var(--border); background: var(--card); color: var(--texto);
       font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px;
       outline: none; cursor: pointer;
     }
-    .container { max-width: 1060px; margin: 22px auto 80px; padding: 0 18px; }
-    .profile-hero {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 18px; overflow: hidden; margin-bottom: 18px;
+
+    /* Disposición de dos columnas: expediente fijo a la izquierda + muro a la derecha */
+    .profile-layout {
+      max-width: 1120px;
+      margin: 24px auto 80px;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 22px;
+      align-items: start;
     }
-    .profile-banner {
-      height: 185px;
+    @media (max-width: 860px) {
+      .profile-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .character-sidebar {
+      position: sticky;
+      top: 76px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+    @media (max-width: 860px) {
+      .character-sidebar { position: static; }
+    }
+
+    .card-banner {
+      height: 118px;
       background: linear-gradient(135deg, #3A1C71, #6C3CE0, #165B6D);
-      background-size: cover; background-position: center; position: relative;
+      position: relative;
     }
-    .visitor-pill {
-      position: absolute; top: 12px; right: 14px;
-      background: rgba(21, 10, 36, 0.88); border: 1px solid var(--accent);
-      color: var(--accent); padding: 4px 12px; border-radius: 999px;
-      font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
+
+    .character-identity {
+      padding: 0 18px 14px;
     }
-    .profile-body {
-      padding: 0 22px 22px; display: flex; align-items: flex-end;
-      justify-content: space-between; gap: 16px; flex-wrap: wrap;
-      margin-top: -44px; position: relative;
+    .character-identity h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      margin-top: 8px;
     }
-    .profile-id { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
-    .avatar-circle {
-      width: 92px; height: 92px; border-radius: 50%; border: 4px solid var(--card);
-      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      background-size: cover; background-position: center;
-      color: #150A24; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
-      font-size: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    .profile-username {
+      color: var(--acento);
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: 2px;
     }
-    .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px; margin-bottom: 16px;
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
     }
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
-      border-radius: 999px; font-size: 12px; font-weight: 600;
-      background: rgba(108, 60, 224, 0.24); border: 1px solid var(--border);
-      color: var(--accent); text-decoration: none;
+    .info-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(108, 60, 224, 0.22);
+      border: 1px solid var(--border);
+      color: var(--acento);
     }
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-      height: 36px; padding: 0 14px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--primary); color: #EDE7E0;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px;
-      cursor: pointer; text-decoration: none;
+
+    .character-sidebar details {
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
     }
-    .btn-ghost { background: transparent; color: var(--texto); }
-    .btn-accent { background: var(--accent); color: #150A24; border-color: var(--accent); }
-    .grid-2 { display: grid; grid-template-columns: 330px 1fr; gap: 18px; }
-    @media (max-width: 840px) { .grid-2 { grid-template-columns: 1fr; } }
-    .attr-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; font-size: 13.5px; }
-    .attr-row {
-      display: flex; justify-content: space-between; gap: 10px;
-      padding: 7px 10px; border-radius: 9px; background: var(--card-2);
+    .character-sidebar summary {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .attr-label { color: var(--muted); font-weight: 600; }
-    .attr-val { font-weight: 700; color: var(--texto); text-align: right; }
-    .stat-block { margin-top: 12px; }
-    .stat-head { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 5px; }
-    .stat-bar { height: 7px; border-radius: 999px; background: var(--card-2); overflow: hidden; }
-    .stat-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #6C3CE0, #2DD4C4); }
-    .stat-fill.weak { background: linear-gradient(90deg, #e03c6c, #f59e0b); }
-    .textarea {
-      width: 100%; background: var(--card-2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 12px; color: var(--texto);
-      font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
+
+    .profile-wall {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .create-post {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .create-post textarea {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      resize: vertical;
+      min-height: 76px;
+    }
+    .create-post-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .btn-publish {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--acento);
+      color: #150A24;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
     }
     .post-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px; margin-bottom: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
     }
   </style>
 </head>
@@ -137,211 +199,552 @@
       <a href="familia.html">Familia / Clan</a>
     </nav>
     <div class="user-menu">
-      <select id="activeCharSelect" class="char-select" aria-label="Personaje activo"></select>
+      <select id="activeCharSelect" class="dropdown" aria-label="Personaje activo"></select>
+      <a href="cuenta-maestra.html" class="dropdown" style="display:inline-flex;align-items:center;text-decoration:none;">Mi Cuenta Maestra</a>
       <a href="registro.html">Entrar</a>
     </div>
   </header>
 
-  <main class="container">
-    <section class="profile-hero">
-      <div id="profileBanner" class="profile-banner">
-        <span id="visitorBadge" class="visitor-pill" style="display:none;">Modo Visitante · Solo lectura</span>
-      </div>
-      <div class="profile-body">
-        <div class="profile-id">
-          <div id="profileAvatar" class="avatar-circle">K</div>
-          <div style="padding-bottom:4px;">
-            <h1 id="profileName" style="font-family:'Space Grotesk',sans-serif;font-size:24px;">Cargando...</h1>
-            <div id="profileHandle" style="color:var(--accent);font-weight:700;font-size:14px;margin:2px 0 8px;">@rol</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="charTagsRow">
-              <a id="profileUniverse" href="universo.html" class="badge">#NexoCentral</a>
-              <a id="profileClan" href="familia.html" class="badge">Familia / Clan</a>
-            </div>
-          </div>
-        </div>
-        <div id="ownerActions" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <a href="crear-personaje.html" class="btn btn-ghost">Editar / Nuevo</a>
-          <a href="cuenta-maestra.html" class="btn">Mi Cuenta Maestra</a>
+  <main class="profile-layout">
+    <aside class="character-sidebar" id="characterSidebar"></aside>
+
+    <section class="profile-wall">
+      <div class="create-post" id="profileCreatePost">
+        <textarea id="profileWallInput" placeholder="Escribe una escena o crónica en este perfil..."></textarea>
+        <div class="create-post-footer">
+          <button type="button" class="btn-publish" id="profileWallPublish">Publicar</button>
         </div>
       </div>
+      <div id="profileWallFeed"></div>
     </section>
-
-    <div class="grid-2">
-      <aside>
-        <div class="card">
-          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:8px;color:var(--accent);">Expediente & Trasfondo</h2>
-          <p id="profileBio" style="line-height:1.6;font-size:13.5px;color:var(--muted);">Sin biografía registrada.</p>
-          <div id="profileAttrs" class="attr-list"></div>
-        </div>
-
-        <div class="card" id="statsCard">
-          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:4px;color:var(--accent);">Habilidades & Debilidades</h2>
-          <div id="profileStats"></div>
-        </div>
-      </aside>
-
-      <section>
-        <div class="card" id="profileComposerCard">
-          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:15.5px;margin-bottom:10px;">Publicar crónica en este perfil</h3>
-          <textarea id="profilePostInput" class="textarea" rows="2" placeholder="Escribe una escena o actualización del personaje..."></textarea>
-          <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-            <button type="button" id="profilePublishBtn" class="btn btn-accent">Publicar</button>
-          </div>
-        </div>
-
-        <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:12px;">Crónicas & Publicaciones</h3>
-        <div id="profilePosts"></div>
-      </section>
-    </div>
   </main>
 
   <script>
-    const normH = v => {
-      const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
-      return s ? '@' + s : '';
-    };
+    (() => {
+      const KEY_LISTA = 'kixuz_subpersonajes';
+      const KEY_ACTIVO = 'kixuz_personaje_activo';
 
-    let personajeActualFicha = null;
+      const SVG_ICON = {
+        uni: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-25 12 12)"/></svg>`,
+        clan: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.8-8 9-4.5-1.2-8-4-8-9V7l8-4z"/></svg>`,
+        cam: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+        img: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+        edit: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+        trash: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`
+      };
 
-    async function cargarPerfil() {
-      const params = new URLSearchParams(window.location.search);
-      const charParam = params.get('char') || '';
+      const PERSONAJE_VACIO = {
+        esPlaceholder: true,
+        nombre: 'Sin personaje',
+        handle: '@nuevo_personaje',
+        genero: '—',
+        orientacion: '—',
+        especies: [],
+        edadAparente: '—',
+        edadReal: '—',
+        ocupacion: '—',
+        clan: '',
+        universos: ['#KIXUZ'],
+        bio: 'Aún no tienes sub-personajes creados. Haz clic en "+ Crear personaje" para armar tu primera ficha.',
+        historiaExtendida: '',
+        vinculos: [],
+        habilidades: [],
+        debilidades: [],
+        fondo: '',
+        avatar: '',
+        banner: '',
+        fondoImagen: ''
+      };
 
-      let subs = [];
-      try {
-        const raw = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-        if (Array.isArray(raw)) subs = raw.filter(p => p && (p.nombre || p.handle));
-      } catch {}
+      const esc = str => String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 
-      let activo = null;
-      try { activo = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null'); } catch {}
-      if (!activo && subs.length) activo = subs[0];
+      const normH = v => {
+        const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+        return s ? '@' + s : '';
+      };
 
-      const targetH = normH(charParam || activo?.handle || '');
-      let info = subs.find(p => normH(p.handle) === targetH) || (normH(activo?.handle) === targetH ? activo : null);
-      let esVisitante = !info;
+      const style = document.createElement('style');
+      style.textContent = `
+        .kixuz-active-pill {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+          color: var(--acento, #2DD4C4); background: rgba(108, 60, 224, 0.16);
+          border: 1px solid rgba(108, 60, 224, 0.45); padding: 5px 12px;
+          border-radius: 18px; margin-bottom: 12px;
+        }
+        .kixuz-edit-banner-btn {
+          position: absolute; top: 10px; right: 10px; z-index: 3;
+          background: rgba(21, 10, 36, 0.82); color: #EDE7E0;
+          border: 1px solid var(--acento, #2DD4C4); border-radius: 8px;
+          padding: 5px 10px; font-family: 'Space Grotesk', sans-serif;
+          font-size: 11.5px; font-weight: 700; cursor: pointer;
+          display: inline-flex; align-items: center; gap: 5px;
+        }
+        .kixuz-edit-banner-btn:hover { background: var(--acento, #2DD4C4); color: #150A24; }
+        .kixuz-avatar-wrap { position: relative; width: 92px; height: 92px; margin-top: -48px; z-index: 2; }
+        .kixuz-avatar-wrap .avatar-circle {
+          width: 92px; height: 92px; border-radius: 50%;
+          border: 3px solid var(--acento, #2DD4C4);
+          background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+          background-size: cover; background-position: center;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 28px; color: #150A24;
+        }
+        .kixuz-edit-avatar-btn {
+          position: absolute; bottom: 0; right: -2px; width: 30px; height: 30px;
+          border-radius: 50%; background: var(--acento, #2DD4C4); color: #150A24;
+          border: 2px solid var(--bg-principal, #150A24);
+          display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .kixuz-profile-edit-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .kixuz-edit-btn {
+          flex: 1; min-width: 105px; background: rgba(108, 60, 224, 0.22);
+          color: var(--texto, #EDE7E0); border: 1px solid rgba(45, 212, 196, 0.55);
+          border-radius: 9px; padding: 7px 10px; font-family: 'Space Grotesk', sans-serif;
+          font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none;
+          display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .kixuz-edit-btn:hover { background: var(--acento, #2DD4C4); color: #150A24; }
+        .kixuz-edit-btn.danger { border-color: rgba(224, 60, 108, 0.55); color: #ff9bb4; background: rgba(224, 60, 108, 0.14); }
+        .kixuz-edit-btn.danger:hover { background: #e03c6c; color: #fff; }
+        .kixuz-dyn-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-top: 8px; }
+        .kixuz-dyn-meta .full { grid-column: 1 / -1; }
+        .kixuz-dyn-meta strong { color: var(--acento, #2DD4C4); font-family: 'Space Grotesk', sans-serif; }
+        .kixuz-dyn-stat { margin-bottom: 10px; }
+        .kixuz-dyn-stat-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; font-weight: 600; }
+        .kixuz-dyn-track { height: 7px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+        .kixuz-dyn-fill { height: 100%; border-radius: 6px; background: var(--acento, #2DD4C4); }
+        .kixuz-dyn-fill.weak { background: #e03c6c; }
+        .kixuz-dyn-bonds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .kixuz-dyn-bond { font-size: 12px; padding: 4px 10px; border-radius: 10px; background: rgba(108, 60, 224, 0.2); border: 1px solid rgba(108, 60, 224, 0.4); }
+        body.kixuz-custom-bg { background-size: cover !important; background-position: center !important; background-attachment: fixed !important; }
+        .kixuz-modal-backdrop {
+          position: fixed; inset: 0; background: rgba(10, 4, 20, 0.78); backdrop-filter: blur(6px);
+          z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px;
+        }
+        .kixuz-modal {
+          width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+          background: var(--bg-principal, #150A24); color: var(--texto, #EDE7E0);
+          border: 1px solid var(--acento, #2DD4C4); border-radius: 16px; padding: 22px;
+        }
+        .kixuz-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .kixuz-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .kixuz-modal-field { margin-bottom: 10px; }
+        .kixuz-modal-field.full { grid-column: 1 / -1; }
+        .kixuz-modal-field label { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 700; margin-bottom: 5px; color: var(--acento, #2DD4C4); }
+        .kixuz-modal-field input, .kixuz-modal-field textarea {
+          width: 100%; padding: 9px 12px; background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(108, 60, 224, 0.55); border-radius: 8px;
+          color: var(--texto, #EDE7E0); font-family: 'Inter', sans-serif; font-size: 13.5px; outline: none;
+        }
+        .kixuz-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+        .kixuz-btn-save { background: var(--acento, #2DD4C4); color: #150A24; border: none; padding: 10px 18px; border-radius: 9px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; cursor: pointer; }
+        .kixuz-btn-cancel { background: transparent; color: var(--texto, #EDE7E0); border: 1px solid rgba(108, 60, 224, 0.6); padding: 10px 14px; border-radius: 9px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; cursor: pointer; }
+      `;
+      document.head.appendChild(style);
 
-      if (!info && window.KIXUZ_DB?.buscarPersonajePublico && targetH) {
+      function comprimirImagen(file, maxAncho, calidad) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = reject;
+          reader.onload = e => {
+            const img = new Image();
+            img.onerror = reject;
+            img.onload = () => {
+              let w = img.width, h = img.height;
+              if (w > maxAncho) { h = Math.round((h * maxAncho) / w); w = maxAncho; }
+              const canvas = document.createElement('canvas');
+              canvas.width = w; canvas.height = h;
+              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+              resolve(canvas.toDataURL('image/jpeg', calidad));
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function obtenerPersonajes() {
+        let guardados = [];
+        try { guardados = JSON.parse(localStorage.getItem(KEY_LISTA) || '[]'); } catch { guardados = []; }
+        if (Array.isArray(guardados) && guardados.length > 0) {
+          const mapa = new Map();
+          guardados.forEach(p => { if (p && p.handle) mapa.set(normH(p.handle), { ...p, handle: normH(p.handle) }); });
+          if (mapa.size > 0) return Array.from(mapa.values());
+        }
+        return [{ ...PERSONAJE_VACIO }];
+      }
+
+      function obtenerActivoMenu(lista) {
         try {
-          const pub = await window.KIXUZ_DB.buscarPersonajePublico(targetH);
-          if (pub) info = pub;
+          const raw = localStorage.getItem(KEY_ACTIVO);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const found = lista.find(p => normH(p.handle) === normH(parsed?.handle));
+            if (found) return found;
+          }
         } catch {}
+        return lista[0];
       }
 
-      if (!info) {
-        info = {
-          nombre: (charParam || 'Personaje').replace(/^@+/, ''),
-          handle: targetH || '@rol',
-          bio: 'Ficha de personaje en modo visitante.',
-          universos: ['#NexoCentral'],
-          clan: 'Familia / Clan'
+      function obtenerPersonajeVista(lista, activoMenu) {
+        const params = new URLSearchParams(window.location.search);
+        const charUrl = params.get('char');
+        if (charUrl) {
+          const h = normH(charUrl);
+          const found = lista.find(p => normH(p.handle) === h);
+          if (found) return found;
+          return {
+            ...PERSONAJE_VACIO,
+            nombre: h.replace(/^@/, ''),
+            handle: h,
+            bio: 'Perfil en modo visitante.'
+          };
+        }
+        return activoMenu;
+      }
+
+      function guardarActivoMenu(personaje) {
+        try {
+          if (personaje.esPlaceholder) localStorage.removeItem(KEY_ACTIVO);
+          else localStorage.setItem(KEY_ACTIVO, JSON.stringify(personaje));
+        } catch {}
+        window.KIXUZ_ACTIVE_CHAR = personaje;
+      }
+
+      async function guardarCambiosPersonaje(personajeActualizado, actualizarActivo = true) {
+        const cleanChar = { ...personajeActualizado, handle: normH(personajeActualizado.handle) };
+        delete cleanChar.esPlaceholder;
+        let guardados = [];
+        try { guardados = JSON.parse(localStorage.getItem(KEY_LISTA) || '[]'); } catch { guardados = []; }
+        const filtrados = guardados.filter(p => normH(p.handle) !== cleanChar.handle);
+        filtrados.push(cleanChar);
+        try {
+          localStorage.setItem(KEY_LISTA, JSON.stringify(filtrados));
+          if (actualizarActivo) {
+            localStorage.setItem(KEY_ACTIVO, JSON.stringify(cleanChar));
+            window.KIXUZ_ACTIVE_CHAR = cleanChar;
+          }
+        } catch {
+          alert('La imagen es demasiado pesada para guardarse en el navegador.');
+          return false;
+        }
+        if (window.KIXUZ_DB?.guardarSubpersonaje) {
+          try { await window.KIXUZ_DB.guardarSubpersonaje(cleanChar); } catch {}
+        }
+        return true;
+      }
+
+      async function borrarPersonaje(personaje) {
+        if (!personaje || personaje.esPlaceholder) return;
+        if (window.KIXUZ_DB?.eliminarSubpersonaje) {
+          await window.KIXUZ_DB.eliminarSubpersonaje(personaje.handle, personaje.id || '');
+        } else {
+          let guardados = [];
+          try { guardados = JSON.parse(localStorage.getItem(KEY_LISTA) || '[]'); } catch { guardados = []; }
+          const filtrados = guardados.filter(p => normH(p.handle) !== normH(personaje.handle));
+          localStorage.setItem(KEY_LISTA, JSON.stringify(filtrados));
+          if (filtrados.length > 0) localStorage.setItem(KEY_ACTIVO, JSON.stringify(filtrados[0]));
+          else localStorage.removeItem(KEY_ACTIVO);
+          sincronizarSelectores();
+        }
+      }
+
+      function aplicarFondoPagina(personaje) {
+        if (personaje.fondoImagen) {
+          const esClaro = document.documentElement.getAttribute('data-theme') === 'light';
+          const velo = esClaro
+            ? 'linear-gradient(rgba(237, 231, 224, 0.78), rgba(237, 231, 224, 0.85))'
+            : 'linear-gradient(rgba(21, 10, 36, 0.74), rgba(21, 10, 36, 0.86))';
+          document.body.classList.add('kixuz-custom-bg');
+          document.body.style.backgroundImage = `${velo}, url('${personaje.fondoImagen}')`;
+        } else {
+          document.body.classList.remove('kixuz-custom-bg');
+          document.body.style.backgroundImage = '';
+        }
+      }
+
+      function abrirSelectorImagen(tipo, personaje, esVistaSolo) {
+        if (personaje.esPlaceholder) { window.location.href = 'crear-personaje.html'; return; }
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          try {
+            const dataUrl = await comprimirImagen(file, tipo === 'avatar' ? 320 : 820, tipo === 'avatar' ? 0.78 : 0.68);
+            const actualizado = { ...personaje };
+            if (tipo === 'avatar') actualizado.avatar = dataUrl;
+            if (tipo === 'banner') actualizado.banner = dataUrl;
+            if (tipo === 'fondo') actualizado.fondoImagen = dataUrl;
+            if (await guardarCambiosPersonaje(actualizado, !esVistaSolo)) {
+              actualizarPerfil(actualizado, esVistaSolo);
+            }
+          } catch { alert('No se pudo procesar la imagen.'); }
         };
+        input.click();
       }
 
-      personajeActualFicha = info;
-      const esAdmin = Boolean(window.KIXUZ_DB?.esAdmin);
-      const puedeEditar = !esVisitante || esAdmin;
-
-      document.getElementById('visitorBadge').style.display = puedeEditar ? 'none' : 'inline-block';
-      document.getElementById('ownerActions').style.display = puedeEditar ? 'flex' : 'none';
-      document.getElementById('profileComposerCard').style.display = puedeEditar ? 'block' : 'none';
-
-      const avatarEl = document.getElementById('profileAvatar');
-      if (info.avatar) {
-        avatarEl.style.backgroundImage = `url('${info.avatar}')`;
-        avatarEl.textContent = '';
-      } else {
-        avatarEl.style.backgroundImage = '';
-        avatarEl.textContent = (info.nombre || 'P').charAt(0).toUpperCase();
+      function abrirModalEdicion(personaje, esVistaSolo) {
+        const previo = document.getElementById('kixuzEditModalBackdrop');
+        if (previo) previo.remove();
+        const backdrop = document.createElement('div');
+        backdrop.id = 'kixuzEditModalBackdrop';
+        backdrop.className = 'kixuz-modal-backdrop';
+        backdrop.innerHTML = `
+          <div class="kixuz-modal" role="dialog" aria-modal="true">
+            <div class="kixuz-modal-head">
+              <h2>Editar Perfil (${esc(personaje.handle)})</h2>
+              <button type="button" class="kixuz-btn-cancel" id="kixuzCloseModal">Cerrar</button>
+            </div>
+            <form id="kixuzEditForm">
+              <div class="kixuz-modal-grid">
+                <div class="kixuz-modal-field full"><label>Nombre</label><input type="text" id="edNombre" value="${esc(personaje.nombre)}" required></div>
+                <div class="kixuz-modal-field"><label>Género</label><input type="text" id="edGenero" value="${esc(personaje.genero || '')}"></div>
+                <div class="kixuz-modal-field"><label>Orientación</label><input type="text" id="edOrientacion" value="${esc(personaje.orientacion || '')}"></div>
+                <div class="kixuz-modal-field"><label>Edad aparente</label><input type="text" id="edEdadAp" value="${esc(personaje.edadAparente || '')}"></div>
+                <div class="kixuz-modal-field"><label>Edad real</label><input type="text" id="edEdadReal" value="${esc(personaje.edadReal || '')}"></div>
+                <div class="kixuz-modal-field full"><label>Especie(s) (separadas por coma)</label><input type="text" id="edEspecies" value="${esc((personaje.especies || []).join(', '))}"></div>
+                <div class="kixuz-modal-field"><label>Ocupación</label><input type="text" id="edOcupacion" value="${esc(personaje.ocupacion || '')}"></div>
+                <div class="kixuz-modal-field"><label>Clan / Facción</label><input type="text" id="edClan" value="${esc(personaje.clan || '')}"></div>
+                <div class="kixuz-modal-field full"><label>Universo(s) (separados por coma)</label><input type="text" id="edUniversos" value="${esc((personaje.universos || []).join(', '))}"></div>
+                <div class="kixuz-modal-field full"><label>Biografía</label><textarea id="edBio">${esc(personaje.bio || '')}</textarea></div>
+                <div class="kixuz-modal-field full"><label>Historia Extendida</label><textarea id="edLore">${esc(personaje.historiaExtendida || '')}</textarea></div>
+              </div>
+              <div class="kixuz-modal-actions">
+                <button type="button" class="kixuz-btn-cancel" id="kixuzCancelModal">Cancelar</button>
+                <button type="submit" class="kixuz-btn-save">Guardar cambios</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(backdrop);
+        const cerrar = () => backdrop.remove();
+        document.getElementById('kixuzCloseModal').addEventListener('click', cerrar);
+        document.getElementById('kixuzCancelModal').addEventListener('click', cerrar);
+        document.getElementById('kixuzEditForm').addEventListener('submit', async e => {
+          e.preventDefault();
+          const actualizado = {
+            ...personaje,
+            nombre: document.getElementById('edNombre').value.trim() || personaje.nombre,
+            genero: document.getElementById('edGenero').value.trim(),
+            orientacion: document.getElementById('edOrientacion').value.trim(),
+            edadAparente: document.getElementById('edEdadAp').value.trim(),
+            edadReal: document.getElementById('edEdadReal').value.trim(),
+            especies: document.getElementById('edEspecies').value.split(',').map(s => s.trim()).filter(Boolean),
+            ocupacion: document.getElementById('edOcupacion').value.trim(),
+            clan: document.getElementById('edClan').value.trim(),
+            universos: document.getElementById('edUniversos').value.split(',').map(u => u.trim()).filter(Boolean).map(u => u.startsWith('#') ? u : '#' + u.replace(/\s+/g, '')),
+            bio: document.getElementById('edBio').value.trim(),
+            historiaExtendida: document.getElementById('edLore').value.trim()
+          };
+          if (await guardarCambiosPersonaje(actualizado, !esVistaSolo)) { cerrar(); sincronizarSelectores(); }
+        });
       }
 
-      const bannerEl = document.getElementById('profileBanner');
-      if (info.banner) {
-        bannerEl.style.backgroundImage = `url('${info.banner}')`;
+      function renderMuroPersonaje(personaje) {
+        const feed = document.getElementById('profileWallFeed');
+        if (!feed) return;
+        let posts = [];
+        try {
+          const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+          const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+          posts = [...p1, ...p2].filter(p => normH(p.autorHandle || p.handle) === normH(personaje.handle));
+        } catch {}
+        feed.innerHTML = posts.length
+          ? posts.map(p => `<article class="post-card"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${esc(p.universo || p.universe || '#KIXUZ')} · ${esc(p.time || 'Reciente')}</div><p style="line-height:1.55;white-space:pre-line;">${esc(p.texto || p.text || '')}</p></article>`).join('')
+          : `<div class="post-card" style="color:var(--muted);font-size:14px;">Sin publicaciones en este perfil todavía.</div>`;
       }
 
-      document.getElementById('profileName').textContent = info.nombre || 'Personaje';
-      document.getElementById('profileHandle').textContent = info.handle || targetH;
-      document.getElementById('profileBio').textContent = info.bio || 'Sin biografía registrada.';
+      function actualizarPerfil(personaje, esVistaSolo = false) {
+        const sidebar = document.getElementById('characterSidebar');
+        if (!sidebar) return;
 
-      const uni = Array.isArray(info.universos) && info.universos[0] ? info.universos[0] : (info.universo || '#NexoCentral');
-      const uniEl = document.getElementById('profileUniverse');
-      uniEl.textContent = uni;
-      uniEl.href = `universo.html?u=${encodeURIComponent(uni.replace(/^#/, ''))}`;
+        document.title = `${personaje.nombre} (${personaje.handle}) - KIXUZ`;
+        sidebar.style.backgroundImage = personaje.fondo || '';
+        aplicarFondoPagina(personaje);
 
-      const clanEl = document.getElementById('profileClan');
-      clanEl.textContent = info.clan || 'Familia / Clan';
-      clanEl.href = `familia.html?char=${encodeURIComponent(info.handle || targetH)}`;
+        const composer = document.getElementById('profileCreatePost');
+        if (composer) composer.style.display = (personaje.esPlaceholder || esVistaSolo) ? 'none' : 'block';
 
-      const attrs = [
-        ['Especie / Raza', info.especie],
-        ['Género', info.genero],
-        ['Edad', info.edad],
-        ['Clan / Facción', info.clan],
-        ['Ocupación / Rol', info.ocupacion]
-      ].filter(([, v]) => v);
+        if (personaje.esPlaceholder) {
+          sidebar.innerHTML = `
+            <div class="card-banner"></div>
+            <div class="character-identity">
+              <div class="kixuz-avatar-wrap"><div class="avatar-circle">K</div></div>
+              <h1>${esc(personaje.nombre)}</h1>
+              <div class="profile-username">${esc(personaje.handle)}</div>
+              <p style="font-size:13.5px;opacity:0.82;margin:10px 0 14px;">${esc(personaje.bio)}</p>
+              <div class="kixuz-profile-edit-bar">
+                <a href="crear-personaje.html" class="kixuz-edit-btn">+ Crear personaje</a>
+              </div>
+            </div>
+          `;
+          renderMuroPersonaje(personaje);
+          return;
+        }
 
-      document.getElementById('profileAttrs').innerHTML = attrs.length
-        ? attrs.map(([k, v]) => `<div class="attr-row"><span class="attr-label">${k}</span><span class="attr-val">${v}</span></div>`).join('')
-        : `<div style="font-size:12.5px;color:var(--muted);">Completa especie, edad y clan desde Editar personaje.</div>`;
+        const universosHTML = (personaje.universos || []).map(u => {
+          const slug = String(u).replace(/^#/, '');
+          return `<a href="universo.html?u=${encodeURIComponent(slug)}" class="info-tag">${SVG_ICON.uni} ${esc(u)}</a>`;
+        }).join('');
 
-      const habs = Array.isArray(info.habilidades) ? info.habilidades : (info.habilidad ? [{ nombre: info.habilidad, valor: info.habilidadNivel || 80 }] : []);
-      const debs = Array.isArray(info.debilidades) ? info.debilidades : (info.debilidad ? [{ nombre: info.debilidad, valor: info.debilidadNivel || 55 }] : []);
-      const statsEl = document.getElementById('profileStats');
+        const clanHTML = personaje.clan
+          ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(personaje.clan)}</a>`
+          : '';
 
-      if (habs.length || debs.length) {
-        statsEl.innerHTML = [
-          ...habs.map(h => `<div class="stat-block"><div class="stat-head"><span>${h.nombre || h}</span><span style="color:var(--accent);">${h.valor || 80}%</span></div><div class="stat-bar"><div class="stat-fill" style="width:${h.valor || 80}%"></div></div></div>`),
-          ...debs.map(d => `<div class="stat-block"><div class="stat-head"><span>${d.nombre || d}</span><span style="color:#ff9bb4;">${d.valor || 55}%</span></div><div class="stat-bar"><div class="stat-fill weak" style="width:${d.valor || 55}%"></div></div></div>`)
-        ].join('');
-      } else {
-        statsEl.innerHTML = `<div style="font-size:12.5px;color:var(--muted);margin-top:8px;">Sin estadísticas cargadas aún.</div>`;
+        const skillsHTML = (personaje.habilidades || []).map(s => `
+          <div class="kixuz-dyn-stat">
+            <div class="kixuz-dyn-stat-head"><span>${esc(s.nombre)}</span><span>${s.valor}/10</span></div>
+            <div class="kixuz-dyn-track"><div class="kixuz-dyn-fill" style="width:${(s.valor || 0) * 10}%"></div></div>
+          </div>
+        `).join('') || '<p style="font-size:13px;opacity:0.7;">Sin habilidades cargadas.</p>';
+
+        const weakHTML = (personaje.debilidades || []).map(w => `
+          <div class="kixuz-dyn-stat">
+            <div class="kixuz-dyn-stat-head"><span>${esc(w.nombre)}</span><span>${w.valor}/10</span></div>
+            <div class="kixuz-dyn-track"><div class="kixuz-dyn-fill weak" style="width:${(w.valor || 0) * 10}%"></div></div>
+          </div>
+        `).join('') || '<p style="font-size:13px;opacity:0.7;">Sin debilidades cargadas.</p>';
+
+        const bondsHTML = (personaje.vinculos && personaje.vinculos.length)
+          ? `<details open><summary>Vínculos Iniciales</summary><div class="kixuz-dyn-bonds">${personaje.vinculos.map(v => `<span class="kixuz-dyn-bond"><strong>${esc(v.personaje || 'Personaje')}</strong>${v.relacion ? ` · ${esc(v.relacion)}` : ''}</span>`).join('')}</div></details>`
+          : '';
+
+        const loreHTML = personaje.historiaExtendida
+          ? `<details><summary>Historia Extendida</summary><p style="font-size:13.5px;white-space:pre-line;margin-top:8px;">${esc(personaje.historiaExtendida)}</p></details>`
+          : '';
+
+        const bannerStyle = personaje.banner ? `style="background-image:url('${personaje.banner}');background-size:cover;background-position:center;"` : '';
+        const avatarStyle = personaje.avatar ? `style="background-image:url('${personaje.avatar}');background-size:cover;background-position:center;"` : '';
+        const inicialAvatar = personaje.avatar ? '' : (personaje.nombre || 'K').charAt(0).toUpperCase();
+
+        sidebar.innerHTML = `
+          <div class="card-banner" ${bannerStyle}>
+            ${!esVistaSolo ? `<button type="button" class="kixuz-edit-banner-btn" id="btnEditBanner">${SVG_ICON.img} Banner</button>` : ''}
+          </div>
+          <div class="character-identity">
+            <div class="kixuz-avatar-wrap">
+              <div class="avatar-circle" ${avatarStyle}>${esc(inicialAvatar)}</div>
+              ${!esVistaSolo ? `<button type="button" class="kixuz-edit-avatar-btn" id="btnEditAvatar" title="Cambiar foto">${SVG_ICON.cam}</button>` : ''}
+            </div>
+            <h1>${esc(personaje.nombre)}</h1>
+            <div class="profile-username">${esc(personaje.handle)}</div>
+            ${esVistaSolo ? `<div style="margin-top:6px;font-size:11.5px;color:var(--acento);">Modo visitante</div>` : ''}
+            <div class="tags-container">${universosHTML}${clanHTML}</div>
+            ${!esVistaSolo ? `
+              <div class="kixuz-profile-edit-bar">
+                <button type="button" class="kixuz-edit-btn" id="btnEditBg">${SVG_ICON.img} Fondo</button>
+                <button type="button" class="kixuz-edit-btn" id="btnEditProfile">${SVG_ICON.edit} Editar</button>
+                <button type="button" class="kixuz-edit-btn danger" id="btnDeleteChar">${SVG_ICON.trash} Eliminar</button>
+              </div>
+            ` : ''}
+          </div>
+          <details open>
+            <summary>Datos Básicos</summary>
+            <div class="kixuz-dyn-meta">
+              <div class="full"><strong>Especie(s):</strong> ${esc((personaje.especies || []).join(' / ') || '—')}</div>
+              <div><strong>Género:</strong> ${esc(personaje.genero || '—')}</div>
+              <div><strong>Orientación:</strong> ${esc(personaje.orientacion || '—')}</div>
+              <div><strong>Edad aparente:</strong> ${esc(personaje.edadAparente || '—')}</div>
+              <div><strong>Edad real:</strong> ${esc(personaje.edadReal || '—')}</div>
+              <div class="full"><strong>Ocupación:</strong> ${esc(personaje.ocupacion || '—')}</div>
+            </div>
+          </details>
+          <details open>
+            <summary>Biografía</summary>
+            <p style="font-size:13.5px;margin-top:8px;">${esc(personaje.bio || 'Sin descripción todavía.')}</p>
+          </details>
+          ${loreHTML}
+          ${bondsHTML}
+          <details open>
+            <summary>Habilidades (1-10)</summary>
+            <div style="margin-top:10px;">${skillsHTML}</div>
+          </details>
+          <details open>
+            <summary style="color:#e03c6c;">Debilidades (1-10)</summary>
+            <div style="margin-top:10px;">${weakHTML}</div>
+          </details>
+        `;
+
+        if (!esVistaSolo) {
+          document.getElementById('btnEditAvatar')?.addEventListener('click', () => abrirSelectorImagen('avatar', personaje, esVistaSolo));
+          document.getElementById('btnEditBanner')?.addEventListener('click', () => abrirSelectorImagen('banner', personaje, esVistaSolo));
+          document.getElementById('btnEditBg')?.addEventListener('click', () => abrirSelectorImagen('fondo', personaje, esVistaSolo));
+          document.getElementById('btnEditProfile')?.addEventListener('click', () => abrirModalEdicion(personaje, esVistaSolo));
+          document.getElementById('btnDeleteChar')?.addEventListener('click', () => borrarPersonaje(personaje));
+        }
+
+        renderMuroPersonaje(personaje);
       }
 
-      renderProfilePosts(info.handle || targetH);
-    }
-
-    function renderProfilePosts(handle) {
-      let posts = [];
-      try {
-        const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
-        const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
-        posts = [...p1, ...p2].filter(p => normH(p.autorHandle || p.handle) === normH(handle));
-      } catch {}
-
-      const postsBox = document.getElementById('profilePosts');
-      postsBox.innerHTML = posts.length
-        ? posts.map(p => `<article class="post-card"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${p.universo || p.universe || '#NexoCentral'} · ${p.time || 'Reciente'}</div><p style="line-height:1.55;white-space:pre-line;">${p.texto || p.text || ''}</p></article>`).join('')
-        : `<div class="card" style="color:var(--muted);font-size:14px;">Este personaje aún no tiene publicaciones en el muro.</div>`;
-    }
-
-    document.getElementById('profilePublishBtn').addEventListener('click', () => {
-      const txt = document.getElementById('profilePostInput').value.trim();
-      if (!txt || !personajeActualFicha) return;
-      const handle = personajeActualFicha.handle || '@rol';
-      const uni = Array.isArray(personajeActualFicha.universos) && personajeActualFicha.universos[0]
-        ? personajeActualFicha.universos[0]
-        : '#NexoCentral';
-      let posts = [];
-      try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
-      posts.unshift({
-        id: 'p_' + Date.now(),
-        author: personajeActualFicha.nombre || 'Personaje',
-        handle,
-        universe: uni,
-        time: 'Ahora mismo',
-        text: txt,
-        kix: 0,
-        liked: false,
-        comments: []
+      document.getElementById('profileWallPublish')?.addEventListener('click', () => {
+        const input = document.getElementById('profileWallInput');
+        const txt = (input?.value || '').trim();
+        const lista = obtenerPersonajes();
+        const activo = obtenerActivoMenu(lista);
+        if (!txt || !activo || activo.esPlaceholder) return;
+        let posts = [];
+        try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
+        posts.unshift({
+          id: 'p_' + Date.now(),
+          author: activo.nombre,
+          handle: activo.handle,
+          universe: (activo.universos && activo.universos[0]) || '#KIXUZ',
+          time: 'Ahora mismo',
+          text: txt,
+          kix: 0,
+          liked: false,
+          comments: []
+        });
+        localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+        input.value = '';
+        renderMuroPersonaje(activo);
       });
-      localStorage.setItem('kixuz_posts', JSON.stringify(posts));
-      document.getElementById('profilePostInput').value = '';
-      renderProfilePosts(handle);
-    });
 
-    window.addEventListener('DOMContentLoaded', cargarPerfil);
-    window.addEventListener('kixuz:personajes-actualizados', cargarPerfil);
+      function sincronizarSelectores() {
+        const lista = obtenerPersonajes();
+        const activoMenu = obtenerActivoMenu(lista);
+        const personajeVista = obtenerPersonajeVista(lista, activoMenu);
+        const esVistaSolo = normH(personajeVista.handle) !== normH(activoMenu.handle);
+        guardarActivoMenu(activoMenu);
+
+        document.querySelectorAll('select.dropdown, #activeCharSelect').forEach(select => {
+          select.innerHTML = '';
+          lista.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.handle;
+            opt.textContent = p.esPlaceholder ? 'Sin personaje' : `${p.nombre} (${p.handle})`;
+            select.appendChild(opt);
+          });
+          const optNuevo = document.createElement('option');
+          optNuevo.value = '__nuevo__';
+          optNuevo.textContent = '+ Crear personaje';
+          select.appendChild(optNuevo);
+          select.value = activoMenu.handle;
+
+          select.onchange = () => {
+            if (select.value === '__nuevo__') { window.location.href = 'crear-personaje.html'; return; }
+            const elegido = lista.find(p => normH(p.handle) === normH(select.value));
+            if (elegido) {
+              guardarActivoMenu(elegido);
+              window.location.href = `perfil.html?char=${encodeURIComponent(elegido.handle)}`;
+            }
+          };
+        });
+
+        actualizarPerfil(personajeVista, esVistaSolo);
+      }
+
+      window.addEventListener('kixuz:personajes-actualizados', sincronizarSelectores);
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', sincronizarSelectores);
+      else sincronizarSelectores();
+    })();
   </script>
 
   <script src="chat.js"></script>
