@@ -33,12 +33,12 @@
             position: absolute;
             top: calc(100% + 10px);
             right: 0;
-            width: 320px;
+            width: 330px;
             max-width: calc(100vw - 24px);
             background: #1B0E30;
             border: 1px solid var(--acento, #2DD4C4);
             border-radius: 14px;
-            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.72);
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75);
             padding: 10px;
             z-index: 99999;
         }
@@ -60,12 +60,8 @@
             border-radius: 999px;
             padding: 0 34px 0 14px;
         }
-        html[data-theme="light"] .kixuz-search-box {
-            background: #F4F1FA;
-        }
-        .kixuz-search-box:focus-within {
-            border-color: var(--acento, #2DD4C4);
-        }
+        html[data-theme="light"] .kixuz-search-box { background: #F4F1FA; }
+        .kixuz-search-box:focus-within { border-color: var(--acento, #2DD4C4); }
         .kixuz-search-input {
             width: 100%;
             border: none;
@@ -75,9 +71,7 @@
             font-size: 13.5px;
             outline: none;
         }
-        html[data-theme="light"] .kixuz-search-input {
-            color: #150A24;
-        }
+        html[data-theme="light"] .kixuz-search-input { color: #150A24; }
         .kixuz-search-clear {
             position: absolute;
             right: 8px;
@@ -95,12 +89,10 @@
             cursor: pointer;
             padding: 0;
         }
-        .kixuz-search-clear.visible {
-            display: flex;
-        }
+        .kixuz-search-clear.visible { display: flex; }
         .kixuz-search-results {
             margin-top: 8px;
-            max-height: 280px;
+            max-height: 290px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -117,22 +109,10 @@
             color: var(--texto, #EDE7E0) !important;
             transition: background 0.18s;
         }
-        html[data-theme="light"] .kixuz-res-item {
-            color: #150A24 !important;
-        }
-        .kixuz-res-item:hover {
-            background: rgba(108, 60, 224, 0.28);
-        }
-        .kixuz-res-name {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-        }
-        .kixuz-res-handle {
-            font-size: 11.5px;
-            color: var(--acento, #2DD4C4);
-            font-weight: 600;
-        }
+        html[data-theme="light"] .kixuz-res-item { color: #150A24 !important; }
+        .kixuz-res-item:hover { background: rgba(108, 60, 224, 0.28); }
+        .kixuz-res-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; }
+        .kixuz-res-handle { font-size: 11.5px; color: var(--acento, #2DD4C4); font-weight: 600; }
         .kixuz-res-badge {
             font-size: 10.5px;
             font-weight: 700;
@@ -142,21 +122,13 @@
             color: var(--texto, #EDE7E0);
             flex-shrink: 0;
         }
-        html[data-theme="light"] .kixuz-res-badge {
-            background: rgba(108, 60, 224, 0.12);
-            color: #4C24B5;
-        }
+        html[data-theme="light"] .kixuz-res-badge { background: rgba(108, 60, 224, 0.12); color: #4C24B5; }
     `;
     if (!document.getElementById('kixuz-search-styles')) {
         document.head.appendChild(style);
     }
 
-    const esc = s => String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-
+    const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const norm = s => String(s || '').trim().toLowerCase();
     const normHandle = h => {
         const s = norm(h).replace(/^@+/, '').replace(/\s+/g, '_');
@@ -167,35 +139,50 @@
 
     async function cargarCatalogo() {
         const mapa = new Map();
-        const agregar = (p) => {
+        const agregar = (p, etiqueta = 'Ficha') => {
             if (!p) return;
-            const nombre = String(p.nombre || p.autorNombre || '').trim();
-            const handle = normHandle(p.handle || p.autorHandle || '');
+            const nombre = String(p.nombre || p.autorNombre || p.author || '').trim();
+            const handle = normHandle(p.handle || p.autorHandle || p.usuario || '');
             if (!nombre && !handle) return;
             const k = handle || norm(nombre);
+            const prev = mapa.get(k) || {};
             mapa.set(k, {
-                nombre: nombre || handle.replace(/^@/, ''),
-                handle: handle || ('@' + norm(nombre).replace(/\s+/g, '_')),
-                clan: p.clan || '',
-                url: `perfil.html?char=${encodeURIComponent(handle || ('@' + norm(nombre).replace(/\s+/g, '_')))}`
+                nombre: nombre || prev.nombre || handle.replace(/^@/, ''),
+                handle: handle || prev.handle || ('@' + norm(nombre).replace(/\s+/g, '_')),
+                clan: p.clan || prev.clan || '',
+                etiqueta: prev.etiqueta === 'Mi Personaje' ? 'Mi Personaje' : etiqueta,
+                url: `perfil.html?char=${encodeURIComponent(handle || prev.handle || ('@' + norm(nombre).replace(/\s+/g, '_')))}`
             });
         };
 
         try {
             const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-            if (Array.isArray(subs)) subs.forEach(agregar);
+            if (Array.isArray(subs)) subs.forEach(p => agregar(p, 'Mi Personaje'));
+        } catch {}
+
+        try {
+            const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+            if (act) agregar(act, 'Mi Personaje');
         } catch {}
 
         try {
             const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-            if (Array.isArray(fam.familia)) fam.familia.forEach(m => agregar({ nombre: m.nombre, handle: m.handle }));
-            if (Array.isArray(fam.clan)) fam.clan.forEach(m => agregar({ nombre: m.nombre, handle: m.handle, clan: m.clanNombre }));
+            if (Array.isArray(fam.familia)) fam.familia.forEach(m => agregar({ nombre: m.nombre, handle: m.handle }, 'Visitar'));
+            if (Array.isArray(fam.clan)) fam.clan.forEach(m => agregar({ nombre: m.nombre, handle: m.handle, clan: m.clanNombre }, 'Visitar'));
+        } catch {}
+
+        try {
+            const posts = [
+                ...JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]'),
+                ...JSON.parse(localStorage.getItem('kixuz_posts') || '[]')
+            ];
+            posts.forEach(p => agregar(p, 'Visitar'));
         } catch {}
 
         if (window.KIXUZ_DB?.listarPersonajesPublicos) {
             try {
                 const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
-                (pub || []).forEach(agregar);
+                (pub || []).forEach(p => agregar(p, 'Visitar'));
             } catch {}
         }
 
@@ -232,11 +219,8 @@
         `;
 
         const userMenu = header.querySelector('.user-menu');
-        if (userMenu) {
-            userMenu.insertBefore(wrap, userMenu.firstChild);
-        } else {
-            header.appendChild(wrap);
-        }
+        if (userMenu) userMenu.insertBefore(wrap, userMenu.firstChild);
+        else header.appendChild(wrap);
 
         const toggle = document.getElementById('kixuzSearchToggle');
         const input = document.getElementById('kixuzSearchInput');
@@ -247,41 +231,38 @@
             const term = norm(q).replace(/^@+/, '');
             clearBtn.classList.toggle('visible', q.trim().length > 0);
 
-            if (!term) {
-                resultsBox.innerHTML = `<div style="padding:8px;font-size:12px;opacity:0.7;text-align:center;">Escribí un nombre o @usuario para buscar</div>`;
-                return;
-            }
+            const matches = term
+                ? catalogo.filter(item =>
+                    norm(item.nombre).includes(term) ||
+                    norm(item.handle).replace(/^@+/, '').includes(term) ||
+                    norm(item.clan).includes(term)
+                )
+                : catalogo.slice(0, 8);
 
-            const matches = catalogo.filter(item =>
-                norm(item.nombre).includes(term) ||
-                norm(item.handle).replace(/^@+/, '').includes(term) ||
-                norm(item.clan).includes(term)
-            );
-
-            const directH = normHandle(q);
-            let html = matches.slice(0, 7).map(item => `
+            let html = matches.slice(0, 8).map(item => `
                 <a href="${item.url}" class="kixuz-res-item">
                     <div>
                         <div class="kixuz-res-name">${esc(item.nombre)}</div>
                         <div class="kixuz-res-handle">${esc(item.handle)}${item.clan ? ' · ' + esc(item.clan) : ''}</div>
                     </div>
-                    <span class="kixuz-res-badge">Visitar</span>
+                    <span class="kixuz-res-badge">${esc(item.etiqueta)}</span>
                 </a>
             `).join('');
 
+            const directH = term ? normHandle(q) : '';
             if (directH && !matches.some(m => normHandle(m.handle) === directH)) {
                 html += `
                     <a href="perfil.html?char=${encodeURIComponent(directH)}" class="kixuz-res-item">
                         <div>
                             <div class="kixuz-res-name">Visitar ${esc(directH)}</div>
-                            <div class="kixuz-res-handle">Entrar como visitante</div>
+                            <div class="kixuz-res-handle">Abrir perfil como visitante</div>
                         </div>
                         <span class="kixuz-res-badge">Ir →</span>
                     </a>
                 `;
             }
 
-            resultsBox.innerHTML = html || `<div style="padding:8px;font-size:12px;opacity:0.7;text-align:center;">Sin resultados para "${esc(q)}"</div>`;
+            resultsBox.innerHTML = html || `<div style="padding:10px;font-size:12px;opacity:0.75;text-align:center;">Escribí un @usuario para visitar su perfil</div>`;
         }
 
         toggle.addEventListener('click', async (e) => {
@@ -302,16 +283,11 @@
         });
 
         document.addEventListener('click', (e) => {
-            if (!wrap.contains(e.target)) {
-                wrap.classList.remove('expanded');
-            }
+            if (!wrap.contains(e.target)) wrap.classList.remove('expanded');
         });
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initBuscador);
-    } else {
-        initBuscador();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBuscador);
+    else initBuscador();
     window.addEventListener('load', initBuscador);
 })();

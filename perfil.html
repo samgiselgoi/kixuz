@@ -11,6 +11,7 @@
     :root {
       --bg-principal: #150A24;
       --bg: #150A24;
+      --bg-secundario: #6C3CE0;
       --card: #1F1135;
       --card-2: #281644;
       --border: rgba(108, 60, 224, 0.35);
@@ -19,7 +20,7 @@
       --accent: #2DD4C4;
       --acento: #2DD4C4;
       --texto: #EDE7E0;
-      --muted: rgba(237, 231, 224, 0.65);
+      --muted: rgba(237, 231, 224, 0.68);
     }
     html[data-theme="light"] {
       --bg-principal: #F4F1FA;
@@ -44,145 +45,83 @@
       border-bottom: 1px solid var(--border);
     }
     html[data-theme="light"] header { background: rgba(255, 255, 255, 0.92); }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
+    .brand { display: inline-flex; align-items: center; text-decoration: none; flex-shrink: 0; }
     .char-select {
-      height: 38px;
-      padding: 0 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--texto);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
+      height: 38px; padding: 0 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--card); color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px;
+      outline: none; cursor: pointer;
     }
-    .container {
-      max-width: 1040px;
-      margin: 22px auto 70px;
-      padding: 0 18px;
-    }
+    .container { max-width: 1060px; margin: 22px auto 80px; padding: 0 18px; }
     .profile-hero {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      overflow: hidden;
-      margin-bottom: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden; margin-bottom: 18px;
     }
     .profile-banner {
-      height: 170px;
+      height: 185px;
       background: linear-gradient(135deg, #3A1C71, #6C3CE0, #165B6D);
-      background-size: cover;
-      background-position: center;
-      position: relative;
+      background-size: cover; background-position: center; position: relative;
     }
     .visitor-pill {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      background: rgba(21, 10, 36, 0.85);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 4px 12px;
-      border-radius: 999px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
+      position: absolute; top: 12px; right: 14px;
+      background: rgba(21, 10, 36, 0.88); border: 1px solid var(--accent);
+      color: var(--accent); padding: 4px 12px; border-radius: 999px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
     }
     .profile-body {
-      padding: 0 22px 22px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: -42px;
-      position: relative;
+      padding: 0 22px 22px; display: flex; align-items: flex-end;
+      justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      margin-top: -44px; position: relative;
     }
-    .profile-id {
-      display: flex;
-      align-items: flex-end;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+    .profile-id { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
     .avatar-circle {
-      width: 86px;
-      height: 86px;
-      border-radius: 50%;
-      border: 4px solid var(--card);
+      width: 92px; height: 92px; border-radius: 50%; border: 4px solid var(--card);
       background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      background-size: cover;
-      background-position: center;
-      color: #150A24;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 800;
-      font-size: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      background-size: cover; background-position: center;
+      color: #150A24; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+      font-size: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; margin-bottom: 16px;
     }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 11px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(108, 60, 224, 0.24);
-      border: 1px solid var(--border);
-      color: var(--accent);
-      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
+      border-radius: 999px; font-size: 12px; font-weight: 600;
+      background: rgba(108, 60, 224, 0.24); border: 1px solid var(--border);
+      color: var(--accent); text-decoration: none;
     }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      height: 36px;
-      padding: 0 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--primary);
-      color: #EDE7E0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      height: 36px; padding: 0 14px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--primary); color: #EDE7E0;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px;
+      cursor: pointer; text-decoration: none;
     }
-    .btn-ghost {
-      background: transparent;
-      color: var(--texto);
+    .btn-ghost { background: transparent; color: var(--texto); }
+    .btn-accent { background: var(--accent); color: #150A24; border-color: var(--accent); }
+    .grid-2 { display: grid; grid-template-columns: 330px 1fr; gap: 18px; }
+    @media (max-width: 840px) { .grid-2 { grid-template-columns: 1fr; } }
+    .attr-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; font-size: 13.5px; }
+    .attr-row {
+      display: flex; justify-content: space-between; gap: 10px;
+      padding: 7px 10px; border-radius: 9px; background: var(--card-2);
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 310px 1fr;
-      gap: 18px;
-    }
-    @media (max-width: 820px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .attr-label { color: var(--muted); font-weight: 600; }
+    .attr-val { font-weight: 700; color: var(--texto); text-align: right; }
+    .stat-block { margin-top: 12px; }
+    .stat-head { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 5px; }
+    .stat-bar { height: 7px; border-radius: 999px; background: var(--card-2); overflow: hidden; }
+    .stat-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #6C3CE0, #2DD4C4); }
+    .stat-fill.weak { background: linear-gradient(90deg, #e03c6c, #f59e0b); }
+    .textarea {
+      width: 100%; background: var(--card-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; color: var(--texto);
+      font-family: 'Inter', sans-serif; font-size: 14px; outline: none;
     }
     .post-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 12px;
     }
   </style>
 </head>
@@ -221,7 +160,7 @@
           </div>
         </div>
         <div id="ownerActions" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <a href="crear-personaje.html" class="btn btn-ghost">+ Nuevo personaje</a>
+          <a href="crear-personaje.html" class="btn btn-ghost">Editar / Nuevo</a>
           <a href="cuenta-maestra.html" class="btn">Mi Cuenta Maestra</a>
         </div>
       </div>
@@ -230,12 +169,26 @@
     <div class="grid-2">
       <aside>
         <div class="card">
-          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;color:var(--accent);">Expediente & Trasfondo</h2>
-          <p id="profileBio" style="line-height:1.6;font-size:14px;color:var(--muted);">Sin biografía registrada.</p>
-          <div id="profileExtraFields" style="margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:13px;"></div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:8px;color:var(--accent);">Expediente & Trasfondo</h2>
+          <p id="profileBio" style="line-height:1.6;font-size:13.5px;color:var(--muted);">Sin biografía registrada.</p>
+          <div id="profileAttrs" class="attr-list"></div>
+        </div>
+
+        <div class="card" id="statsCard">
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:4px;color:var(--accent);">Habilidades & Debilidades</h2>
+          <div id="profileStats"></div>
         </div>
       </aside>
+
       <section>
+        <div class="card" id="profileComposerCard">
+          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:15.5px;margin-bottom:10px;">Publicar crónica en este perfil</h3>
+          <textarea id="profilePostInput" class="textarea" rows="2" placeholder="Escribe una escena o actualización del personaje..."></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+            <button type="button" id="profilePublishBtn" class="btn btn-accent">Publicar</button>
+          </div>
+        </div>
+
         <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:12px;">Crónicas & Publicaciones</h3>
         <div id="profilePosts"></div>
       </section>
@@ -248,6 +201,8 @@
       return s ? '@' + s : '';
     };
 
+    let personajeActualFicha = null;
+
     async function cargarPerfil() {
       const params = new URLSearchParams(window.location.search);
       const charParam = params.get('char') || '';
@@ -259,9 +214,7 @@
       } catch {}
 
       let activo = null;
-      try {
-        activo = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-      } catch {}
+      try { activo = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null'); } catch {}
       if (!activo && subs.length) activo = subs[0];
 
       const targetH = normH(charParam || activo?.handle || '');
@@ -279,15 +232,19 @@
         info = {
           nombre: (charParam || 'Personaje').replace(/^@+/, ''),
           handle: targetH || '@rol',
-          bio: 'Perfil en modo visitante.',
+          bio: 'Ficha de personaje en modo visitante.',
           universos: ['#NexoCentral'],
           clan: 'Familia / Clan'
         };
       }
 
+      personajeActualFicha = info;
       const esAdmin = Boolean(window.KIXUZ_DB?.esAdmin);
-      document.getElementById('visitorBadge').style.display = (esVisitante && !esAdmin) ? 'inline-block' : 'none';
-      document.getElementById('ownerActions').style.display = (!esVisitante || esAdmin) ? 'flex' : 'none';
+      const puedeEditar = !esVisitante || esAdmin;
+
+      document.getElementById('visitorBadge').style.display = puedeEditar ? 'none' : 'inline-block';
+      document.getElementById('ownerActions').style.display = puedeEditar ? 'flex' : 'none';
+      document.getElementById('profileComposerCard').style.display = puedeEditar ? 'block' : 'none';
 
       const avatarEl = document.getElementById('profileAvatar');
       if (info.avatar) {
@@ -316,26 +273,72 @@
       clanEl.textContent = info.clan || 'Familia / Clan';
       clanEl.href = `familia.html?char=${encodeURIComponent(info.handle || targetH)}`;
 
-      const extraEl = document.getElementById('profileExtraFields');
-      const campos = [
-        info.edad ? `<strong>Edad:</strong> ${info.edad}` : '',
-        info.especie ? `<strong>Especie / Raza:</strong> ${info.especie}` : '',
-        info.ocupacion ? `<strong>Rol / Ocupación:</strong> ${info.ocupacion}` : ''
-      ].filter(Boolean);
-      extraEl.innerHTML = campos.map(c => `<div>${c}</div>`).join('');
+      const attrs = [
+        ['Especie / Raza', info.especie],
+        ['Género', info.genero],
+        ['Edad', info.edad],
+        ['Clan / Facción', info.clan],
+        ['Ocupación / Rol', info.ocupacion]
+      ].filter(([, v]) => v);
 
+      document.getElementById('profileAttrs').innerHTML = attrs.length
+        ? attrs.map(([k, v]) => `<div class="attr-row"><span class="attr-label">${k}</span><span class="attr-val">${v}</span></div>`).join('')
+        : `<div style="font-size:12.5px;color:var(--muted);">Completa especie, edad y clan desde Editar personaje.</div>`;
+
+      const habs = Array.isArray(info.habilidades) ? info.habilidades : (info.habilidad ? [{ nombre: info.habilidad, valor: info.habilidadNivel || 80 }] : []);
+      const debs = Array.isArray(info.debilidades) ? info.debilidades : (info.debilidad ? [{ nombre: info.debilidad, valor: info.debilidadNivel || 55 }] : []);
+      const statsEl = document.getElementById('profileStats');
+
+      if (habs.length || debs.length) {
+        statsEl.innerHTML = [
+          ...habs.map(h => `<div class="stat-block"><div class="stat-head"><span>${h.nombre || h}</span><span style="color:var(--accent);">${h.valor || 80}%</span></div><div class="stat-bar"><div class="stat-fill" style="width:${h.valor || 80}%"></div></div></div>`),
+          ...debs.map(d => `<div class="stat-block"><div class="stat-head"><span>${d.nombre || d}</span><span style="color:#ff9bb4;">${d.valor || 55}%</span></div><div class="stat-bar"><div class="stat-fill weak" style="width:${d.valor || 55}%"></div></div></div>`)
+        ].join('');
+      } else {
+        statsEl.innerHTML = `<div style="font-size:12.5px;color:var(--muted);margin-top:8px;">Sin estadísticas cargadas aún.</div>`;
+      }
+
+      renderProfilePosts(info.handle || targetH);
+    }
+
+    function renderProfilePosts(handle) {
       let posts = [];
       try {
         const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
         const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
-        posts = [...p1, ...p2].filter(p => normH(p.autorHandle || p.handle) === (info.handle || targetH));
+        posts = [...p1, ...p2].filter(p => normH(p.autorHandle || p.handle) === normH(handle));
       } catch {}
 
       const postsBox = document.getElementById('profilePosts');
       postsBox.innerHTML = posts.length
-        ? posts.map(p => `<article class="post-card"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${p.universo || p.universe || ''}</div><p style="line-height:1.55;">${p.texto || p.text || ''}</p></article>`).join('')
+        ? posts.map(p => `<article class="post-card"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${p.universo || p.universe || '#NexoCentral'} · ${p.time || 'Reciente'}</div><p style="line-height:1.55;white-space:pre-line;">${p.texto || p.text || ''}</p></article>`).join('')
         : `<div class="card" style="color:var(--muted);font-size:14px;">Este personaje aún no tiene publicaciones en el muro.</div>`;
     }
+
+    document.getElementById('profilePublishBtn').addEventListener('click', () => {
+      const txt = document.getElementById('profilePostInput').value.trim();
+      if (!txt || !personajeActualFicha) return;
+      const handle = personajeActualFicha.handle || '@rol';
+      const uni = Array.isArray(personajeActualFicha.universos) && personajeActualFicha.universos[0]
+        ? personajeActualFicha.universos[0]
+        : '#NexoCentral';
+      let posts = [];
+      try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
+      posts.unshift({
+        id: 'p_' + Date.now(),
+        author: personajeActualFicha.nombre || 'Personaje',
+        handle,
+        universe: uni,
+        time: 'Ahora mismo',
+        text: txt,
+        kix: 0,
+        liked: false,
+        comments: []
+      });
+      localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+      document.getElementById('profilePostInput').value = '';
+      renderProfilePosts(handle);
+    });
 
     window.addEventListener('DOMContentLoaded', cargarPerfil);
     window.addEventListener('kixuz:personajes-actualizados', cargarPerfil);

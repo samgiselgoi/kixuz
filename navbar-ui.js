@@ -66,21 +66,11 @@
             flex-shrink: 0;
             transition: transform 0.18s;
         }
-        .kixuz-auth-btn:hover {
-            transform: translateY(-1px);
-        }
+        .kixuz-auth-btn:hover { transform: translateY(-1px); }
         @media (max-width: 820px) {
-            header {
-                padding: 10px 14px !important;
-                gap: 8px !important;
-            }
-            .nav-links a span {
-                display: none;
-            }
-            .nav-links a {
-                width: 36px;
-                padding: 0;
-            }
+            header { padding: 10px 14px !important; gap: 8px !important; }
+            .nav-links a span { display: none; }
+            .nav-links a { width: 36px; padding: 0; }
         }
     `;
     if (!document.getElementById('kixuz-nav-styles')) {
@@ -104,12 +94,9 @@
         let propios = [];
         try {
             const raw = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-            if (Array.isArray(raw)) {
-                propios = raw.filter(p => p && (p.nombre || p.handle));
-            }
+            if (Array.isArray(raw)) propios = raw.filter(p => p && (p.nombre || p.handle));
         } catch {}
 
-        // Filtrar cualquier personaje de prueba que no pertenezca a tus subpersonajes reales
         const propiosHandles = new Set(propios.map(p => String(p.handle || '').trim().toLowerCase()));
         Array.from(sel.options).forEach(opt => {
             const val = String(opt.value || '').trim().toLowerCase();
@@ -117,15 +104,17 @@
             if (HANDLES_PRUEBA.has(val) && !propiosHandles.has(val)) {
                 opt.remove();
             }
+            // Quitar cualquier emoji residual de las opciones
+            opt.textContent = opt.textContent.replace(/[👑🎭🔑✨]/g, '').trim();
         });
 
-        // Asegurar opción de "Mi Cuenta Maestra" para gestionar cuentas solo allí
-        if (!Array.from(sel.options).some(o => o.value === '__cuenta_maestra__')) {
-            const optCM = document.createElement('option');
+        let optCM = Array.from(sel.options).find(o => o.value === '__cuenta_maestra__');
+        if (!optCM) {
+            optCM = document.createElement('option');
             optCM.value = '__cuenta_maestra__';
-            optCM.textContent = '👑 Mi Cuenta Maestra';
             sel.appendChild(optCM);
         }
+        optCM.textContent = 'Mi Cuenta Maestra';
 
         if (!sel.dataset.cmBound) {
             sel.dataset.cmBound = '1';
@@ -141,13 +130,11 @@
         const header = document.querySelector('header');
         if (!header) return;
 
-        // 1. Restaurar logo original de KIXUZ
         const brand = header.querySelector('.brand, .logo');
         if (brand) {
             brand.innerHTML = `<img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px; width: auto; display: block;">`;
         }
 
-        // 2. Navegación con SVGs (Inicio y Mi Personaje solo icono)
         const paginaActual = window.location.pathname.split('/').pop() || 'index.html';
         const nav = header.querySelector('.nav-links');
         if (nav) {
@@ -169,7 +156,6 @@
             `;
         }
 
-        // 3. Botón de acceso con SVG limpio
         const authLink = header.querySelector('a[href*="registro.html"]');
         if (authLink) {
             authLink.className = 'kixuz-auth-btn';
@@ -178,10 +164,8 @@
             authLink.innerHTML = SVGS.entrar;
         }
 
-        // 4. Limpiar personajes de prueba del desplegable
         limpiarSelectorPersonajes();
 
-        // 5. Ocultar barra superior al bajar scroll y mostrar al subir
         if (!window._kixuzScrollBound) {
             window._kixuzScrollBound = true;
             let lastScrollY = window.scrollY;
