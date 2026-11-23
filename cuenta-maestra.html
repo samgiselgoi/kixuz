@@ -92,7 +92,7 @@
         .btn-danger {
             background: rgba(224, 60, 108, 0.18); color: #ff9bb4;
             border: 1px solid rgba(224, 60, 108, 0.5); border-radius: 8px; padding: 6px 11px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
         }
         .cards-grid {
             display: grid;
@@ -171,7 +171,6 @@
             </div>
         </section>
 
-        <!-- Mis sub-personajes de esta cuenta -->
         <section class="panel">
             <div class="row-between">
                 <h2 style="font-size:18px;">Mis personajes en esta cuenta</h2>
@@ -180,7 +179,6 @@
             <div id="myCharsGrid" class="cards-grid"></div>
         </section>
 
-        <!-- Contabilidad total de personajes registrados en toda la página (propios + de otros) -->
         <section class="panel" id="masterRegistryPanel">
             <div class="row-between">
                 <div>
@@ -351,8 +349,8 @@
 
                 const registrarEnMapa = (p, forzarPropio = false) => {
                     if (!p) return;
-                    const h = normH(p.handle || p.autorHandle || '');
-                    const nom = String(p.nombre || p.autorNombre || '').trim() || (h ? h.slice(1) : '');
+                    const h = normH(p.handle || p.autorHandle || p.usuario || '');
+                    const nom = String(p.nombre || p.autorNombre || p.author || '').trim() || (h ? h.slice(1) : '');
                     if (!h && !nom) return;
                     const key = h || nom.toLowerCase();
                     const esPropio = forzarPropio || propiosHandles.has(h) || (miUid && p.uidMaestro === miUid);
@@ -369,7 +367,6 @@
 
                 propios.forEach(p => registrarEnMapa(p, true));
 
-                // Consultar TODOS los personajes registrados en Firestore (propios y de otros)
                 if (window.KIXUZ_DB?.listarPersonajesPublicos) {
                     try {
                         const remotos = await window.KIXUZ_DB.listarPersonajesPublicos();
@@ -378,6 +375,18 @@
                         }
                     } catch {}
                 }
+
+                try {
+                    const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+                    (fam.familia || []).forEach(m => registrarEnMapa({ nombre: m.nombre, handle: m.handle }, false));
+                    (fam.clan || []).forEach(m => registrarEnMapa({ nombre: m.nombre, handle: m.handle, clan: m.clanNombre }, false));
+
+                    const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+                    const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+                    [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(post => {
+                        registrarEnMapa({ nombre: post.autorNombre || post.author, handle: post.autorHandle || post.handle }, false);
+                    });
+                } catch {}
 
                 todosRegistradosCache = Array.from(mapa.values()).sort((a, b) =>
                     String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es', { numeric: true, sensitivity: 'base' })
