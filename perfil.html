@@ -3,29 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Perfil de Personaje</title>
+    <title>KIXUZ — Expediente y Perfil de Personaje</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-principal: #150A24;
             --bg-secundario: #6C3CE0;
             --acento: #2DD4C4;
             --texto: #EDE7E0;
-            --tarjeta: rgba(34, 18, 58, 0.92);
-            --borde: rgba(108, 60, 224, 0.4);
+            --tarjeta: rgba(28, 14, 48, 0.92);
+            --borde: rgba(108, 60, 224, 0.45);
         }
-        * { box-sizing: border-box; }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --bg-secundario: #6C3CE0;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.94);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-principal);
+            background-color: var(--bg-principal);
             color: var(--texto);
+            font-family: 'Crimson Pro', 'Inter', serif;
             min-height: 100vh;
+            line-height: 1.55;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
+        h1, h2, h3, .font-title { font-family: 'Cinzel', 'Space Grotesk', serif; }
+
         header {
             position: relative;
             z-index: 900;
@@ -39,77 +50,98 @@
             gap: 10px;
             flex-wrap: nowrap;
         }
-        @media (max-width: 980px) {
-            header { flex-wrap: wrap; }
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
+        html[data-theme="light"] header { background: rgba(244, 241, 250, 0.95); }
+        @media (max-width: 980px) { header { flex-wrap: wrap; } }
+
+        .logo { display: inline-flex; align-items: center; text-decoration: none; flex-shrink: 0; }
+        .nav-links { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
         .nav-links a {
             color: var(--texto);
             text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
             padding: 6px 10px;
             border-radius: 8px;
-            font-size: 14px;
             white-space: nowrap;
         }
         .nav-links a:hover, .nav-links a.active {
             background: rgba(108, 60, 224, 0.28);
             color: var(--acento);
         }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .user-menu { display: flex; align-items: center; gap: 8px; }
         #activeCharSelect {
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+        }
+        .btn-auth-link {
+            background: var(--acento);
+            color: #150A24 !important;
             padding: 6px 10px;
             border-radius: 8px;
-            border: 1px solid var(--borde);
-            background: rgba(15, 8, 28, 0.9);
-            color: var(--texto);
+            font-weight: 700;
+            text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 13px;
         }
-        main {
-            max-width: 980px;
-            margin: 24px auto;
-            padding: 0 16px 70px;
+
+        .profile-layout {
+            max-width: 1180px;
+            margin: 24px auto 80px;
+            padding: 0 18px;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .profile-layout { grid-template-columns: 1fr; }
+        }
+
+        .left-column {
+            position: sticky;
+            top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 14px;
         }
-        .profile-hero {
+        @media (max-width: 900px) {
+            .left-column { position: static; }
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .panel-box {
             background: var(--tarjeta);
             border: 1px solid var(--borde);
-            border-radius: 18px;
-            overflow: hidden;
+            border-radius: 16px;
+            padding: 16px 18px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
         }
-        .banner-box {
-            height: 170px;
-            background: linear-gradient(135deg, rgba(108,60,224,0.55), rgba(45,212,196,0.28));
+
+        .mini-banner {
+            height: 115px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(108, 60, 224, 0.55), rgba(45, 212, 196, 0.25));
             background-size: cover;
             background-position: center;
+            margin-bottom: -42px;
+            border: 1px solid var(--borde);
         }
-        .hero-body {
-            padding: 0 22px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .hero-top {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-top: -46px;
-        }
-        .avatar-box {
-            width: 96px;
-            height: 96px;
+
+        .avatar-circle {
+            width: 86px;
+            height: 86px;
             border-radius: 50%;
             border: 3px solid var(--acento);
             background: #22123A;
@@ -117,60 +149,101 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Unbounded', sans-serif;
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
             font-size: 28px;
             color: var(--acento);
-            flex-shrink: 0;
+            margin-bottom: 10px;
         }
-        .avatar-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .card {
-            background: var(--tarjeta);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 18px 20px;
-        }
-        .tabs {
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        .tags-container {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 10px;
         }
-        .tab-btn {
-            padding: 8px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(21, 10, 36, 0.65);
+        .info-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .tag-universo {
+            background: rgba(108, 60, 224, 0.28);
             color: var(--texto);
+            border: 1px solid var(--bg-secundario);
+        }
+        .tag-clan {
+            background: rgba(45, 212, 196, 0.14);
+            color: var(--acento);
+            border: 1px solid rgba(45, 212, 196, 0.45);
+        }
+        .tag-relacion {
+            background: rgba(224, 60, 108, 0.16);
+            color: #ffb3c6;
+            border: 1px solid rgba(224, 60, 108, 0.45);
+        }
+
+        .accordion-item {
+            border-top: 1px solid rgba(108, 60, 224, 0.25);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .accordion-btn {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--texto);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 13.5px;
             cursor: pointer;
+            padding: 4px 0;
         }
-        .tab-btn.active {
+        .accordion-btn:hover { color: var(--acento); }
+        .accordion-body { display: none; padding-top: 8px; font-size: 15px; }
+        .accordion-body.open { display: block; }
+
+        .stat-row { margin-bottom: 8px; }
+        .stat-head { display: flex; justify-content: space-between; font-size: 13.5px; font-family: 'Inter', sans-serif; margin-bottom: 3px; }
+        .stat-track {
+            height: 7px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
             background: var(--acento);
-            color: #150A24;
-            border-color: var(--acento);
+            border-radius: 999px;
         }
+
         .btn {
             background: var(--acento);
             color: #150A24;
             border: none;
-            border-radius: 10px;
-            padding: 8px 13px;
+            border-radius: 9px;
+            padding: 7px 13px;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12.5px;
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .btn-secondary {
-            background: rgba(108, 60, 224, 0.28);
+            background: rgba(108, 60, 224, 0.25);
             color: var(--texto);
             border: 1px solid var(--borde);
         }
@@ -179,205 +252,308 @@
             color: #ff9bb4;
             border: 1px solid rgba(224, 60, 108, 0.5);
         }
-        .tag-pill {
-            display: inline-block;
-            padding: 2px 9px;
-            border-radius: 999px;
-            font-size: 12px;
+
+        .top-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .top-tab {
+            background: rgba(108, 60, 224, 0.2);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
-            background: rgba(45, 212, 196, 0.16);
-            color: var(--acento);
-            border: 1px solid rgba(45, 212, 196, 0.4);
+            font-size: 13px;
+            cursor: pointer;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
+        .top-tab.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
+
+        input, textarea, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.34);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
         }
-        .info-box {
+        html[data-theme="light"] input,
+        html[data-theme="light"] textarea,
+        html[data-theme="light"] select { background: #fff; color: #150A24; }
+
+        .post-card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 15px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .post-content { white-space: pre-wrap; word-break: break-word; font-size: 16px; }
+        .comment-box {
+            background: rgba(21, 10, 36, 0.65);
+            border: 1px solid rgba(108, 60, 224, 0.28);
+            border-radius: 10px;
+            padding: 8px 11px;
+            font-size: 14px;
+        }
+        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .muted { opacity: 0.78; font-size: 13px; font-family: 'Inter', sans-serif; }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .photo-tile {
             background: rgba(21, 10, 36, 0.65);
             border: 1px solid var(--borde);
             border-radius: 12px;
-            padding: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .post-card {
-            background: rgba(21, 10, 36, 0.65);
-            border: 1px solid var(--borde);
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-        }
-        .post-content {
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 1.5;
-            margin-top: 8px;
-        }
-        .muted { opacity: 0.75; font-size: 13px; }
-        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        input, textarea {
-            width: 100%;
-            padding: 9px 11px;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--texto);
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-        }
-        .edit-modal {
-            display: none;
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px solid var(--borde);
-        }
-        .edit-modal.open { display: flex; flex-direction: column; gap: 10px; }
+        .photo-tile img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
     </style>
 </head>
 <body>
     <header>
-        <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
             <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
         </a>
-        <nav class="nav-links">
+        <nav class="nav-links" id="mainNavLinks">
             <a href="index.html">Inicio</a>
             <a href="perfil.html" class="active">Mi Perfil</a>
             <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
+            <a href="familia.html" id="navFamiliaLink">Familia / Clan</a>
             <a href="cuenta-maestra.html">Cuenta Maestra</a>
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
+            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro">🔑</a>
         </div>
     </header>
 
-    <main>
-        <section class="profile-hero">
-            <div class="banner-box" id="profileBanner"></div>
-            <div class="hero-body">
-                <div class="hero-top">
-                    <div style="display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap;">
-                        <div class="avatar-box" id="profileAvatar">?</div>
-                        <div>
-                            <h1 id="profileName" style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px;">Personaje</h1>
-                            <div id="profileHandle" class="muted">@rol</div>
-                        </div>
-                    </div>
-                    <div id="profileOwnerActions" style="display:none; gap:8px; flex-wrap:wrap;">
-                        <button type="button" class="btn btn-secondary" id="btnEditFicha">✏️ Editar ficha</button>
+    <main class="profile-layout">
+        <!-- Columna izquierda fija: identidad, enlaces entrelazados, ficha desplegable y amigos -->
+        <aside class="left-column">
+            <section class="panel-box">
+                <div class="mini-banner" id="charBanner"></div>
+                <div style="padding: 0 4px;">
+                    <div class="avatar-circle" id="charAvatar">?</div>
+                    <h1 id="charName" style="font-size: 22px; color: var(--acento);">Personaje</h1>
+                    <div id="charHandle" class="muted">@rol</div>
+                    <div id="charEstadoRol" class="muted" style="margin-top: 4px; font-weight: 600;">🟢 Libre para rol</div>
+
+                    <div class="tags-container" id="charTagsRow"></div>
+
+                    <div id="ownerEditControls" style="display: none; gap: 6px; flex-wrap: wrap; margin-top: 12px;">
+                        <button type="button" class="btn btn-secondary" id="btnToggleEditFicha">✏️ Editar ficha</button>
                         <label class="btn btn-secondary" style="cursor:pointer;">
                             🖼️ Avatar
-                            <input type="file" id="inputAvatarFile" accept="image/*" style="display:none;">
+                            <input type="file" id="fileAvatar" accept="image/*" style="display:none;">
                         </label>
                         <label class="btn btn-secondary" style="cursor:pointer;">
                             🌄 Banner
-                            <input type="file" id="inputBannerFile" accept="image/*" style="display:none;">
+                            <input type="file" id="fileBanner" accept="image/*" style="display:none;">
                         </label>
+                        <label class="btn btn-secondary" style="cursor:pointer;">
+                            🎨 Fondo
+                            <input type="file" id="fileBg" accept="image/*" style="display:none;">
+                        </label>
+                        <button type="button" class="btn btn-danger" id="btnClearBg">Quitar fondo</button>
+                    </div>
+
+                    <div id="visitorFriendControls" style="display: none; margin-top: 12px;">
+                        <button type="button" class="btn" id="btnFriendAction">🤝 Enviar solicitud de amistad</button>
+                    </div>
+
+                    <div id="editFichaPanel" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--borde); flex-direction:column; gap:8px;">
+                        <input type="text" id="inpNombre" placeholder="Nombre">
+                        <input type="text" id="inpEspecie" placeholder="Especie / Raza">
+                        <input type="text" id="inpEdad" placeholder="Edad">
+                        <input type="text" id="inpGenero" placeholder="Género">
+                        <input type="text" id="inpClan" placeholder="Clan / Familia principal">
+                        <input type="text" id="inpUniversos" placeholder="Universos (#Tag1, #Tag2)">
+                        <select id="inpEstadoRol">
+                            <option value="🟢 Libre para rol">🟢 Libre para rol</option>
+                            <option value="🎭 En rol">🎭 En rol</option>
+                            <option value="🔴 Ocupado">🔴 Ocupado</option>
+                        </select>
+                        <textarea id="inpBio" rows="3" placeholder="Biografía / Historia"></textarea>
+                        <textarea id="inpHabilidades" rows="2" placeholder="Habilidades (ej. Sigilo:8, Telepatía:7)"></textarea>
+                        <textarea id="inpDebilidades" rows="2" placeholder="Debilidades (ej. Luz solar:6, Orgullo:5)"></textarea>
+                        <div class="row-between">
+                            <button type="button" class="btn btn-secondary" id="btnCancelEdit">Cancelar</button>
+                            <button type="button" class="btn" id="btnSaveFicha">Guardar</button>
+                        </div>
                     </div>
                 </div>
 
-                <p id="profileBio" style="margin:4px 0 0; line-height:1.5; white-space:pre-wrap;">Sin biografía todavía.</p>
-                <div id="profileUniversos" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+                <!-- Acordeones de información -->
+                <div class="accordion-item">
+                    <button type="button" class="accordion-btn" data-acc="accExp">
+                        <span>📋 Expediente</span><span>▾</span>
+                    </button>
+                    <div class="accordion-body open" id="accExp">
+                        <div><strong>Especie:</strong> <span id="valEspecie">—</span></div>
+                        <div><strong>Edad:</strong> <span id="valEdad">—</span></div>
+                        <div><strong>Género:</strong> <span id="valGenero">—</span></div>
+                        <div><strong>Clan / Familia:</strong> <span id="valClan">—</span></div>
+                    </div>
+                </div>
 
-                <div class="edit-modal" id="editFichaBox">
-                    <div class="info-grid">
-                        <div>
-                            <label class="muted">Nombre</label>
-                            <input type="text" id="editNombreInput">
-                        </div>
-                        <div>
-                            <label class="muted">Especie / Raza</label>
-                            <input type="text" id="editEspecieInput">
-                        </div>
-                        <div>
-                            <label class="muted">Edad</label>
-                            <input type="text" id="editEdadInput">
-                        </div>
-                        <div>
-                            <label class="muted">Clan / Familia</label>
-                            <input type="text" id="editClanInput">
+                <div class="accordion-item">
+                    <button type="button" class="accordion-btn" data-acc="accBio">
+                        <span>📖 Biografía</span><span>▾</span>
+                    </button>
+                    <div class="accordion-body open" id="accBio">
+                        <p id="valBio" style="white-space: pre-wrap;">Sin biografía todavía.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button type="button" class="accordion-btn" data-acc="accHab">
+                        <span>⚡ Habilidades (1–10)</span><span>▾</span>
+                    </button>
+                    <div class="accordion-body" id="accHab">
+                        <div id="valHabilidades"></div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button type="button" class="accordion-btn" data-acc="accDeb">
+                        <span>🔻 Debilidades (1–10)</span><span>▾</span>
+                    </button>
+                    <div class="accordion-body" id="accDeb">
+                        <div id="valDebilidades"></div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button type="button" class="accordion-btn" data-acc="accFam">
+                        <span>🌳 Familia y Clanes</span><span>▾</span>
+                    </button>
+                    <div class="accordion-body" id="accFam">
+                        <div id="valFamiliaClanes"></div>
+                        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="familia.html" id="linkArbolFamiliar" class="btn btn-secondary" style="padding:5px 10px; font-size:11.5px;">Ver Árbol</a>
+                            <a href="familia.html#clan" id="linkJerarquiaClan" class="btn btn-secondary" style="padding:5px 10px; font-size:11.5px;">Ver Clanes</a>
                         </div>
                     </div>
-                    <div>
-                        <label class="muted">Biografía / Historia</label>
-                        <textarea id="editBioInput" rows="3"></textarea>
-                    </div>
-                    <div style="display:flex; justify-content:flex-end; gap:8px;">
-                        <button type="button" class="btn btn-secondary" id="btnCancelFicha">Cancelar</button>
-                        <button type="button" class="btn" id="btnSaveFicha">Guardar cambios</button>
-                    </div>
+                </div>
+            </section>
+
+            <!-- Amigos y solicitudes en el perfil -->
+            <section class="panel-box" id="profileFriendsSection">
+                <h2 style="font-size: 16px; color: var(--acento); margin-bottom: 8px;">🤝 Amigos y Solicitudes</h2>
+                <div id="friendRequestsBox" style="margin-bottom: 10px;"></div>
+                <div id="friendsListBox" class="muted">Sin amigos agregados aún.</div>
+            </section>
+        </aside>
+
+        <!-- Columna derecha: pestañas (Muro / Fotos), compositor y publicaciones -->
+        <div class="right-column">
+            <div class="row-between">
+                <div class="top-tabs">
+                    <button type="button" class="top-tab active" data-ptab="muro">📝 Muro</button>
+                    <button type="button" class="top-tab" data-ptab="fotos">🖼️ Fotos</button>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="top-tab active" data-sort="recientes">🕒 Más recientes</button>
+                    <button type="button" class="top-tab" data-sort="kixiz">🔥 Kixiz</button>
+                    <select id="filterUniProfile" style="width:auto; padding:6px 10px; font-size:12.5px;">
+                        <option value="">Todos los universos</option>
+                    </select>
                 </div>
             </div>
-        </section>
 
-        <div class="tabs">
-            <button type="button" class="tab-btn active" data-tab="muro">📝 Muro</button>
-            <button type="button" class="tab-btn" data-tab="info">📋 Información</button>
-            <button type="button" class="tab-btn" data-tab="fotos">🖼️ Fotos</button>
+            <section id="sectionMuro" style="display:flex; flex-direction:column; gap:14px;">
+                <div class="panel-box">
+                    <div class="row-between" style="margin-bottom:8px;">
+                        <span class="muted" id="wallComposerLabel">Publicando en muro...</span>
+                        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                            <select id="wallAlcanceTipo" style="width:auto; padding:6px 9px; font-size:12.5px;">
+                                <option value="general">🌐 Inicio y Muro</option>
+                                <option value="universo">🌌 Universo</option>
+                                <option value="familia">🌳 Familia</option>
+                                <option value="clan">🛡️ Clan</option>
+                            </select>
+                            <select id="wallAlcanceDestino" style="display:none; width:auto; padding:6px 9px; font-size:12.5px;"></select>
+                            <select id="wallIcOoc" style="width:auto; padding:6px 9px; font-size:12.5px;">
+                                <option value="IC">🎭 IC</option>
+                                <option value="OOC">💬 OOC</option>
+                            </select>
+                            <label class="btn btn-secondary" style="padding:6px 10px; cursor:pointer;">
+                                🖼️ Foto
+                                <input type="file" id="wallPostImg" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                    </div>
+                    <form id="wallPostForm">
+                        <textarea id="wallPostInput" rows="3" placeholder="Escribí una escena o publicación... (Shift + Enter: salto de línea)" required></textarea>
+                        <div class="row-between" style="margin-top:8px;">
+                            <span class="muted">Shift + Enter agrega salto de línea.</span>
+                            <button type="submit" class="btn">Publicar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="wallPostsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+            </section>
+
+            <section class="panel-box" id="sectionFotos" style="display:none;">
+                <h2 style="font-size: 18px; color: var(--acento); margin-bottom: 12px;">🖼️ Fotos del Personaje</h2>
+                <div class="photos-grid" id="profilePhotosGrid"></div>
+            </section>
         </div>
-
-        <section class="card" id="tabMuro">
-            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">Publicaciones del personaje</h2>
-            <div id="wallPostsList"></div>
-        </section>
-
-        <section class="card" id="tabInfo" style="display:none;">
-            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">Ficha e Información</h2>
-            <div class="info-grid">
-                <div class="info-box"><div class="muted">Especie</div><strong id="infoEspecie">—</strong></div>
-                <div class="info-box"><div class="muted">Edad</div><strong id="infoEdad">—</strong></div>
-                <div class="info-box"><div class="muted">Clan / Familia</div><strong id="infoClan">—</strong></div>
-            </div>
-        </section>
-
-        <section class="card" id="tabFotos" style="display:none;">
-            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">Galería / Portada</h2>
-            <div id="photosGallery" class="info-grid"></div>
-        </section>
     </main>
 
     <script type="module" src="firebase-config.js"></script>
     <script src="characters.js"></script>
     <script src="theme.js"></script>
+    <script src="universos-core.js"></script>
     <script src="kixuz-72h-aviso.js"></script>
     <script src="kixuz-admin-master.js"></script>
     <script src="chat.js"></script>
     <script>
         (() => {
-            const esc = s => String(s || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+            const POSTS_KEY = 'kixuz_posts_v1';
+            const FRIENDS_KEY = 'kixuz_amistades_v1';
+            const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             const norm = v => String(v || '').trim().toLowerCase();
             const normHandle = v => {
                 const s = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
                 return s ? '@' + s : '';
             };
 
-            let personajeVisto = null;
+            let perfilChar = null;
+            let ordenMuro = 'recientes';
+            let wallImgB64 = '';
 
             function esKixuz() {
                 if (window.KIXUZ_DB?.esAdmin) return true;
                 const p = window.KIXUZ_DB?.perfilCuenta || {};
-                const u = window.KIXUZ_DB?.usuarioActual || {};
                 let loc = {};
                 try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
-                const n = norm(p.nombreMaestro || u.displayName || loc.nombreMaestro || loc.nombre || '');
-                const e = norm(p.email || u.email || loc.email || '');
-                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || n === 'kixuz' || e.startsWith('kixuz@');
+                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || norm(p.nombreMaestro) === 'kixuz';
             }
 
-            function puedeBorrar(autorUid = '', autorHandle = '') {
-                if (esKixuz()) return true;
-                if (window.KIXUZ_DB?.puedeEliminar) return window.KIXUZ_DB.puedeEliminar(autorUid, autorHandle);
+            function esPropio() {
+                if (!perfilChar) return false;
+                if (window.KIXUZ_CHARS?.esPersonajePropio) {
+                    return window.KIXUZ_CHARS.esPersonajePropio(perfilChar);
+                }
                 const ac = window.KIXUZ_ACTIVE_CHAR;
-                return Boolean(ac?.handle && autorHandle && normHandle(ac.handle) === normHandle(autorHandle));
+                return Boolean(ac?.handle && normHandle(ac.handle) === normHandle(perfilChar.handle));
             }
 
-            function comprimirImagen(file, maxW = 800, quality = 0.78) {
+            function puedeBorrar(uid = '', handle = '') {
+                if (esKixuz()) return true;
+                if (window.KIXUZ_DB?.puedeEliminar) return window.KIXUZ_DB.puedeEliminar(uid, handle);
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                return Boolean(ac?.handle && handle && normHandle(ac.handle) === normHandle(handle));
+            }
+
+            function comprimirImg(file, maxW = 900, quality = 0.78) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = ev => {
@@ -387,8 +563,7 @@
                             const canvas = document.createElement('canvas');
                             canvas.width = Math.max(1, Math.round((img.width || maxW) * scale));
                             canvas.height = Math.max(1, Math.round((img.height || maxW) * scale));
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                             resolve(canvas.toDataURL('image/jpeg', quality));
                         };
                         img.onerror = reject;
@@ -399,167 +574,537 @@
                 });
             }
 
-            async function cargarPerfil() {
+            function parseStats(raw) {
+                if (!raw) return [];
+                if (Array.isArray(raw)) return raw;
+                return String(raw).split(',').map(part => {
+                    const [lbl, valStr] = part.split(':');
+                    const n = Math.max(1, Math.min(10, Number(String(valStr || '5').trim()) || 5));
+                    return { label: String(lbl || '').trim(), score: n };
+                }).filter(x => x.label);
+            }
+
+            function renderStatsBars(containerId, items) {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                if (!items.length) {
+                    el.innerHTML = `<div class="muted">Sin datos registrados.</div>`;
+                    return;
+                }
+                el.innerHTML = items.map(it => `
+                    <div class="stat-row">
+                        <div class="stat-head"><span>${esc(it.label)}</span><strong>${it.score}/10</strong></div>
+                        <div class="stat-track"><div class="stat-fill" style="width:${it.score * 10}%;"></div></div>
+                    </div>
+                `).join('');
+            }
+
+            function obtenerClanesDelPersonaje(handle) {
+                const h = normHandle(handle);
+                const clanes = new Set();
+                if (perfilChar?.clan) clanes.add(perfilChar.clan);
+                try {
+                    const d = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+                    (Array.isArray(d.clan) ? d.clan : []).forEach(c => {
+                        if (normHandle(c.handle) === h || normHandle(c.duenoHandle) === h) {
+                            if (c.clanNombre) clanes.add(c.clanNombre);
+                        }
+                    });
+                } catch {}
+                return Array.from(clanes);
+            }
+
+            function obtenerFamiliaDelPersonaje(handle) {
+                const h = normHandle(handle);
+                try {
+                    const d = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+                    return (Array.isArray(d.familia) ? d.familia : []).filter(f =>
+                        normHandle(f.duenoHandle) === h || normHandle(f.handle) === h
+                    );
+                } catch { return []; }
+            }
+
+            function renderAmigos() {
+                const hPerfil = normHandle(perfilChar?.handle || '');
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                const hActivo = normHandle(ac?.handle || '');
+                const reqBox = document.getElementById('friendRequestsBox');
+                const listBox = document.getElementById('friendsListBox');
+                const visBox = document.getElementById('visitorFriendControls');
+
+                let amistades = [];
+                try { amistades = JSON.parse(localStorage.getItem(FRIENDS_KEY) || '[]'); } catch { amistades = []; }
+                if (!Array.isArray(amistades)) amistades = [];
+
+                if (hActivo && hPerfil && hActivo !== hPerfil && !esPropio()) {
+                    visBox.style.display = 'block';
+                    const yaAmigos = amistades.some(a =>
+                        a.estado === 'aceptada' &&
+                        ((normHandle(a.deHandle) === hActivo && normHandle(a.paraHandle) === hPerfil) ||
+                         (normHandle(a.deHandle) === hPerfil && normHandle(a.paraHandle) === hActivo))
+                    );
+                    const pendiente = amistades.some(a =>
+                        a.estado === 'pendiente' && normHandle(a.deHandle) === hActivo && normHandle(a.paraHandle) === hPerfil
+                    );
+                    const btn = document.getElementById('btnFriendAction');
+                    btn.textContent = yaAmigos ? '✓ Amigos' : (pendiente ? '⏳ Solicitud enviada' : '🤝 Enviar solicitud de amistad');
+                    btn.disabled = yaAmigos || pendiente;
+                    btn.onclick = async () => {
+                        amistades.push({
+                            id: 'local_am_' + Date.now(),
+                            deNombre: ac.nombre,
+                            deHandle: hActivo,
+                            paraNombre: perfilChar.nombre,
+                            paraHandle: hPerfil,
+                            estado: 'pendiente'
+                        });
+                        try { localStorage.setItem(FRIENDS_KEY, JSON.stringify(amistades)); } catch {}
+                        if (window.KIXUZ_DB?.enviarSolicitudAmistad) {
+                            try { await window.KIXUZ_DB.enviarSolicitudAmistad({ destinoNombre: perfilChar.nombre, destinoHandle: hPerfil }); } catch {}
+                        }
+                        renderAmigos();
+                    };
+                } else {
+                    visBox.style.display = 'none';
+                }
+
+                const recibidas = amistades.filter(a => a.estado === 'pendiente' && normHandle(a.paraHandle) === hPerfil);
+                reqBox.innerHTML = '';
+                recibidas.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = 'row-between';
+                    div.style.cssText = 'padding:6px 0; border-bottom:1px solid rgba(108,60,224,0.2);';
+                    div.innerHTML = `
+                        <span style="font-size:13px;"><strong>${esc(r.deNombre || r.deHandle)}</strong> quiere ser tu amigo</span>
+                        <div style="display:flex; gap:4px;">
+                            <button type="button" class="btn btn-acc" style="padding:3px 8px; font-size:11px;">Aceptar</button>
+                            <button type="button" class="btn btn-danger btn-rej" style="padding:3px 8px; font-size:11px;">Rechazar</button>
+                        </div>
+                    `;
+                    div.querySelector('.btn-acc').addEventListener('click', () => {
+                        r.estado = 'aceptada';
+                        localStorage.setItem(FRIENDS_KEY, JSON.stringify(amistades));
+                        renderAmigos();
+                    });
+                    div.querySelector('.btn-rej').addEventListener('click', () => {
+                        amistades = amistades.filter(x => x.id !== r.id);
+                        localStorage.setItem(FRIENDS_KEY, JSON.stringify(amistades));
+                        renderAmigos();
+                    });
+                    reqBox.appendChild(div);
+                });
+
+                const aceptados = amistades.filter(a =>
+                    a.estado === 'aceptada' && (normHandle(a.deHandle) === hPerfil || normHandle(a.paraHandle) === hPerfil)
+                );
+                if (!aceptados.length) {
+                    listBox.innerHTML = 'Sin amigos agregados aún.';
+                } else {
+                    listBox.innerHTML = aceptados.map(a => {
+                        const otroH = normHandle(a.deHandle) === hPerfil ? a.paraHandle : a.deHandle;
+                        const otroN = normHandle(a.deHandle) === hPerfil ? (a.paraNombre || a.paraHandle) : (a.deNombre || a.deHandle);
+                        return `<div style="margin-bottom:4px;"><a href="perfil.html?char=${encodeURIComponent(otroH)}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(otroN)}</a> <span class="muted">${esc(otroH)}</span></div>`;
+                    }).join('');
+                }
+            }
+
+            function renderMuroPerfil() {
+                const cont = document.getElementById('wallPostsContainer');
+                if (!cont || !perfilChar) return;
+                const hPerfil = normHandle(perfilChar.handle);
+                const filtroUni = norm((document.getElementById('filterUniProfile')?.value || '').replace(/^#+/, ''));
+
+                let posts = [];
+                try { posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); } catch { posts = []; }
+                if (!Array.isArray(posts)) posts = [];
+
+                let list = posts.filter(p => {
+                    const matchChar = normHandle(p.autorHandle) === hPerfil || normHandle(p.muroHandle) === hPerfil;
+                    if (!matchChar) return false;
+                    if (window.KIXUZ_UNIVERSOS?.puedeVerPublicacion && !window.KIXUZ_UNIVERSOS.puedeVerPublicacion(p)) return false;
+                    if (filtroUni) {
+                        const uP = norm((p.universo || p.alcanceDestino || '').replace(/^#+/, ''));
+                        if (uP !== filtroUni) return false;
+                    }
+                    return true;
+                });
+
+                if (ordenMuro === 'kixiz') {
+                    list.sort((a, b) => Number(b.kixiz || 0) - Number(a.kixiz || 0));
+                }
+
+                if (!list.length) {
+                    cont.innerHTML = `<div class="panel-box muted" style="text-align:center;">No hay publicaciones en este muro todavía.</div>`;
+                    return;
+                }
+
+                cont.innerHTML = '';
+                list.forEach(p => {
+                    const card = document.createElement('article');
+                    card.className = 'post-card';
+                    const canDel = puedeBorrar(p.autorUid, p.autorHandle);
+                    const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
+
+                    card.innerHTML = `
+                        <div class="row-between">
+                            <div>
+                                <a href="perfil.html?char=${encodeURIComponent(p.autorHandle)}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(p.autorNombre)}</a>
+                                <span class="muted">${esc(p.autorHandle)}</span>
+                                ${p.muroHandle && normHandle(p.muroHandle) !== normHandle(p.autorHandle) ? `<span class="muted"> &gt; <a href="perfil.html?char=${encodeURIComponent(p.muroHandle)}" style="color:var(--acento); text-decoration:none;">${esc(p.muroHandle)}</a></span>` : ''}
+                            </div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                ${p.modoRol ? `<span class="info-tag tag-universo">${esc(p.modoRol)}</span>` : ''}
+                                ${p.universo ? `<span class="info-tag tag-clan">${esc(p.universo)}</span>` : ''}
+                                ${canDel ? `<button type="button" class="btn btn-danger btn-del-p" style="padding:4px 8px;">🗑️</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="post-content">${esc(p.contenido)}</div>
+                        ${p.imagen ? `<img src="${esc(p.imagen)}" alt="Adjunto" style="max-width:100%; border-radius:10px;">` : ''}
+                        <div class="row-between">
+                            <button type="button" class="btn btn-secondary btn-kix">🔥 Kix (${Number(p.kixiz || 0)})</button>
+                            <span class="muted">${respuestas.length} comentario(s)</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            ${respuestas.map((r, idx) => `
+                                <div class="comment-box">
+                                    <div class="row-between">
+                                        <strong style="color:var(--acento); font-size:12.5px;">${esc(r.autorNombre)} <span class="muted">${esc(r.autorHandle)}</span></strong>
+                                        ${puedeBorrar(r.autorUid, r.autorHandle) ? `<button type="button" class="btn btn-danger btn-del-r" data-idx="${idx}" style="padding:2px 6px; font-size:11px;">Borrar</button>` : ''}
+                                    </div>
+                                    <div style="white-space:pre-wrap; margin-top:2px;">${esc(r.texto)}</div>
+                                </div>
+                            `).join('')}
+                            <form class="reply-form" style="display:flex; gap:8px; align-items:flex-end; margin-top:4px;">
+                                <textarea class="reply-input" rows="1" placeholder="Comentar... (Shift + Enter: salto de línea)" style="flex:1; min-height:38px;"></textarea>
+                                <button type="submit" class="btn btn-secondary">Enviar</button>
+                            </form>
+                        </div>
+                    `;
+
+                    card.querySelector('.btn-kix').addEventListener('click', () => {
+                        p.kixiz = Number(p.kixiz || 0) + 1;
+                        localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+                        renderMuroPerfil();
+                    });
+
+                    const delP = card.querySelector('.btn-del-p');
+                    if (delP) {
+                        delP.addEventListener('click', async () => {
+                            if (!puedeBorrar(p.autorUid, p.autorHandle)) return;
+                            posts = posts.filter(x => String(x.id) !== String(p.id));
+                            localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+                            if (window.KIXUZ_DB?.eliminarPost) {
+                                try { await window.KIXUZ_DB.eliminarPost(p.id); } catch {}
+                            }
+                            renderMuroPerfil();
+                        });
+                    }
+
+                    card.querySelectorAll('.btn-del-r').forEach(rb => {
+                        rb.addEventListener('click', () => {
+                            const i = Number(rb.dataset.idx);
+                            if (!puedeBorrar(respuestas[i]?.autorUid, respuestas[i]?.autorHandle)) return;
+                            respuestas.splice(i, 1);
+                            p.respuestas = respuestas;
+                            localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+                            renderMuroPerfil();
+                        });
+                    });
+
+                    const rForm = card.querySelector('.reply-form');
+                    const rInp = card.querySelector('.reply-input');
+                    rInp.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            rForm.requestSubmit();
+                        }
+                    });
+                    rForm.addEventListener('submit', ev => {
+                        ev.preventDefault();
+                        const txt = String(rInp.value || '').replace(/^
++|
++$/g, '');
+                        if (!txt.trim()) return;
+                        const ac = window.KIXUZ_ACTIVE_CHAR || { nombre: 'Personaje', handle: '@rol' };
+                        respuestas.push({ autorNombre: ac.nombre, autorHandle: normHandle(ac.handle), texto: txt });
+                        p.respuestas = respuestas;
+                        localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+                        rInp.value = '';
+                        renderMuroPerfil();
+                    });
+
+                    cont.appendChild(card);
+                });
+            }
+
+            async function cargarTodo() {
                 const params = new URLSearchParams(window.location.search || '');
                 const charParam = params.get('char') || '';
 
                 if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista) {
-                    personajeVisto = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(charParam);
+                    perfilChar = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(charParam);
                 } else {
-                    personajeVisto = window.KIXUZ_ACTIVE_CHAR || null;
+                    perfilChar = window.KIXUZ_ACTIVE_CHAR || null;
                 }
 
-                if (!personajeVisto) {
-                    const subs = window.KIXUZ_CHARS?.obtenerSubpersonajes ? window.KIXUZ_CHARS.obtenerSubpersonajes() : [];
-                    personajeVisto = subs[0] || { nombre: 'Personaje', handle: '@rol', bio: 'Creá o seleccioná un personaje para ver su ficha.' };
+                if (!perfilChar) {
+                    perfilChar = { nombre: 'Personaje', handle: '@rol', bio: 'Creá o elegí un personaje para ver su expediente.' };
                 }
 
-                const nombre = personajeVisto.nombre || 'Personaje';
-                const handle = normHandle(personajeVisto.handle) || '@rol';
-                document.getElementById('profileName').textContent = nombre;
-                document.getElementById('profileHandle').textContent = handle;
-                document.getElementById('profileBio').textContent = personajeVisto.bio || 'Sin biografía todavía.';
-                document.getElementById('infoEspecie').textContent = personajeVisto.especie || '—';
-                document.getElementById('infoEdad').textContent = personajeVisto.edad || '—';
-                document.getElementById('infoClan').textContent = personajeVisto.clan || '—';
+                const hPerfil = normHandle(perfilChar.handle) || '@rol';
+                const qChar = encodeURIComponent(hPerfil);
+                document.getElementById('navFamiliaLink').href = `familia.html?char=${qChar}`;
+                document.getElementById('linkArbolFamiliar').href = `familia.html?char=${qChar}#familia`;
+                document.getElementById('linkJerarquiaClan').href = `familia.html?char=${qChar}#clan`;
 
-                const avEl = document.getElementById('profileAvatar');
-                if (personajeVisto.avatar) {
-                    avEl.innerHTML = `<img src="${esc(personajeVisto.avatar)}" alt="${esc(nombre)}">`;
-                } else {
-                    avEl.textContent = nombre.charAt(0).toUpperCase() || '?';
-                }
+                document.getElementById('charName').textContent = perfilChar.nombre || 'Personaje';
+                document.getElementById('charHandle').textContent = hPerfil;
+                document.getElementById('charEstadoRol').textContent = perfilChar.estadoRol || '🟢 Libre para rol';
+                document.getElementById('valEspecie').textContent = perfilChar.especie || '—';
+                document.getElementById('valEdad').textContent = perfilChar.edad || '—';
+                document.getElementById('valGenero').textContent = perfilChar.genero || '—';
+                document.getElementById('valClan').textContent = perfilChar.clan || '—';
+                document.getElementById('valBio').textContent = perfilChar.bio || 'Sin biografía todavía.';
 
-                const banEl = document.getElementById('profileBanner');
-                if (personajeVisto.banner) {
-                    banEl.style.backgroundImage = `url("${personajeVisto.banner.replace(/"/g, '%22')}")`;
-                } else {
-                    banEl.style.backgroundImage = '';
-                }
+                const avEl = document.getElementById('charAvatar');
+                if (perfilChar.avatar) avEl.innerHTML = `<img src="${esc(perfilChar.avatar)}" alt="${esc(perfilChar.nombre)}">`;
+                else avEl.textContent = (perfilChar.nombre || 'P').charAt(0).toUpperCase();
 
-                const unis = Array.isArray(personajeVisto.universos) ? personajeVisto.universos : (personajeVisto.universo ? [personajeVisto.universo] : []);
-                document.getElementById('profileUniversos').innerHTML = unis.length
-                    ? unis.map(u => `<span class="tag-pill">${esc(u.startsWith('#') ? u : '#' + u)}</span>`).join('')
-                    : '';
+                const banEl = document.getElementById('charBanner');
+                banEl.style.backgroundImage = perfilChar.banner ? `url("${perfilChar.banner.replace(/"/g, '%22')}")` : '';
+                document.body.style.backgroundImage = perfilChar.fondo ? `url("${perfilChar.fondo.replace(/"/g, '%22')}")` : '';
 
-                const galEl = document.getElementById('photosGallery');
-                const fotos = [personajeVisto.avatar, personajeVisto.banner].filter(Boolean);
-                galEl.innerHTML = fotos.length
-                    ? fotos.map(src => `<div class="info-box" style="padding:6px;"><img src="${esc(src)}" alt="Foto" style="width:100%; height:160px; object-fit:cover; border-radius:8px;"></div>`).join('')
-                    : `<div class="muted">Sin fotos cargadas en este personaje.</div>`;
-
-                const esPropio = window.KIXUZ_CHARS?.esPersonajePropio ? window.KIXUZ_CHARS.esPersonajePropio(personajeVisto) : true;
-                const actionsEl = document.getElementById('profileOwnerActions');
-                actionsEl.style.display = (esPropio || esKixuz()) ? 'flex' : 'none';
-
-                renderMuroPersonaje(handle);
-            }
-
-            function renderMuroPersonaje(handleTarget) {
-                const wallEl = document.getElementById('wallPostsList');
-                if (!wallEl) return;
-                let posts = [];
-                try { posts = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]'); } catch { posts = []; }
-                if (!Array.isArray(posts)) posts = [];
-
-                const propios = posts.filter(p => normHandle(p.autorHandle || p.muroHandle) === normHandle(handleTarget));
-                if (!propios.length) {
-                    wallEl.innerHTML = `<div class="muted">Este personaje todavía no tiene publicaciones en su muro.</div>`;
-                    return;
-                }
-
-                wallEl.innerHTML = '';
-                propios.forEach(p => {
-                    const card = document.createElement('article');
-                    card.className = 'post-card';
-                    const canDel = puedeBorrar(p.autorUid, p.autorHandle);
-                    card.innerHTML = `
-                        <div class="row-between">
-                            <strong>${esc(p.autorNombre || 'Personaje')} <span class="muted">${esc(p.autorHandle || '')}</span></strong>
-                            ${canDel ? `<button type="button" class="btn btn-danger btn-del" style="padding:4px 9px; font-size:12px;">🗑️</button>` : ''}
-                        </div>
-                        <div class="post-content">${esc(p.contenido || '')}</div>
-                    `;
-                    const delBtn = card.querySelector('.btn-del');
-                    if (delBtn) {
-                        delBtn.addEventListener('click', async () => {
-                            if (!puedeBorrar(p.autorUid, p.autorHandle)) return;
-                            const next = posts.filter(x => String(x.id) !== String(p.id));
-                            try { localStorage.setItem('kixuz_posts_v1', JSON.stringify(next)); } catch {}
-                            if (window.KIXUZ_DB?.eliminarPost) {
-                                try { await window.KIXUZ_DB.eliminarPost(p.id); } catch {}
-                            }
-                            renderMuroPersonaje(handleTarget);
-                        });
-                    }
-                    wallEl.appendChild(card);
+                const unis = Array.isArray(perfilChar.universos) ? perfilChar.universos : (perfilChar.universo ? [perfilChar.universo] : []);
+                const clanes = obtenerClanesDelPersonaje(hPerfil);
+                const tagsRow = document.getElementById('charTagsRow');
+                let tagsHtml = '';
+                unis.forEach(u => {
+                    const tagNorm = window.KIXUZ_UNIVERSOS?.normTag ? window.KIXUZ_UNIVERSOS.normTag(u) : (u.startsWith('#') ? u : '#' + u);
+                    tagsHtml += `<a href="universo.html?u=${encodeURIComponent(tagNorm)}" class="info-tag tag-universo">🌌 ${esc(tagNorm)}</a>`;
                 });
+                clanes.forEach(c => {
+                    tagsHtml += `<a href="familia.html?char=${qChar}#clan" class="info-tag tag-clan">🛡️ ${esc(c)}</a>`;
+                });
+                if (perfilChar.pareja) {
+                    tagsHtml += `<span class="info-tag tag-relacion">💍 ${esc(perfilChar.pareja)}</span>`;
+                }
+                tagsRow.innerHTML = tagsHtml;
+
+                renderStatsBars('valHabilidades', parseStats(perfilChar.habilidades));
+                renderStatsBars('valDebilidades', parseStats(perfilChar.debilidades));
+
+                const famList = obtenerFamiliaDelPersonaje(hPerfil);
+                const famClanesEl = document.getElementById('valFamiliaClanes');
+                famClanesEl.innerHTML = `
+                    <div style="margin-bottom:6px;"><strong>Familia:</strong> ${famList.length ? famList.map(f => `<a href="perfil.html?char=${encodeURIComponent(f.handle)}" style="color:var(--acento); text-decoration:none;">${esc(f.nombre)}</a> (${esc(f.relacion)})`).join(', ') : '<span class="muted">Sin vínculos familiares registrados</span>'}</div>
+                    <div><strong>Clanes:</strong> ${clanes.length ? clanes.map(c => `<span class="info-tag tag-clan">${esc(c)}</span>`).join(' ') : '<span class="muted">Sin clanes</span>'}</div>
+                `;
+
+                const fotos = [
+                    perfilChar.avatar ? { titulo: 'Avatar', src: perfilChar.avatar } : null,
+                    perfilChar.banner ? { titulo: 'Banner', src: perfilChar.banner } : null,
+                    perfilChar.fondo ? { titulo: 'Fondo', src: perfilChar.fondo } : null
+                ].filter(Boolean);
+                document.getElementById('profilePhotosGrid').innerHTML = fotos.length
+                    ? fotos.map(f => `<div class="photo-tile"><img src="${esc(f.src)}" alt="${esc(f.titulo)}"><span class="muted">${esc(f.titulo)}</span></div>`).join('')
+                    : `<div class="muted">No hay fotos cargadas en este personaje.</div>`;
+
+                const puedeEditarPerfil = esPropio();
+                document.getElementById('ownerEditControls').style.display = puedeEditarPerfil ? 'flex' : 'none';
+                if (!puedeEditarPerfil) {
+                    document.getElementById('editFichaPanel').style.display = 'none';
+                }
+
+                const ac = window.KIXUZ_ACTIVE_CHAR || { nombre: perfilChar.nombre, handle: hPerfil };
+                document.getElementById('wallComposerLabel').textContent = `Publicando como ${ac.nombre} (${normHandle(ac.handle)}) en muro de ${perfilChar.nombre}`;
+
+                renderAmigos();
+                renderMuroPerfil();
             }
 
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+            document.querySelectorAll('.accordion-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    const t = btn.dataset.tab;
-                    document.getElementById('tabMuro').style.display = t === 'muro' ? 'block' : 'none';
-                    document.getElementById('tabInfo').style.display = t === 'info' ? 'block' : 'none';
-                    document.getElementById('tabFotos').style.display = t === 'fotos' ? 'block' : 'none';
+                    const body = document.getElementById(btn.dataset.acc);
+                    if (body) body.classList.toggle('open');
                 });
             });
 
-            document.getElementById('btnEditFicha').addEventListener('click', () => {
-                if (!personajeVisto) return;
-                document.getElementById('editNombreInput').value = personajeVisto.nombre || '';
-                document.getElementById('editEspecieInput').value = personajeVisto.especie || '';
-                document.getElementById('editEdadInput').value = personajeVisto.edad || '';
-                document.getElementById('editClanInput').value = personajeVisto.clan || '';
-                document.getElementById('editBioInput').value = personajeVisto.bio || '';
-                document.getElementById('editFichaBox').classList.add('open');
+            document.querySelectorAll('[data-ptab]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-ptab]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const isFotos = btn.dataset.ptab === 'fotos';
+                    document.getElementById('sectionMuro').style.display = isFotos ? 'none' : 'flex';
+                    document.getElementById('sectionFotos').style.display = isFotos ? 'block' : 'none';
+                });
             });
 
-            document.getElementById('btnCancelFicha').addEventListener('click', () => {
-                document.getElementById('editFichaBox').classList.remove('open');
+            document.querySelectorAll('[data-sort]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    ordenMuro = btn.dataset.sort;
+                    renderMuroPerfil();
+                });
+            });
+
+            document.getElementById('filterUniProfile').addEventListener('change', renderMuroPerfil);
+
+            document.getElementById('wallAlcanceTipo').addEventListener('change', e => {
+                const dest = document.getElementById('wallAlcanceDestino');
+                const v = e.target.value;
+                if (v === 'general') {
+                    dest.style.display = 'none';
+                    dest.innerHTML = '';
+                } else if (v === 'universo') {
+                    dest.style.display = 'inline-block';
+                    const unis = window.KIXUZ_UNIVERSOS?.obtenerUniversosVisibles() || [];
+                    dest.innerHTML = unis.map(u => `<option value="${esc(u.tag)}">${esc(u.tag)}</option>`).join('') || '<option value="">Sin universos</option>';
+                } else if (v === 'clan') {
+                    dest.style.display = 'inline-block';
+                    const clanes = obtenerClanesDelPersonaje(window.KIXUZ_ACTIVE_CHAR?.handle || perfilChar?.handle);
+                    dest.innerHTML = clanes.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('') || '<option value="">Sin clanes</option>';
+                } else {
+                    dest.style.display = 'none';
+                }
+            });
+
+            document.getElementById('btnToggleEditFicha').addEventListener('click', () => {
+                if (!esPropio() || !perfilChar) return;
+                document.getElementById('inpNombre').value = perfilChar.nombre || '';
+                document.getElementById('inpEspecie').value = perfilChar.especie || '';
+                document.getElementById('inpEdad').value = perfilChar.edad || '';
+                document.getElementById('inpGenero').value = perfilChar.genero || '';
+                document.getElementById('inpClan').value = perfilChar.clan || '';
+                document.getElementById('inpUniversos').value = Array.isArray(perfilChar.universos) ? perfilChar.universos.join(', ') : (perfilChar.universo || '');
+                document.getElementById('inpEstadoRol').value = perfilChar.estadoRol || '🟢 Libre para rol';
+                document.getElementById('inpBio').value = perfilChar.bio || '';
+                document.getElementById('inpHabilidades').value = Array.isArray(perfilChar.habilidades)
+                    ? perfilChar.habilidades.map(x => `${x.label}:${x.score}`).join(', ')
+                    : (perfilChar.habilidades || '');
+                document.getElementById('inpDebilidades').value = Array.isArray(perfilChar.debilidades)
+                    ? perfilChar.debilidades.map(x => `${x.label}:${x.score}`).join(', ')
+                    : (perfilChar.debilidades || '');
+                document.getElementById('editFichaPanel').style.display = 'flex';
+            });
+
+            document.getElementById('btnCancelEdit').addEventListener('click', () => {
+                document.getElementById('editFichaPanel').style.display = 'none';
             });
 
             document.getElementById('btnSaveFicha').addEventListener('click', async () => {
-                if (!personajeVisto) return;
-                personajeVisto.nombre = document.getElementById('editNombreInput').value.trim() || personajeVisto.nombre;
-                personajeVisto.especie = document.getElementById('editEspecieInput').value.trim();
-                personajeVisto.edad = document.getElementById('editEdadInput').value.trim();
-                personajeVisto.clan = document.getElementById('editClanInput').value.trim();
-                personajeVisto.bio = document.getElementById('editBioInput').value;
+                if (!esPropio() || !perfilChar) return;
+                perfilChar.nombre = document.getElementById('inpNombre').value.trim() || perfilChar.nombre;
+                perfilChar.especie = document.getElementById('inpEspecie').value.trim();
+                perfilChar.edad = document.getElementById('inpEdad').value.trim();
+                perfilChar.genero = document.getElementById('inpGenero').value.trim();
+                perfilChar.clan = document.getElementById('inpClan').value.trim();
+                const uniStr = document.getElementById('inpUniversos').value.trim();
+                perfilChar.universos = uniStr ? uniStr.split(',').map(x => x.trim()).filter(Boolean).map(x => x.startsWith('#') ? x : '#' + x.replace(/\s+/g, '')) : [];
+                perfilChar.estadoRol = document.getElementById('inpEstadoRol').value;
+                perfilChar.bio = document.getElementById('inpBio').value;
+                perfilChar.habilidades = parseStats(document.getElementById('inpHabilidades').value);
+                perfilChar.debilidades = parseStats(document.getElementById('inpDebilidades').value);
 
                 if (window.KIXUZ_DB?.guardarSubpersonaje) {
-                    await window.KIXUZ_DB.guardarSubpersonaje(personajeVisto);
+                    await window.KIXUZ_DB.guardarSubpersonaje(perfilChar);
                 }
-                document.getElementById('editFichaBox').classList.remove('open');
-                await cargarPerfil();
+                document.getElementById('editFichaPanel').style.display = 'none';
+                await cargarTodo();
             });
 
-            document.getElementById('inputAvatarFile').addEventListener('change', async e => {
-                const file = e.target.files?.[0];
-                if (!file || !personajeVisto) return;
-                personajeVisto.avatar = await comprimirImagen(file, 360, 0.8);
-                if (window.KIXUZ_DB?.guardarSubpersonaje) {
-                    await window.KIXUZ_DB.guardarSubpersonaje(personajeVisto);
-                }
-                await cargarPerfil();
+            document.getElementById('fileAvatar').addEventListener('change', async e => {
+                if (!esPropio() || !perfilChar) return;
+                const f = e.target.files?.[0];
+                if (!f) return;
+                perfilChar.avatar = await comprimirImg(f, 400, 0.82);
+                if (window.KIXUZ_DB?.guardarSubpersonaje) await window.KIXUZ_DB.guardarSubpersonaje(perfilChar);
+                await cargarTodo();
             });
 
-            document.getElementById('inputBannerFile').addEventListener('change', async e => {
-                const file = e.target.files?.[0];
-                if (!file || !personajeVisto) return;
-                personajeVisto.banner = await comprimirImagen(file, 960, 0.78);
-                if (window.KIXUZ_DB?.guardarSubpersonaje) {
-                    await window.KIXUZ_DB.guardarSubpersonaje(personajeVisto);
-                }
-                await cargarPerfil();
+            document.getElementById('fileBanner').addEventListener('change', async e => {
+                if (!esPropio() || !perfilChar) return;
+                const f = e.target.files?.[0];
+                if (!f) return;
+                perfilChar.banner = await comprimirImg(f, 1200, 0.8);
+                if (window.KIXUZ_DB?.guardarSubpersonaje) await window.KIXUZ_DB.guardarSubpersonaje(perfilChar);
+                await cargarTodo();
             });
 
-            window.addEventListener('DOMContentLoaded', cargarPerfil);
-            window.addEventListener('kixuz:personaje-cambiado', cargarPerfil);
-            window.addEventListener('kixuz:personajes-actualizados', cargarPerfil);
-            window.addEventListener('kixuz:sesion-actualizada', cargarPerfil);
+            document.getElementById('fileBg').addEventListener('change', async e => {
+                if (!esPropio() || !perfilChar) return;
+                const f = e.target.files?.[0];
+                if (!f) return;
+                perfilChar.fondo = await comprimirImg(f, 1280, 0.75);
+                if (window.KIXUZ_DB?.guardarSubpersonaje) await window.KIXUZ_DB.guardarSubpersonaje(perfilChar);
+                await cargarTodo();
+            });
+
+            document.getElementById('btnClearBg').addEventListener('click', async () => {
+                if (!esPropio() || !perfilChar) return;
+                perfilChar.fondo = '';
+                if (window.KIXUZ_DB?.guardarSubpersonaje) await window.KIXUZ_DB.guardarSubpersonaje(perfilChar);
+                await cargarTodo();
+            });
+
+            document.getElementById('wallPostImg').addEventListener('change', async e => {
+                const f = e.target.files?.[0];
+                if (f) wallImgB64 = await comprimirImg(f, 820, 0.78);
+            });
+
+            const wTa = document.getElementById('wallPostInput');
+            wTa.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('wallPostForm').requestSubmit();
+                }
+            });
+
+            document.getElementById('wallPostForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                const contenido = String(wTa.value || '').replace(/^
++|
++$/g, '');
+                if (!contenido.trim() || !perfilChar) return;
+
+                const ac = window.KIXUZ_ACTIVE_CHAR || perfilChar;
+                const alcanceTipo = document.getElementById('wallAlcanceTipo').value;
+                const alcanceDestino = document.getElementById('wallAlcanceDestino').value || '';
+                const modoRol = document.getElementById('wallIcOoc').value;
+
+                const nuevo = {
+                    id: 'local_' + Date.now(),
+                    autorNombre: ac.nombre,
+                    autorHandle: normHandle(ac.handle),
+                    muroHandle: normHandle(perfilChar.handle),
+                    contenido,
+                    universo: alcanceTipo === 'universo' ? alcanceDestino : '',
+                    alcanceTipo,
+                    alcanceDestino,
+                    modoRol,
+                    imagen: wallImgB64,
+                    kixiz: 0,
+                    respuestas: []
+                };
+
+                let posts = [];
+                try { posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); } catch { posts = []; }
+                posts.unshift(nuevo);
+                localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+
+                if (window.KIXUZ_DB?.publicarPost) {
+                    try { await window.KIXUZ_DB.publicarPost(nuevo); } catch {}
+                }
+
+                wTa.value = '';
+                wallImgB64 = '';
+                renderMuroPerfil();
+            });
+
+            window.addEventListener('DOMContentLoaded', cargarTodo);
+            window.addEventListener('kixuz:personaje-cambiado', cargarTodo);
+            window.addEventListener('kixuz:personajes-actualizados', cargarTodo);
+            window.addEventListener('kixuz:sesion-actualizada', cargarTodo);
         })();
     </script>
 </body>
