@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Cuenta Maestra (Mis Personajes)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(28, 14, 48, 0.92);
+            --borde: rgba(108, 60, 224, 0.45);
+        }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.94);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg-principal);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            line-height: 1.55;
+        }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        header {
+            position: sticky; top: 0; z-index: 900;
+            background: rgba(21, 10, 36, 0.96); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde); padding: 8px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; flex-wrap: wrap; transition: transform 0.24s ease;
+        }
+        html[data-theme="light"] header { background: rgba(244, 241, 250, 0.96); }
+        header.header-hidden { transform: translateY(-100%); }
+        .logo { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; flex-shrink: 0; }
+        .logo img { height: 32px; width: auto; }
+        .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--texto); text-decoration: none; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; font-size: 13px; padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+        }
+        .nav-links a:hover, .nav-links a.active { background: rgba(108, 60, 224, 0.28); color: var(--acento); }
+        .user-menu { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+        #activeCharSelect {
+            background: rgba(0, 0, 0, 0.35); color: var(--texto); border: 1px solid var(--borde);
+            border-radius: 8px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 12.5px; max-width: 220px;
+        }
+        .btn-auth-link {
+            background: var(--acento); color: #150A24 !important; padding: 6px 10px;
+            border-radius: 8px; font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 700; text-decoration: none;
+        }
+        .page-wrap { max-width: 980px; margin: 26px auto 80px; padding: 0 18px; display: flex; flex-direction: column; gap: 18px; }
+        .panel-box { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 20px 22px; }
+        .btn {
+            background: var(--acento); color: #150A24; border: none; border-radius: 10px;
+            padding: 8px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-secondary { background: rgba(108, 60, 224, 0.25); color: var(--texto); border: 1px solid var(--borde); }
+        .btn-danger { background: rgba(224, 60, 108, 0.2); color: #ff9bb4; border: 1px solid rgba(224, 60, 108, 0.5); }
+        .char-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 12px 14px; border: 1px solid var(--borde); border-radius: 12px;
+            margin-bottom: 10px; background: rgba(21, 10, 36, 0.65);
+        }
+        .char-avatar {
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--acento);
+            background: #281445; object-fit: cover; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--acento); flex-shrink: 0;
+        }
+        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .muted { opacity: 0.78; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">🏠 Inicio</a>
+            <a href="perfil.html">🎭 Mi Perfil</a>
+            <a href="universo.html">🌌 Universos</a>
+            <a href="familia.html">🌳 Familia / Clan</a>
+            <a href="cuenta-maestra.html" class="active">👑 Cuenta Maestra</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro">🔑 Entrar</a>
+        </div>
+    </header>
+
+    <main class="page-wrap">
+        <section class="panel-box row-between">
+            <div>
+                <h1 style="font-size:22px; color:var(--acento);">👑 Cuenta Maestra</h1>
+                <div id="accountSummary" class="muted">Administrá tus personajes creados.</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <a href="crear-personaje.html" class="btn">+ Crear personaje</a>
+                <a href="registro.html" class="btn btn-secondary">🔑 Cuenta / Sesión</a>
+                <button type="button" class="btn btn-danger" id="btnLogout" style="display:none;">Cerrar sesión</button>
+            </div>
+        </section>
+
+        <section class="panel-box">
+            <h2 style="font-size:17px; color:var(--acento); margin-bottom:12px;">Mis Personajes</h2>
+            <div id="myCharactersContainer"></div>
+        </section>
+    </main>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script src="characters.js"></script>
+    <script src="theme.js"></script>
+    <script src="universos-core.js"></script>
+    <script src="kixuz-72h-aviso.js"></script>
+    <script src="kixuz-admin-master.js"></script>
+    <script src="chat.js"></script>
+    <script src="barra-buscador.js"></script>
+    <script>
+        (() => {
+            const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            const normHandle = v => {
+                const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            function renderCuenta() {
+                const summary = document.getElementById('accountSummary');
+                const logoutBtn = document.getElementById('btnLogout');
+                const listEl = document.getElementById('myCharactersContainer');
+
+                const perfil = window.KIXUZ_DB?.perfilCuenta;
+                const user = window.KIXUZ_DB?.usuarioActual;
+                let loc = null;
+                try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || 'null'); } catch {}
+
+                if (perfil || user || loc) {
+                    const nom = perfil?.nombreMaestro || user?.displayName || loc?.nombreMaestro || loc?.email || user?.email || 'Cuenta activa';
+                    summary.textContent = `Sesión iniciada: ${nom} · Administrá tus personajes.`;
+                    logoutBtn.style.display = 'inline-flex';
+                } else {
+                    summary.textContent = 'Administrá tus personajes guardados en este dispositivo o iniciá sesión para sincronizarlos.';
+                    logoutBtn.style.display = 'none';
+                }
+
+                const chars = window.KIXUZ_CHARS?.obtenerSubpersonajes ? window.KIXUZ_CHARS.obtenerSubpersonajes() : [];
+                const activo = window.KIXUZ_CHARS?.obtenerPersonajeActivo ? window.KIXUZ_CHARS.obtenerPersonajeActivo() : null;
+
+                if (!chars.length) {
+                    listEl.innerHTML = `<div class="muted">Todavía no creaste personajes. Usá <strong>+ Crear personaje</strong> para comenzar.</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = '';
+                chars.forEach(p => {
+                    const h = normHandle(p.handle || p.nombre) || '@rol';
+                    const esAct = activo && normHandle(activo.handle || activo.nombre) === h;
+                    const row = document.createElement('div');
+                    row.className = 'char-row';
+                    row.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            ${p.avatar
+                                ? `<img src="${esc(p.avatar)}" alt="${esc(p.nombre)}" class="char-avatar">`
+                                : `<div class="char-avatar">${esc((p.nombre || 'P').charAt(0).toUpperCase())}</div>`}
+                            <div>
+                                <strong style="color:var(--acento); font-size:15px;">${esc(p.nombre || 'Personaje')}</strong>
+                                <span class="muted">${esc(h)}</span>
+                                ${esAct ? `<span style="margin-left:6px; font-size:11px; font-weight:700; color:var(--acento);">● Activo</span>` : ''}
+                                <div class="muted">${esc(p.especie || '')} ${p.clan ? '· ' + esc(p.clan) : ''}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-secondary btn-use" style="padding:6px 11px; font-size:12px;">Usar</button>
+                            <a href="perfil.html?char=${encodeURIComponent(h)}" class="btn" style="padding:6px 11px; font-size:12px;">Ver / Editar perfil</a>
+                            <button type="button" class="btn btn-danger btn-del" style="padding:6px 10px; font-size:12px;">🗑️</button>
+                        </div>
+                    `;
+                    row.querySelector('.btn-use').addEventListener('click', () => {
+                        try { localStorage.setItem('kixuz_personaje_activo', JSON.stringify(p)); } catch {}
+                        window.KIXUZ_ACTIVE_CHAR = p;
+                        window.dispatchEvent(new CustomEvent('kixuz:personaje-cambiado', { detail: p }));
+                        window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+                        renderCuenta();
+                    });
+                    row.querySelector('.btn-del').addEventListener('click', async () => {
+                        if (!confirm(`¿Eliminar el personaje ${p.nombre || h}?`)) return;
+                        if (window.KIXUZ_DB?.eliminarSubpersonaje) {
+                            await window.KIXUZ_DB.eliminarSubpersonaje(h, p.id);
+                        }
+                        renderCuenta();
+                    });
+                    listEl.appendChild(row);
+                });
+            }
+
+            document.getElementById('btnLogout').addEventListener('click', async () => {
+                if (window.KIXUZ_DB?.cerrarSesion) {
+                    await window.KIXUZ_DB.cerrarSesion();
+                }
+                renderCuenta();
+            });
+
+            window.addEventListener('DOMContentLoaded', renderCuenta);
+            window.addEventListener('kixuz:personajes-actualizados', renderCuenta);
+            window.addEventListener('kixuz:sesion-actualizada', renderCuenta);
+        })();
+    </script>
+</body>
+</html>
