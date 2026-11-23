@@ -57,7 +57,7 @@
         }
 
         main {
-            max-width: 1020px;
+            max-width: 1040px;
             margin: 28px auto 90px;
             padding: 0 18px;
             display: flex;
@@ -83,7 +83,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
             gap: 10px;
             margin-top: 12px;
         }
@@ -116,43 +116,77 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
         }
 
+        /* Animación flotante para las tarjetas centradas */
+        @keyframes kixuzCardFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
         .gen-block {
-            margin-top: 14px; padding: 14px; border-radius: 14px;
+            margin-top: 14px; padding: 16px; border-radius: 16px;
             background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(108, 60, 224, 0.3);
         }
         .gen-head {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; gap: 8px; flex-wrap: wrap;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 14px; gap: 10px; flex-wrap: wrap; text-align: center;
         }
         .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
         }
         .member-card {
-            background: rgba(21, 10, 36, 0.72); border: 1px solid var(--borde);
-            border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;
-            transition: transform 0.22s ease, border-color 0.22s ease;
+            width: 245px;
+            background: rgba(21, 10, 36, 0.78);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            animation: kixuzCardFloat 4.2s ease-in-out infinite;
+            transition: border-color 0.22s ease, box-shadow 0.22s ease;
         }
-        html[data-theme="light"] .member-card { background: #F9F7FD; }
-        .member-card:hover { transform: translateY(-3px); border-color: var(--acento); }
+        .member-card:nth-child(2n) { animation-delay: 0.9s; }
+        .member-card:nth-child(3n) { animation-delay: 1.8s; }
+        html[data-theme="light"] .member-card { background: #FFFFFF; }
+        .member-card:hover {
+            animation-play-state: paused;
+            border-color: var(--acento);
+            box-shadow: 0 12px 26px rgba(45, 212, 196, 0.16);
+        }
+        .member-avatar {
+            width: 64px; height: 64px; border-radius: 50%;
+            border: 2.5px solid var(--acento);
+            background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 22px; color: #150A24;
+            flex-shrink: 0;
+        }
         .member-link {
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
-            color: var(--acento); text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 15.5px;
+            color: var(--acento);
+            text-decoration: none;
         }
         .member-link:hover { text-decoration: underline; }
         .pill-rol {
             display: inline-block; font-size: 11.5px; font-weight: 700;
-            padding: 3px 9px; border-radius: 999px;
-            background: rgba(108, 60, 224, 0.26); color: var(--texto); width: fit-content;
+            padding: 3px 10px; border-radius: 999px;
+            background: rgba(108, 60, 224, 0.26); color: var(--texto);
+        }
+        .card-actions-row {
+            display: flex; justify-content: center; gap: 6px; margin-top: 6px; flex-wrap: wrap;
         }
         .req-card {
             display: flex; justify-content: space-between; align-items: center; gap: 10px;
             flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
             background: rgba(45, 212, 196, 0.1); border: 1px solid var(--acento); margin-top: 10px;
-        }
-        details.registry-box summary {
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;
-            color: var(--acento); cursor: pointer; list-style: none;
-            display: flex; justify-content: space-between; align-items: center;
         }
     </style>
 </head>
@@ -179,9 +213,10 @@
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
                 <div>
                     <h1 style="font-size:22px;">Familia y Clanes</h1>
-                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Una única familia con generaciones enlazadas y todos los clanes que desees.</p>
+                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Crea tu etiqueta de Familia o Clan para el perfil, gestiona generaciones y enlaza personajes.</p>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" class="btn-ghost" id="btnSetProfileTag">Crear / Asignar etiqueta al perfil</button>
                     <button type="button" class="btn-ghost" id="addGenBtn">+ Nueva Generación</button>
                 </div>
             </div>
@@ -203,12 +238,12 @@
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
                     <h2 style="font-size:17px;">Agregar miembro a la Familia</h2>
-                    <button type="button" class="btn-ghost" id="btnAddSelfFamily">Agregarme a mí mismo</button>
+                    <button type="button" class="btn-ghost" id="btnAddSelfFamily">Agregarme a mí en la generación elegida</button>
                 </div>
                 <form id="addFamilyForm" class="form-grid">
                     <input type="text" id="famNombre" placeholder="Nombre del miembro" required>
                     <input type="text" id="famHandle" placeholder="@usuario (ej. @kaelen)" required>
-                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Hijo/a, Tío/a, Sobrino/a, Pareja)" required>
+                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Hijo/a, Tío/a, Pareja)" required>
                     <datalist id="relacionesSugeridas">
                         <option value="Madre">
                         <option value="Padre">
@@ -238,13 +273,13 @@
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
                     <h2 style="font-size:17px;">Agregar miembro a un Clan</h2>
-                    <button type="button" class="btn-ghost" id="btnAddSelfClan">Agregarme a mí mismo al Clan</button>
+                    <button type="button" class="btn-ghost" id="btnAddSelfClan">Agregarme a mí a este Clan</button>
                 </div>
                 <form id="addClanForm" class="form-grid">
                     <input type="text" id="clanNombreClan" placeholder="Nombre del Clan (ej. Clan Eclipse)" required>
                     <input type="text" id="clanMiembroNombre" placeholder="Nombre del personaje" required>
                     <input type="text" id="clanMiembroHandle" placeholder="@usuario" required>
-                    <input type="text" id="clanRango" placeholder="Relación o rango (ej. Líder, Guardia, Aprendiz)">
+                    <input type="text" id="clanRango" placeholder="Relación o rango (ej. Líder, Guardia)">
                     <select id="clanEnvioModo" aria-label="Agregar directo o enviar solicitud">
                         <option value="directo">Agregar directo al Clan</option>
                         <option value="solicitud">Enviar solicitud al @usuario</option>
@@ -255,26 +290,13 @@
 
             <div id="clanesCardsContainer"></div>
         </section>
-
-        <!-- Directorio de todos los personajes registrados en la página -->
-        <section class="panel">
-            <details class="registry-box" id="allCharsRegistry">
-                <summary>
-                    <span>Personajes registrados en la página</span>
-                    <span id="registryCountBadge" class="pill-rol">0</span>
-                </summary>
-                <div style="margin-top:12px;">
-                    <input type="text" id="registryFilterInput" placeholder="Filtrar personajes registrados por nombre o @usuario...">
-                    <div class="cards-grid" id="allCharsGrid" style="margin-top:12px;"></div>
-                </div>
-            </details>
-        </section>
     </main>
 
     <script>
         (() => {
             const KEY_FAM_CLAN = 'kixuz_familia_clan_v1';
             const KEY_SOLICITUDES = 'kixuz_solicitudes_vinculo_v1';
+            const KEY_FOTOS = 'kixuz_perfil_fotos_v1';
 
             const esc = s => String(s || '')
                 .replace(/&/g, '&amp;')
@@ -310,21 +332,40 @@
             };
 
             function getRelacionReciproca(rel) {
-                const key = String(rel || '').trim().toLowerCase();
-                return RELACION_RECIPROCA[key] || (rel || 'Vínculo');
+                return RELACION_RECIPROCA[String(rel || '').trim().toLowerCase()] || (rel || 'Vínculo');
+            }
+
+            function obtenerAvatarPorHandle(handle) {
+                const h = normH(handle);
+                try {
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs)) {
+                        const found = subs.find(p => normH(p?.handle) === h && p?.avatar);
+                        if (found) return found.avatar;
+                    }
+                } catch {}
+                try {
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act && normH(act.handle) === h && act.avatar) return act.avatar;
+                } catch {}
+                try {
+                    const fotos = JSON.parse(localStorage.getItem(KEY_FOTOS) || '{}');
+                    if (fotos && fotos[h]?.avatar) return fotos[h].avatar;
+                } catch {}
+                return '';
             }
 
             function getPersonajeActivoObj() {
                 const ac = window.KIXUZ_ACTIVE_CHAR;
                 if (ac && !ac.esPlaceholder && ac.handle) {
-                    return { nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
+                    return { ...ac, nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
                 }
                 try {
                     const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act?.handle) return { nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
+                    if (act?.handle) return { ...act, nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
                     const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
                     if (Array.isArray(subs) && subs[0]?.handle) {
-                        return { nombre: subs[0].nombre || subs[0].handle.slice(1), handle: normH(subs[0].handle) };
+                        return { ...subs[0], nombre: subs[0].nombre || subs[0].handle.slice(1), handle: normH(subs[0].handle) };
                     }
                 } catch {}
                 return { nombre: 'Personaje', handle: '@rol' };
@@ -379,6 +420,27 @@
                 try { localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(arr)); } catch {}
             }
 
+            function asignarEtiquetaAlPerfil(handle, etiquetaTexto) {
+                const h = normH(handle);
+                const tagClean = String(etiquetaTexto || '').trim();
+                if (!h || !tagClean) return;
+
+                try {
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs)) {
+                        const nextSubs = subs.map(p => normH(p?.handle) === h ? { ...p, clan: tagClean } : p);
+                        localStorage.setItem('kixuz_subpersonajes', JSON.stringify(nextSubs));
+                    }
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act && normH(act.handle) === h) {
+                        const nextAct = { ...act, clan: tagClean };
+                        localStorage.setItem('kixuz_personaje_activo', JSON.stringify(nextAct));
+                        window.KIXUZ_ACTIVE_CHAR = nextAct;
+                    }
+                } catch {}
+                window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+            }
+
             function agregarVinculo(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId }) {
                 const owner = normH(duenoHandle);
                 const target = normH(destinoHandle);
@@ -395,7 +457,6 @@
                         genId: gId
                     });
 
-                    // Si el destino es otro perfil, agrega también su vínculo recíproco en ese perfil
                     if (target !== owner) {
                         const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
                         st.familia.push({
@@ -417,6 +478,7 @@
                         handle: target,
                         rango: relacion || 'Miembro'
                     });
+                    asignarEtiquetaAlPerfil(target, cNom);
 
                     if (target !== owner) {
                         st.clan.push({
@@ -429,6 +491,26 @@
                         });
                     }
                 }
+            }
+
+            function tarjetaHtml({ id, nombre, handle, subEtiqueta, tipoLista }) {
+                const h = normH(handle);
+                const avatarUrl = obtenerAvatarPorHandle(h);
+                const inicial = (nombre || h.replace(/^@/, '') || 'K').charAt(0).toUpperCase();
+                const avatarStyle = avatarUrl ? `style="background-image:url('${esc(avatarUrl)}');"` : '';
+                return `
+                    <div class="member-card" data-card-id="${esc(id)}">
+                        <div class="member-avatar" ${avatarStyle}>${avatarUrl ? '' : esc(inicial)}</div>
+                        <a href="perfil.html?char=${encodeURIComponent(h)}" class="member-link">${esc(nombre || h)}</a>
+                        <a href="perfil.html?char=${encodeURIComponent(h)}" style="font-size:12.5px;opacity:0.85;text-decoration:none;color:inherit;">${esc(h)}</a>
+                        <span class="pill-rol">${esc(subEtiqueta)}</span>
+                        <div class="card-actions-row">
+                            <a href="perfil.html?char=${encodeURIComponent(h)}" class="btn-ghost" style="text-decoration:none;">Perfil</a>
+                            <button type="button" class="btn-ghost" data-edit-item="${esc(id)}" data-list="${esc(tipoLista)}">Editar</button>
+                            <button type="button" class="btn-danger" data-del-item="${esc(id)}" data-list="${esc(tipoLista)}">Eliminar</button>
+                        </div>
+                    </div>
+                `;
             }
 
             function poblarSelectorGeneraciones() {
@@ -447,15 +529,11 @@
 
                 const actual = getDuenoActual();
                 const mias = leerSolicitudes().filter(s => s.estado === 'pendiente' && normH(s.paraHandle) === actual);
-
-                if (!mias.length) {
-                    panel.style.display = 'none';
-                    return;
-                }
+                if (!mias.length) { panel.style.display = 'none'; return; }
 
                 panel.style.display = 'block';
                 listEl.innerHTML = mias.map(s => `
-                    <div class="req-card" data-req-id="${esc(s.id)}">
+                    <div class="req-card">
                         <div>
                             <strong style="color:var(--acento);">${esc(s.deHandle)}</strong> te envió solicitud para <strong>${s.categoria === 'clan' ? 'Clan (' + esc(s.clanNombre || '') + ')' : 'Familia'}</strong> como <strong>${esc(s.relacion || 'Vínculo')}</strong>.
                         </div>
@@ -500,6 +578,41 @@
                 });
             }
 
+            function bindCardActions(container) {
+                container.querySelectorAll('[data-del-item]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.delItem;
+                        const listaKey = btn.dataset.list === 'clan' ? 'clan' : 'familia';
+                        const st = leerEstado();
+                        st[listaKey] = st[listaKey].filter(x => String(x.id) !== String(id));
+                        guardarEstado(st);
+                        renderAll();
+                    });
+                });
+
+                container.querySelectorAll('[data-edit-item]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.editItem;
+                        const listaKey = btn.dataset.list === 'clan' ? 'clan' : 'familia';
+                        const st = leerEstado();
+                        const item = st[listaKey].find(x => String(x.id) === String(id));
+                        if (!item) return;
+
+                        if (listaKey === 'familia') {
+                            const nuevaRel = prompt('Nueva relación familiar:', item.relacion || '');
+                            if (nuevaRel !== null && nuevaRel.trim()) item.relacion = nuevaRel.trim();
+                        } else {
+                            const nuevoClan = prompt('Nombre del Clan:', item.clanNombre || '');
+                            if (nuevoClan !== null && nuevoClan.trim()) item.clanNombre = nuevoClan.trim();
+                            const nuevoRango = prompt('Nuevo rango o relación:', item.rango || '');
+                            if (nuevoRango !== null && nuevoRango.trim()) item.rango = nuevoRango.trim();
+                        }
+                        guardarEstado(st);
+                        renderAll();
+                    });
+                });
+            }
+
             function renderFamilia() {
                 const container = document.getElementById('familiaGenerationsContainer');
                 if (!container) return;
@@ -517,32 +630,20 @@
                             </div>
                             <div class="cards-grid">
                                 ${enGen.length
-                                    ? enGen.map(m => `
-                                        <div class="member-card">
-                                            <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="member-link">${esc(m.nombre)}</a>
-                                            <div style="font-size:12.5px;opacity:0.8;">${esc(m.handle)}</div>
-                                            <span class="pill-rol">${esc(m.relacion)}</span>
-                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;">
-                                                <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="btn-ghost" style="text-decoration:none;">Ver perfil</a>
-                                                <button type="button" class="btn-danger" data-del-fam="${esc(m.id)}">Quitar</button>
-                                            </div>
-                                        </div>
-                                    `).join('')
+                                    ? enGen.map(m => tarjetaHtml({
+                                        id: m.id,
+                                        nombre: m.nombre,
+                                        handle: m.handle,
+                                        subEtiqueta: m.relacion,
+                                        tipoLista: 'familia'
+                                    })).join('')
                                     : `<p style="font-size:13px;opacity:0.68;">Sin integrantes en esta generación todavía.</p>`}
                             </div>
                         </div>
                     `;
                 }).join('');
 
-                container.querySelectorAll('[data-del-fam]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const id = btn.dataset.delFam;
-                        const next = leerEstado();
-                        next.familia = next.familia.filter(x => String(x.id) !== String(id));
-                        guardarEstado(next);
-                        renderFamilia();
-                    });
-                });
+                bindCardActions(container);
             }
 
             function renderClanes() {
@@ -560,7 +661,7 @@
                 });
 
                 if (!agrupados.size) {
-                    container.innerHTML = `<div class="panel" style="opacity:0.75;font-size:13.5px;">Aún no agregaste miembros a ningún clan.</div>`;
+                    container.innerHTML = `<div class="panel" style="opacity:0.75;font-size:13.5px;text-align:center;">Aún no agregaste miembros a ningún clan.</div>`;
                     return;
                 }
 
@@ -571,73 +672,18 @@
                             <span style="font-size:12px;opacity:0.72;">${lista.length} ${lista.length === 1 ? 'miembro' : 'miembros'}</span>
                         </div>
                         <div class="cards-grid">
-                            ${lista.map(m => `
-                                <div class="member-card">
-                                    <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="member-link">${esc(m.nombre)}</a>
-                                    <div style="font-size:12.5px;opacity:0.8;">${esc(m.handle)}</div>
-                                    <span class="pill-rol">${esc(m.rango || 'Miembro')}</span>
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;">
-                                        <a href="perfil.html?char=${encodeURIComponent(m.handle)}" class="btn-ghost" style="text-decoration:none;">Ver perfil</a>
-                                        <button type="button" class="btn-danger" data-del-clan="${esc(m.id)}">Quitar</button>
-                                    </div>
-                                </div>
-                            `).join('')}
+                            ${lista.map(m => tarjetaHtml({
+                                id: m.id,
+                                nombre: m.nombre,
+                                handle: m.handle,
+                                subEtiqueta: `${m.rango || 'Miembro'} · ${nombreClan}`,
+                                tipoLista: 'clan'
+                            })).join('')}
                         </div>
                     </div>
                 `).join('');
 
-                container.querySelectorAll('[data-del-clan]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const id = btn.dataset.delClan;
-                        const next = leerEstado();
-                        next.clan = next.clan.filter(x => String(x.id) !== String(id));
-                        guardarEstado(next);
-                        renderClanes();
-                    });
-                });
-            }
-
-            function renderRegistroPersonajes() {
-                const grid = document.getElementById('allCharsGrid');
-                const badge = document.getElementById('registryCountBadge');
-                const filtro = (document.getElementById('registryFilterInput')?.value || '').trim().toLowerCase();
-                if (!grid) return;
-
-                const todos = window.KIXUZ_NAV?.recolectarPersonajesRegistrados
-                    ? window.KIXUZ_NAV.recolectarPersonajesRegistrados()
-                    : [];
-
-                if (badge) badge.textContent = String(todos.length);
-
-                const filtrados = filtro
-                    ? todos.filter(p =>
-                        (p.nombre || '').toLowerCase().includes(filtro) ||
-                        (p.handle || '').toLowerCase().includes(filtro) ||
-                        (p.clan || '').toLowerCase().includes(filtro)
-                    )
-                    : todos;
-
-                grid.innerHTML = filtrados.length
-                    ? filtrados.map(p => `
-                        <div class="member-card">
-                            <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="member-link">${esc(p.nombre)}</a>
-                            <div style="font-size:12.5px;opacity:0.8;">${esc(p.handle)}</div>
-                            <span class="pill-rol">${esc(p.origen || 'Registrado')}</span>
-                            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
-                                <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="btn-ghost" style="text-decoration:none;">Abrir perfil</a>
-                                <button type="button" class="btn-ghost" data-quick-add-fam="${esc(p.handle)}" data-quick-name="${esc(p.nombre)}">+ Familia</button>
-                            </div>
-                        </div>
-                    `).join('')
-                    : `<p style="font-size:13px;opacity:0.7;">No se encontraron personajes con ese filtro.</p>`;
-
-                grid.querySelectorAll('[data-quick-add-fam]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.getElementById('famNombre').value = btn.dataset.quickName || '';
-                        document.getElementById('famHandle').value = btn.dataset.quickAddFam || '';
-                        document.getElementById('famRelacion').focus();
-                    });
-                });
+                bindCardActions(container);
             }
 
             function renderAll() {
@@ -645,7 +691,6 @@
                 renderSolicitudes();
                 renderFamilia();
                 renderClanes();
-                renderRegistroPersonajes();
             }
 
             document.getElementById('tabFamilia').addEventListener('click', () => {
@@ -666,8 +711,16 @@
                 document.getElementById('tabClanes').click();
             }
 
+            document.getElementById('btnSetProfileTag').addEventListener('click', () => {
+                const yo = getPersonajeActivoObj();
+                const nuevaEtiqueta = prompt('Escribe el nombre de tu Familia o Clan para mostrar como etiqueta en el perfil:', yo.clan || '');
+                if (nuevaEtiqueta === null || !nuevaEtiqueta.trim()) return;
+                asignarEtiquetaAlPerfil(yo.handle, nuevaEtiqueta.trim());
+                alert(`Etiqueta "${nuevaEtiqueta.trim()}" asignada al perfil ${yo.handle}.`);
+            });
+
             document.getElementById('addGenBtn').addEventListener('click', () => {
-                const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación o Linaje Mayor):');
+                const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación):');
                 if (!titulo || !titulo.trim()) return;
                 const st = leerEstado();
                 st.generaciones.push({ id: 'gen_' + Date.now(), titulo: titulo.trim() });
@@ -675,11 +728,10 @@
                 renderAll();
             });
 
-            // Botón para agregarse a sí mismo a la Familia
             document.getElementById('btnAddSelfFamily').addEventListener('click', () => {
                 const yo = getPersonajeActivoObj();
                 const owner = getDuenoActual();
-                const rel = prompt('Escribe tu relación / rol en esta familia (ej. Miembro fundador, Hijo/a, Madre/Padre):', 'Miembro');
+                const rel = prompt('Tu relación / rol en la familia:', 'Miembro');
                 if (!rel || !rel.trim()) return;
                 const genId = document.getElementById('famGenSelect')?.value || 'gen_2';
                 const st = leerEstado();
@@ -695,7 +747,6 @@
                 renderAll();
             });
 
-            // Botón para agregarse a sí mismo a un Clan
             document.getElementById('btnAddSelfClan').addEventListener('click', () => {
                 const yo = getPersonajeActivoObj();
                 const owner = getDuenoActual();
@@ -715,7 +766,6 @@
                 renderAll();
             });
 
-            // Guardar en Familia (permite agregarse a sí mismo o a otro personaje, con relación libre)
             document.getElementById('addFamilyForm').addEventListener('submit', e => {
                 e.preventDefault();
                 const nombre = document.getElementById('famNombre').value.trim();
@@ -756,7 +806,6 @@
                 renderAll();
             });
 
-            // Guardar en Clan
             document.getElementById('addClanForm').addEventListener('submit', e => {
                 e.preventDefault();
                 const clanNombre = document.getElementById('clanNombreClan').value.trim();
@@ -796,8 +845,6 @@
                 e.target.reset();
                 renderAll();
             });
-
-            document.getElementById('registryFilterInput')?.addEventListener('input', renderRegistroPersonajes);
 
             window.addEventListener('DOMContentLoaded', renderAll);
             window.addEventListener('kixuz:personajes-actualizados', renderAll);
