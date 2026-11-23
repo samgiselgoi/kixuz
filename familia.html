@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Familia / Clan</title>
+    <title>KIXUZ — Familia y Clanes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-principal: #150A24;
             --bg-secundario: #6C3CE0;
             --acento: #2DD4C4;
             --texto: #EDE7E0;
-            --tarjeta: rgba(34, 18, 58, 0.88);
-            --borde: rgba(108, 60, 224, 0.35);
+            --tarjeta: rgba(34, 18, 58, 0.92);
+            --borde: rgba(108, 60, 224, 0.4);
         }
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
             background: var(--bg-principal);
             color: var(--texto);
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         header {
             position: relative;
             z-index: 900;
-            background: rgba(21, 10, 36, 0.94);
+            background: rgba(21, 10, 36, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--borde);
             padding: 10px 20px;
@@ -31,7 +38,6 @@
             justify-content: space-between;
             gap: 10px;
             flex-wrap: nowrap;
-            overflow: visible;
         }
         @media (max-width: 980px) {
             header { flex-wrap: wrap; }
@@ -47,30 +53,141 @@
             text-decoration: none;
             padding: 6px 10px;
             border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(108, 60, 224, 0.28);
+            color: var(--acento);
         }
         .user-menu {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        main {
-            max-width: 960px;
-            margin: 24px auto;
-            padding: 0 16px;
+        #activeCharSelect {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--borde);
+            background: rgba(15, 8, 28, 0.9);
+            color: var(--texto);
+            font-size: 13px;
         }
-    </style>
+        main {
+            max-width: 980px;
+            margin: 24px auto;
+            padding: 0 16px 75px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+        .btn {
+            background: var(--acento);
+            color: #150A24;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary {
+            background: rgba(108, 60, 224, 0.28);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+        }
+        .btn-danger {
+            background: rgba(224, 60, 108, 0.2);
+            color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5);
+        }
+        .tag-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: rgba(45, 212, 196, 0.16);
+            color: var(--acento);
+            border: 1px solid rgba(45, 212, 196, 0.4);
+            text-decoration: none;
+        }
+        .muted { opacity: 0.75; font-size: 13px; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+        input, textarea, select {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--texto);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        textarea { resize: vertical; }
+        .post-card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .post-content {
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+        .comment-box {
+            background: rgba(21, 10, 36, 0.65);
+            border: 1px solid rgba(108, 60, 224, 0.28);
+            border-radius: 10px;
+            padding: 8px 11px;
+            font-size: 13.5px;
+        }
+        .tab-btn {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(21, 10, 36, 0.65);
+            color: var(--texto);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: var(--acento);
+            color: #150A24;
+            border-color: var(--acento);
+        }
+</style>
 </head>
 <body>
     <header>
         <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
             <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-            <span style="display:none; color:var(--acento); font-weight:800;">KIXUZ</span>
+            <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
         </a>
         <nav class="nav-links">
             <a href="index.html">Inicio</a>
             <a href="perfil.html">Mi Perfil</a>
             <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
+            <a href="familia.html" class="active">Familia / Clan</a>
             <a href="cuenta-maestra.html">Cuenta Maestra</a>
         </nav>
         <div class="user-menu">
@@ -78,9 +195,51 @@
             <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
         </div>
     </header>
-    <main id="appMain">
-        <h1>KIXUZ — Familia / Clan</h1>
-        <div id="feedPosts"></div>
+    <main>
+        <section class="card">
+            <h1 style="margin:0 0 6px; font-family:'Space Grotesk',sans-serif; font-size:22px;">🏰 Familia y Clanes Entrelazados</h1>
+            <div id="famActiveCharInfo" class="muted">Cargando personaje activo...</div>
+        </section>
+        <section class="card">
+            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">Enviar solicitud de vínculo familiar o clan</h2>
+            <form id="vinculoForm" style="display:flex; flex-direction:column; gap:12px;">
+                <div class="grid-2">
+                    <div>
+                        <label class="muted">Personaje registrado</label>
+                        <select id="vincDestinoSelect"></select>
+                    </div>
+                    <div>
+                        <label class="muted">O escribir @handle directo</label>
+                        <input type="text" id="vincDestinoManual" placeholder="Ej. @Asmodeus">
+                    </div>
+                    <div>
+                        <label class="muted">Tipo de vínculo / Rango</label>
+                        <select id="vincRelacionSelect">
+                            <option value="Hermano/a">Hermano/a (Familia)</option>
+                            <option value="Padre / Madre">Padre / Madre (Familia)</option>
+                            <option value="Hijo/a">Hijo/a (Familia)</option>
+                            <option value="Pareja / Consorte">Pareja / Consorte</option>
+                            <option value="Líder de Clan">Líder de Clan</option>
+                            <option value="Miembro de Clan">Miembro de Clan</option>
+                            <option value="Aliado/a Juramentado/a">Aliado/a Juramentado/a</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="muted">Nombre de la Familia o Clan</label>
+                        <input type="text" id="vincGrupoInput" placeholder="Ej. Casa Prince / Clan Sombra">
+                    </div>
+                </div>
+                <div><button type="submit" class="btn">Enviar solicitud de vínculo</button></div>
+            </form>
+        </section>
+        <section class="card">
+            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">📩 Solicitudes pendientes</h2>
+            <div id="famPendientesList"></div>
+        </section>
+        <section class="card">
+            <h2 style="margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:18px;">🌳 Árbol Familiar y Clanes Vinculados</h2>
+            <div id="famArbolList"></div>
+        </section>
     </main>
     <script type="module" src="firebase-config.js"></script>
     <script src="characters.js"></script>
@@ -88,5 +247,219 @@
     <script src="kixuz-72h-aviso.js"></script>
     <script src="kixuz-admin-master.js"></script>
     <script src="chat.js"></script>
+
+    <script>
+        (() => {
+            const VINCULOS_KEY = 'kixuz_vinculos_familia_v1';
+            const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            const norm = v => String(v || '').trim().toLowerCase();
+            const normHandle = v => {
+                const s = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            let vinculosCache = [];
+            let personajesCache = [];
+
+            function esKixuz() {
+                if (window.KIXUZ_DB?.esAdmin) return true;
+                const p = window.KIXUZ_DB?.perfilCuenta || {};
+                let loc = {};
+                try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
+                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || norm(p.nombreMaestro) === 'kixuz';
+            }
+
+            function leerVinculos() {
+                try {
+                    const arr = JSON.parse(localStorage.getItem(VINCULOS_KEY) || '[]');
+                    return Array.isArray(arr) ? arr : [];
+                } catch { return []; }
+            }
+
+            function guardarVinculos(arr) {
+                try { localStorage.setItem(VINCULOS_KEY, JSON.stringify(arr)); } catch {}
+            }
+
+            async function cargarDatos() {
+                vinculosCache = leerVinculos();
+                if (window.KIXUZ_DB?.listarPersonajesPublicos) {
+                    try {
+                        personajesCache = await window.KIXUZ_DB.listarPersonajesPublicos();
+                    } catch {
+                        personajesCache = window.KIXUZ_CHARS?.obtenerSubpersonajes ? window.KIXUZ_CHARS.obtenerSubpersonajes() : [];
+                    }
+                } else {
+                    personajesCache = window.KIXUZ_CHARS?.obtenerSubpersonajes ? window.KIXUZ_CHARS.obtenerSubpersonajes() : [];
+                }
+                renderFamilia();
+            }
+
+            function renderFamilia() {
+                const activo = window.KIXUZ_ACTIVE_CHAR;
+                const miHandle = normHandle(activo?.handle || '');
+                document.getElementById('famActiveCharInfo').textContent = activo
+                    ? `Personaje activo: ${activo.nombre} (${miHandle}) — Familia/Clan base: ${activo.clan || 'Sin asignar'}`
+                    : 'Seleccioná o creá un personaje para gestionar su familia y clanes.';
+
+                const selDestino = document.getElementById('vincDestinoSelect');
+                selDestino.innerHTML = '<option value="">Elegí un personaje...</option>';
+                personajesCache.forEach(p => {
+                    const h = normHandle(p.handle);
+                    if (!h || h === miHandle) return;
+                    const opt = document.createElement('option');
+                    opt.value = h;
+                    opt.textContent = `${p.nombre} (${h})`;
+                    selDestino.appendChild(opt);
+                });
+
+                const pendientesEl = document.getElementById('famPendientesList');
+                const pendientes = vinculosCache.filter(v =>
+                    v.estado === 'pendiente' && (normHandle(v.paraHandle) === miHandle || esKixuz())
+                );
+                pendientesEl.innerHTML = pendientes.length ? '' : '<div class="muted">No hay solicitudes pendientes.</div>';
+                pendientes.forEach(v => {
+                    const row = document.createElement('div');
+                    row.className = 'row-between';
+                    row.style.cssText = 'padding:10px 12px; border:1px solid var(--borde); border-radius:12px; margin-bottom:8px; background:rgba(21,10,36,0.65);';
+                    row.innerHTML = `
+                        <div>
+                            <a href="perfil.html?char=${encodeURIComponent(v.deHandle)}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(v.deNombre || v.deHandle)}</a>
+                            <span class="muted">solicita vínculo con</span>
+                            <strong>${esc(v.paraHandle)}</strong>:
+                            <span class="tag-pill">${esc(v.relacion)}</span>
+                            ${v.grupoNombre ? `<span class="tag-pill">🏰 ${esc(v.grupoNombre)}</span>` : ''}
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn btn-acc" style="padding:5px 10px; font-size:12px;">✓ Aceptar</button>
+                            <button type="button" class="btn btn-danger btn-rej" style="padding:5px 10px; font-size:12px;">✕ Rechazar</button>
+                        </div>
+                    `;
+                    row.querySelector('.btn-acc').addEventListener('click', async () => {
+                        v.estado = 'aceptada';
+                        guardarVinculos(vinculosCache);
+                        renderFamilia();
+                        if (window.KIXUZ_DB?.aceptarSolicitudVinculo && !String(v.id || '').startsWith('local_')) {
+                            try { await window.KIXUZ_DB.aceptarSolicitudVinculo(v); } catch {}
+                        }
+                    });
+                    row.querySelector('.btn-rej').addEventListener('click', async () => {
+                        vinculosCache = vinculosCache.filter(x => String(x.id) !== String(v.id));
+                        guardarVinculos(vinculosCache);
+                        renderFamilia();
+                        if (window.KIXUZ_DB?.rechazarSolicitudVinculo && !String(v.id || '').startsWith('local_')) {
+                            try { await window.KIXUZ_DB.rechazarSolicitudVinculo(v.id); } catch {}
+                        }
+                    });
+                    pendientesEl.appendChild(row);
+                });
+
+                const arbolEl = document.getElementById('famArbolList');
+                const aceptados = vinculosCache.filter(v =>
+                    v.estado === 'aceptada' && (normHandle(v.deHandle) === miHandle || normHandle(v.paraHandle) === miHandle || esKixuz())
+                );
+                arbolEl.innerHTML = aceptados.length ? '' : '<div class="muted">Todavía no hay vínculos familiares o de clan aceptados para este personaje.</div>';
+                aceptados.forEach(v => {
+                    const otroHandle = normHandle(v.deHandle) === miHandle ? v.paraHandle : v.deHandle;
+                    const otroNombre = normHandle(v.deHandle) === miHandle ? (v.paraNombre || v.paraHandle) : (v.deNombre || v.deHandle);
+                    const card = document.createElement('div');
+                    card.className = 'row-between';
+                    card.style.cssText = 'padding:12px 14px; border:1px solid var(--borde); border-radius:12px; margin-bottom:8px; background:rgba(21,10,36,0.65);';
+                    card.innerHTML = `
+                        <div>
+                            <a href="perfil.html?char=${encodeURIComponent(otroHandle)}" style="color:var(--acento); font-weight:700; text-decoration:none; font-size:15px;">${esc(otroNombre)}</a>
+                            <span class="muted">(${esc(otroHandle)})</span>
+                            <div style="margin-top:5px; display:flex; gap:6px; flex-wrap:wrap;">
+                                <span class="tag-pill">🧬 ${esc(v.relacion)}</span>
+                                ${v.grupoNombre ? `<span class="tag-pill">🏰 ${esc(v.grupoNombre)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <a href="perfil.html?char=${encodeURIComponent(otroHandle)}" class="btn btn-secondary" style="padding:5px 10px; font-size:12px;">Ver perfil</a>
+                            <button type="button" class="btn btn-danger btn-del-v" style="padding:5px 10px; font-size:12px;">Desvincular</button>
+                        </div>
+                    `;
+                    card.querySelector('.btn-del-v').addEventListener('click', async () => {
+                        vinculosCache = vinculosCache.filter(x => String(x.id) !== String(v.id));
+                        guardarVinculos(vinculosCache);
+                        renderFamilia();
+                        if (window.KIXUZ_DB?.rechazarSolicitudVinculo && !String(v.id || '').startsWith('local_')) {
+                            try { await window.KIXUZ_DB.rechazarSolicitudVinculo(v.id); } catch {}
+                        }
+                    });
+                    arbolEl.appendChild(card);
+                });
+            }
+
+            document.getElementById('vinculoForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                const activo = window.KIXUZ_ACTIVE_CHAR;
+                if (!activo) {
+                    alert('Primero elegí o creá un personaje activo.');
+                    return;
+                }
+                const destinoSelect = document.getElementById('vincDestinoSelect').value;
+                const destinoManual = normHandle(document.getElementById('vincDestinoManual').value);
+                const destinoHandle = destinoManual || destinoSelect;
+                const relacion = document.getElementById('vincRelacionSelect').value;
+                const grupoNombre = document.getElementById('vincGrupoInput').value.trim();
+
+                if (!destinoHandle || destinoHandle === normHandle(activo.handle)) {
+                    alert('Ingresá o elegí un personaje destino válido.');
+                    return;
+                }
+
+                const destObj = personajesCache.find(p => normHandle(p.handle) === destinoHandle);
+                const nuevo = {
+                    id: 'local_v_' + Date.now(),
+                    deNombre: activo.nombre,
+                    deHandle: normHandle(activo.handle),
+                    paraNombre: destObj?.nombre || destinoHandle.replace(/^@/, ''),
+                    paraHandle: destinoHandle,
+                    relacion,
+                    grupoNombre,
+                    estado: 'pendiente'
+                };
+
+                vinculosCache.unshift(nuevo);
+                guardarVinculos(vinculosCache);
+                document.getElementById('vincDestinoManual').value = '';
+                document.getElementById('vincGrupoInput').value = '';
+                renderFamilia();
+
+                if (window.KIXUZ_DB?.enviarSolicitudVinculo) {
+                    try {
+                        const idRemoto = await window.KIXUZ_DB.enviarSolicitudVinculo({
+                            destinoHandle,
+                            relacion,
+                            grupoNombre
+                        });
+                        if (idRemoto) {
+                            nuevo.id = idRemoto;
+                            guardarVinculos(vinculosCache);
+                        }
+                    } catch {}
+                }
+            });
+
+            window.addEventListener('DOMContentLoaded', cargarDatos);
+            window.addEventListener('kixuz:personaje-cambiado', renderFamilia);
+            window.addEventListener('kixuz:personajes-actualizados', cargarDatos);
+            window.addEventListener('load', () => {
+                if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharSolicitudesVinculo) {
+                    window.KIXUZ_DB.escucharSolicitudesVinculo(sols => {
+                        if (!Array.isArray(sols)) return;
+                        const loc = leerVinculos().filter(v => String(v.id || '').startsWith('local_') || v.estado === 'aceptada');
+                        const m = new Map();
+                        loc.forEach(v => m.set(String(v.id), v));
+                        sols.forEach(s => m.set(String(s.id), s));
+                        vinculosCache = Array.from(m.values());
+                        guardarVinculos(vinculosCache);
+                        renderFamilia();
+                    });
+                }
+            });
+        })();
+    </script>
+
 </body>
 </html>
