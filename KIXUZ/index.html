@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Inicio y Muro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(34, 18, 58, 0.92);
+            --borde: rgba(108, 60, 224, 0.4);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-principal);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+        header {
+            position: relative;
+            z-index: 900;
+            background: rgba(21, 10, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+        @media (max-width: 980px) {
+            header { flex-wrap: wrap; }
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .nav-links a {
+            color: var(--texto);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(108, 60, 224, 0.28);
+            color: var(--acento);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #activeCharSelect {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--borde);
+            background: rgba(15, 8, 28, 0.9);
+            color: var(--texto);
+            font-size: 13px;
+        }
+        main {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 0 16px 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+        .btn {
+            background: var(--acento);
+            color: #150A24;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary {
+            background: rgba(108, 60, 224, 0.28);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+        }
+        .btn-danger {
+            background: rgba(224, 60, 108, 0.2);
+            color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5);
+        }
+        .muted { opacity: 0.75; font-size: 13px; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--texto);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+        textarea { resize: vertical; }
+
+        .post-card { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+        .post-content { white-space: pre-wrap; word-break: break-word; line-height: 1.5; font-size: 15px; }
+        .tag-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(45, 212, 196, 0.16); color: var(--acento); border: 1px solid rgba(45, 212, 196, 0.4); }
+        .comment-box { background: rgba(21, 10, 36, 0.65); border: 1px solid rgba(108, 60, 224, 0.28); border-radius: 10px; padding: 8px 11px; font-size: 13.5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo" style="display:inline-flex; align-items:center; text-decoration:none;">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:36px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+            <span style="display:none; color:var(--acento); font-weight:800; font-family:'Unbounded',sans-serif;">KIXUZ</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html" class="active">Inicio</a>
+            <a href="perfil.html">Mi Perfil</a>
+            <a href="universo.html">Universos</a>
+            <a href="familia.html">Familia / Clan</a>
+            <a href="cuenta-maestra.html">Cuenta Maestra</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link" title="Entrar / Registro" aria-label="Entrar / Registro" style="text-decoration:none;">🔑</a>
+        </div>
+    </header>
+    <main>
+        <section class="card" id="createPostBox">
+            <div class="row-between" style="margin-bottom:10px;">
+                <div>
+                    <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:22px;">Muro Multiverso KIXUZ</h1>
+                    <div id="postingAsLabel" class="muted" style="margin-top:3px;">Publicando con personaje activo</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <label id="pin72hWrap" style="display:none; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--acento); cursor:pointer;">
+                        <input type="checkbox" id="pin72hCheckbox" style="width:auto;">
+                        <span>📌 Fijar 72h en Inicio (Kixuz)</span>
+                    </label>
+                    <input type="text" id="postUniverseInput" placeholder="#Universo (opcional)" style="width:170px; padding:7px 10px; font-size:13px;">
+                </div>
+            </div>
+            <form id="postForm">
+                <textarea id="postContentInput" rows="3" placeholder="Escribí una escena, publicación o novedad... (Shift + Enter para salto de línea)" required></textarea>
+                <div class="row-between" style="margin-top:10px;">
+                    <span class="muted">Shift + Enter agrega un salto de línea sin enviar.</span>
+                    <button type="submit" class="btn">Publicar</button>
+                </div>
+            </form>
+        </section>
+        <section class="card" style="padding:12px 18px;">
+            <div class="row-between">
+                <strong style="font-family:'Space Grotesk',sans-serif;">Filtrar por Universo</strong>
+                <input type="text" id="filterUniverseInput" placeholder="Ej. #Kixuz o vacío para todos" style="max-width:260px; padding:7px 11px; font-size:13.5px;">
+            </div>
+        </section>
+        <section id="feedPosts" style="display:flex; flex-direction:column; gap:14px;"></section>
+    </main>
+    <script type="module" src="firebase-config.js"></script>
+    <script src="characters.js"></script>
+    <script src="theme.js"></script>
+    <script src="kixuz-72h-aviso.js"></script>
+    <script src="kixuz-admin-master.js"></script>
+    <script src="chat.js"></script>
+
+    <script>
+        (() => {
+            const POSTS_STORAGE = 'kixuz_posts_v1';
+            const esc = s => String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            const norm = v => String(v || '').trim().toLowerCase();
+            const normHandle = v => {
+                const s = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            let postsCache = [];
+
+            function esKixuz() {
+                if (window.KIXUZ_DB?.esAdmin) return true;
+                const p = window.KIXUZ_DB?.perfilCuenta || {};
+                const u = window.KIXUZ_DB?.usuarioActual || {};
+                let loc = {};
+                try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
+                const n = norm(p.nombreMaestro || u.displayName || loc.nombreMaestro || loc.nombre || '');
+                const e = norm(p.email || u.email || loc.email || '');
+                return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || n === 'kixuz' || e.startsWith('kixuz@');
+            }
+
+            function getAutorActual() {
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                if (ac && ac.nombre) {
+                    return {
+                        nombre: String(ac.nombre).trim(),
+                        handle: normHandle(ac.handle) || normHandle(ac.nombre) || '@rol',
+                        uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
+                    };
+                }
+                if (esKixuz()) {
+                    return {
+                        nombre: 'Kixuz',
+                        handle: '@Kixuz',
+                        uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
+                    };
+                }
+                return { nombre: 'Invitado', handle: '@invitado', uid: '' };
+            }
+
+            function puedeBorrarItem(autorUid = '', autorHandle = '') {
+                if (esKixuz()) return true;
+                if (window.KIXUZ_DB?.puedeEliminar) {
+                    return window.KIXUZ_DB.puedeEliminar(autorUid, autorHandle);
+                }
+                const act = getAutorActual();
+                return Boolean(autorHandle && normHandle(autorHandle) === normHandle(act.handle));
+            }
+
+            function leerLocalPosts() {
+                try {
+                    const arr = JSON.parse(localStorage.getItem(POSTS_STORAGE) || '[]');
+                    return Array.isArray(arr) ? arr : [];
+                } catch { return []; }
+            }
+
+            function guardarLocalPosts(arr) {
+                try { localStorage.setItem(POSTS_STORAGE, JSON.stringify(arr.slice(0, 150))); } catch {}
+            }
+
+            function actualizarCabeceraComposer() {
+                const autor = getAutorActual();
+                const lbl = document.getElementById('postingAsLabel');
+                if (lbl) lbl.textContent = `Publicando como: ${autor.nombre} (${autor.handle})`;
+                const pinWrap = document.getElementById('pin72hWrap');
+                if (pinWrap) pinWrap.style.display = esKixuz() ? 'inline-flex' : 'none';
+            }
+
+            function renderFeed() {
+                const feed = document.getElementById('feedPosts');
+                if (!feed) return;
+                const filtroUni = norm((document.getElementById('filterUniverseInput')?.value || '').replace(/^#+/, ''));
+
+                const lista = postsCache.filter(p => {
+                    if (!filtroUni) return true;
+                    const u = norm((p.universo || '').replace(/^#+/, ''));
+                    return u.includes(filtroUni);
+                });
+
+                if (!lista.length) {
+                    feed.innerHTML = `<div class="card muted" style="text-align:center;">No hay publicaciones para mostrar todavía.</div>`;
+                    return;
+                }
+
+                feed.innerHTML = '';
+                lista.forEach(p => {
+                    const art = document.createElement('article');
+                    art.className = 'post-card';
+                    art.dataset.postId = String(p.id || '');
+                    art.dataset.autorUid = String(p.autorUid || '');
+                    art.dataset.autorHandle = String(p.autorHandle || '');
+                    art.dataset.esAviso72h = p.esAviso72h ? '1' : '0';
+                    art.dataset.pinInicioMs = String(p.pinInicioMs || 0);
+                    art.dataset.desfijadoManual = p.desfijadoManual ? '1' : '0';
+
+                    const puedeBorrarPost = puedeBorrarItem(p.autorUid, p.autorHandle);
+                    const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
+                    const hLink = encodeURIComponent(p.autorHandle || p.autorNombre || '');
+
+                    art.innerHTML = `
+                        <div class="row-between">
+                            <div>
+                                <a href="perfil.html?char=${hLink}" style="color:var(--acento); font-weight:700; text-decoration:none;">${esc(p.autorNombre || 'Personaje')}</a>
+                                <span class="muted">${esc(p.autorHandle || '')}</span>
+                                ${p.esAviso72h ? '<span class="tag-pill" style="margin-left:6px;">📌 72h Kixuz</span>' : ''}
+                            </div>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                ${p.universo ? `<span class="tag-pill">${esc(p.universo)}</span>` : ''}
+                                ${puedeBorrarPost ? `<button type="button" class="btn btn-danger btn-del-post" style="padding:5px 9px; font-size:12px;">🗑️ Eliminar</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="post-content">${esc(p.contenido || '')}</div>
+                        <div class="row-between" style="padding-top:4px;">
+                            <button type="button" class="btn btn-secondary btn-kix" style="padding:6px 12px; font-size:12.5px;">🔥 Kix (${Number(p.kixiz || 0)})</button>
+                            <span class="muted">${respuestas.length} comentario(s)</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:7px; margin-top:4px;">
+                            ${respuestas.map((r, idx) => {
+                                const delR = puedeBorrarItem(r.autorUid, r.autorHandle);
+                                return `
+                                    <div class="comment-box" data-autor-uid="${esc(r.autorUid || '')}" data-autor-handle="${esc(r.autorHandle || '')}">
+                                        <div class="row-between" style="margin-bottom:3px;">
+                                            <strong style="font-size:12.5px; color:var(--acento);">${esc(r.autorNombre || 'Personaje')} <span class="muted">${esc(r.autorHandle || '')}</span></strong>
+                                            ${delR ? `<button type="button" class="btn btn-danger btn-del-reply" data-r-idx="${idx}" style="padding:2px 7px; font-size:11px;">Borrar</button>` : ''}
+                                        </div>
+                                        <div style="white-space:pre-wrap; word-break:break-word;">${esc(r.texto || '')}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            <form class="reply-form" style="display:flex; gap:8px; align-items:flex-end; margin-top:4px;">
+                                <textarea class="reply-input" rows="1" placeholder="Escribir comentario... (Shift + Enter: salto de línea)" style="flex:1; min-height:38px;"></textarea>
+                                <button type="submit" class="btn btn-secondary" style="padding:8px 12px;">Comentar</button>
+                            </form>
+                        </div>
+                    `;
+
+                    art.querySelector('.btn-kix').addEventListener('click', async () => {
+                        p.kixiz = Number(p.kixiz || 0) + 1;
+                        guardarLocalPosts(postsCache);
+                        renderFeed();
+                        if (window.KIXUZ_DB?.darKix) {
+                            try { await window.KIXUZ_DB.darKix(p.id, 1); } catch {}
+                        }
+                    });
+
+                    const delPostBtn = art.querySelector('.btn-del-post');
+                    if (delPostBtn) {
+                        delPostBtn.addEventListener('click', async () => {
+                            if (!puedeBorrarItem(p.autorUid, p.autorHandle)) return;
+                            postsCache = postsCache.filter(x => String(x.id) !== String(p.id));
+                            guardarLocalPosts(postsCache);
+                            renderFeed();
+                            if (window.KIXUZ_DB?.eliminarPost) {
+                                try { await window.KIXUZ_DB.eliminarPost(p.id); } catch {}
+                            }
+                        });
+                    }
+
+                    art.querySelectorAll('.btn-del-reply').forEach(rBtn => {
+                        rBtn.addEventListener('click', async () => {
+                            const rIdx = Number(rBtn.dataset.rIdx);
+                            const actualR = Array.isArray(p.respuestas) ? [...p.respuestas] : [];
+                            if (isNaN(rIdx) || rIdx < 0 || rIdx >= actualR.length) return;
+                            if (!puedeBorrarItem(actualR[rIdx].autorUid, actualR[rIdx].autorHandle)) return;
+                            actualR.splice(rIdx, 1);
+                            p.respuestas = actualR;
+                            guardarLocalPosts(postsCache);
+                            renderFeed();
+                            if (window.KIXUZ_DB?.actualizarRespuestasPost) {
+                                try { await window.KIXUZ_DB.actualizarRespuestasPost(p.id, actualR); } catch {}
+                            }
+                        });
+                    });
+
+                    const rForm = art.querySelector('.reply-form');
+                    const rInp = art.querySelector('.reply-input');
+                    rInp.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            rForm.requestSubmit();
+                        }
+                    });
+                    rForm.addEventListener('submit', async ev => {
+                        ev.preventDefault();
+                        const txt = String(rInp.value || '').replace(/^\n+|\n+$/g, '');
+                        if (!txt.trim()) return;
+                        const autor = getAutorActual();
+                        const repObj = {
+                            autorNombre: autor.nombre,
+                            autorHandle: autor.handle,
+                            autorUid: autor.uid,
+                            texto: txt
+                        };
+                        p.respuestas = Array.isArray(p.respuestas) ? [...p.respuestas, repObj] : [repObj];
+                        rInp.value = '';
+                        guardarLocalPosts(postsCache);
+                        renderFeed();
+                        if (window.KIXUZ_DB?.agregarRespuestaPost) {
+                            try { await window.KIXUZ_DB.agregarRespuestaPost(p.id, repObj); } catch {}
+                        }
+                    });
+
+                    feed.appendChild(art);
+                });
+            }
+
+            const postTextarea = document.getElementById('postContentInput');
+            postTextarea.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('postForm').requestSubmit();
+                }
+            });
+
+            document.getElementById('postForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                const contenido = String(postTextarea.value || '').replace(/^\n+|\n+$/g, '');
+                if (!contenido.trim()) return;
+
+                const autor = getAutorActual();
+                const pin72h = Boolean(document.getElementById('pin72hCheckbox')?.checked && esKixuz());
+                let uniVal = document.getElementById('postUniverseInput').value.trim();
+                if (uniVal && !uniVal.startsWith('#')) uniVal = '#' + uniVal.replace(/\s+/g, '');
+                if (pin72h) uniVal = '#Kixuz';
+
+                const nuevo = {
+                    id: 'local_' + Date.now(),
+                    autorNombre: pin72h ? 'Kixuz' : autor.nombre,
+                    autorHandle: pin72h ? '@Kixuz' : autor.handle,
+                    autorUid: autor.uid,
+                    contenido,
+                    universo: uniVal,
+                    esAviso72h: pin72h,
+                    pinInicioMs: pin72h ? Date.now() : 0,
+                    desfijadoManual: false,
+                    kixiz: 0,
+                    respuestas: []
+                };
+
+                postsCache = [nuevo, ...postsCache];
+                guardarLocalPosts(postsCache);
+                postTextarea.value = '';
+                if (document.getElementById('pin72hCheckbox')) {
+                    document.getElementById('pin72hCheckbox').checked = false;
+                }
+                renderFeed();
+
+                if (window.KIXUZ_DB?.publicarPost) {
+                    try {
+                        const resId = await window.KIXUZ_DB.publicarPost({
+                            contenido,
+                            universo: uniVal,
+                            esAviso72h: pin72h,
+                            autorNombre: nuevo.autorNombre,
+                            autorHandle: nuevo.autorHandle
+                        });
+                        if (typeof resId === 'string' && resId) {
+                            nuevo.id = resId;
+                            guardarLocalPosts(postsCache);
+                        }
+                    } catch {}
+                }
+            });
+
+            document.getElementById('filterUniverseInput').addEventListener('input', renderFeed);
+
+            window.addEventListener('DOMContentLoaded', () => {
+                postsCache = leerLocalPosts();
+                actualizarCabeceraComposer();
+                renderFeed();
+            });
+
+            window.addEventListener('kixuz:personajes-actualizados', actualizarCabeceraComposer);
+            window.addEventListener('kixuz:sesion-actualizada', actualizarCabeceraComposer);
+
+            window.addEventListener('load', () => {
+                actualizarCabeceraComposer();
+                if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharPosts) {
+                    window.KIXUZ_DB.escucharPosts(nubePosts => {
+                        if (!Array.isArray(nubePosts)) return;
+                        const locales = leerLocalPosts().filter(p => String(p.id || '').startsWith('local_'));
+                        const mapa = new Map();
+                        nubePosts.forEach(p => mapa.set(String(p.id), p));
+                        locales.forEach(p => {
+                            if (!mapa.has(String(p.id))) mapa.set(String(p.id), p);
+                        });
+                        postsCache = Array.from(mapa.values());
+                        guardarLocalPosts(postsCache);
+                        renderFeed();
+                    });
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
