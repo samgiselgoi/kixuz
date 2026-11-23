@@ -36,12 +36,6 @@
             background: rgba(21, 10, 36, 0.92);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--borde);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
         }
         html[data-theme="light"] header { background: rgba(244, 241, 250, 0.92); }
         .logo { display: inline-flex; align-items: center; text-decoration: none; }
@@ -51,13 +45,11 @@
             font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px;
             padding: 6px 10px; border-radius: 8px;
         }
-        .nav-links a:hover, .nav-links a.active { background: rgba(108, 60, 224, 0.25); color: var(--acento); }
         .user-menu { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .user-menu select {
             background: rgba(0, 0, 0, 0.35); color: var(--texto);
             border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
         }
-        html[data-theme="light"] .user-menu select { background: #fff; color: #150A24; }
         .btn-auth-link {
             background: var(--acento); color: #150A24 !important;
             padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
@@ -91,7 +83,7 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 10px;
             margin-top: 12px;
         }
@@ -124,68 +116,43 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
         }
 
-        /* Tarjetas de miembros y generaciones */
         .gen-block {
-            margin-top: 14px;
-            padding: 14px;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.22);
-            border: 1px solid rgba(108, 60, 224, 0.3);
+            margin-top: 14px; padding: 14px; border-radius: 14px;
+            background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(108, 60, 224, 0.3);
         }
         .gen-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 8px;
-            flex-wrap: wrap;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; gap: 8px; flex-wrap: wrap;
         }
         .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-            gap: 12px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 12px;
         }
         .member-card {
-            background: rgba(21, 10, 36, 0.72);
-            border: 1px solid var(--borde);
-            border-radius: 14px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            background: rgba(21, 10, 36, 0.72); border: 1px solid var(--borde);
+            border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;
             transition: transform 0.22s ease, border-color 0.22s ease;
         }
         html[data-theme="light"] .member-card { background: #F9F7FD; }
         .member-card:hover { transform: translateY(-3px); border-color: var(--acento); }
         .member-link {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--acento);
-            text-decoration: none;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
+            color: var(--acento); text-decoration: none;
         }
         .member-link:hover { text-decoration: underline; }
         .pill-rol {
-            display: inline-block;
-            font-size: 11.5px;
-            font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 999px;
-            background: rgba(108, 60, 224, 0.26);
-            color: var(--texto);
-            width: fit-content;
+            display: inline-block; font-size: 11.5px; font-weight: 700;
+            padding: 3px 9px; border-radius: 999px;
+            background: rgba(108, 60, 224, 0.26); color: var(--texto); width: fit-content;
         }
         .req-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding: 12px 14px;
-            border-radius: 12px;
-            background: rgba(45, 212, 196, 0.1);
-            border: 1px solid var(--acento);
-            margin-top: 10px;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
+            background: rgba(45, 212, 196, 0.1); border: 1px solid var(--acento); margin-top: 10px;
+        }
+        details.registry-box summary {
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px;
+            color: var(--acento); cursor: pointer; list-style: none;
+            display: flex; justify-content: space-between; align-items: center;
         }
     </style>
 </head>
@@ -211,8 +178,8 @@
         <section class="panel">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
                 <div>
-                    <h1 id="famPageTitle" style="font-size:22px;">Familia y Clanes</h1>
-                    <p id="famPageSub" style="font-size:13.5px;opacity:0.78;margin-top:4px;">Una única familia con generaciones enlazadas y todos los clanes que desees.</p>
+                    <h1 style="font-size:22px;">Familia y Clanes</h1>
+                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Una única familia con generaciones enlazadas y todos los clanes que desees.</p>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button type="button" class="btn-ghost" id="addGenBtn">+ Nueva Generación</button>
@@ -234,18 +201,26 @@
         <!-- Vista Familia -->
         <section id="viewFamilia">
             <div class="panel">
-                <h2 style="font-size:17px;">Agregar miembro a la Familia</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <h2 style="font-size:17px;">Agregar miembro a la Familia</h2>
+                    <button type="button" class="btn-ghost" id="btnAddSelfFamily">Agregarme a mí mismo</button>
+                </div>
                 <form id="addFamilyForm" class="form-grid">
                     <input type="text" id="famNombre" placeholder="Nombre del miembro" required>
                     <input type="text" id="famHandle" placeholder="@usuario (ej. @kaelen)" required>
-                    <select id="famRelacion" aria-label="Parentesco">
-                        <option value="Madre">Madre</option>
-                        <option value="Padre">Padre</option>
-                        <option value="Hijo/a">Hijo/a</option>
-                        <option value="Hermano/a">Hermano/a</option>
-                        <option value="Abuelo/a">Abuelo/a</option>
-                        <option value="Pareja">Pareja</option>
-                    </select>
+                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Hijo/a, Tío/a, Sobrino/a, Pareja)" required>
+                    <datalist id="relacionesSugeridas">
+                        <option value="Madre">
+                        <option value="Padre">
+                        <option value="Hijo/a">
+                        <option value="Hermano/a">
+                        <option value="Abuelo/a">
+                        <option value="Nieto/a">
+                        <option value="Tío/a">
+                        <option value="Sobrino/a">
+                        <option value="Primo/a">
+                        <option value="Pareja">
+                    </datalist>
                     <select id="famGenSelect" aria-label="Generación"></select>
                     <select id="famEnvioModo" aria-label="Agregar directo o enviar solicitud">
                         <option value="directo">Agregar directo a mi ficha</option>
@@ -261,12 +236,15 @@
         <!-- Vista Clanes -->
         <section id="viewClanes" style="display:none;">
             <div class="panel">
-                <h2 style="font-size:17px;">Agregar miembro a un Clan</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <h2 style="font-size:17px;">Agregar miembro a un Clan</h2>
+                    <button type="button" class="btn-ghost" id="btnAddSelfClan">Agregarme a mí mismo al Clan</button>
+                </div>
                 <form id="addClanForm" class="form-grid">
                     <input type="text" id="clanNombreClan" placeholder="Nombre del Clan (ej. Clan Eclipse)" required>
                     <input type="text" id="clanMiembroNombre" placeholder="Nombre del personaje" required>
                     <input type="text" id="clanMiembroHandle" placeholder="@usuario" required>
-                    <input type="text" id="clanRango" placeholder="Rango o rol (ej. Líder, Guardia)">
+                    <input type="text" id="clanRango" placeholder="Relación o rango (ej. Líder, Guardia, Aprendiz)">
                     <select id="clanEnvioModo" aria-label="Agregar directo o enviar solicitud">
                         <option value="directo">Agregar directo al Clan</option>
                         <option value="solicitud">Enviar solicitud al @usuario</option>
@@ -276,6 +254,20 @@
             </div>
 
             <div id="clanesCardsContainer"></div>
+        </section>
+
+        <!-- Directorio de todos los personajes registrados en la página -->
+        <section class="panel">
+            <details class="registry-box" id="allCharsRegistry">
+                <summary>
+                    <span>Personajes registrados en la página</span>
+                    <span id="registryCountBadge" class="pill-rol">0</span>
+                </summary>
+                <div style="margin-top:12px;">
+                    <input type="text" id="registryFilterInput" placeholder="Filtrar personajes registrados por nombre o @usuario...">
+                    <div class="cards-grid" id="allCharsGrid" style="margin-top:12px;"></div>
+                </div>
+            </details>
         </section>
     </main>
 
@@ -306,24 +298,42 @@
                 'hermana': 'Hermana / Hermano',
                 'abuelo/a': 'Nieto/a',
                 'nieto/a': 'Abuelo/a',
+                'tío/a': 'Sobrino/a',
+                'tio/a': 'Sobrino/a',
+                'tío': 'Sobrino/a',
+                'tía': 'Sobrino/a',
+                'sobrino/a': 'Tío/a',
+                'sobrino': 'Tío/a',
+                'sobrina': 'Tío/a',
+                'primo/a': 'Primo/a',
                 'pareja': 'Pareja'
             };
 
             function getRelacionReciproca(rel) {
                 const key = String(rel || '').trim().toLowerCase();
-                return RELACION_RECIPROCA[key] || (rel || 'Vínculo familiar');
+                return RELACION_RECIPROCA[key] || (rel || 'Vínculo');
+            }
+
+            function getPersonajeActivoObj() {
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                if (ac && !ac.esPlaceholder && ac.handle) {
+                    return { nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
+                }
+                try {
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act?.handle) return { nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs) && subs[0]?.handle) {
+                        return { nombre: subs[0].nombre || subs[0].handle.slice(1), handle: normH(subs[0].handle) };
+                    }
+                } catch {}
+                return { nombre: 'Personaje', handle: '@rol' };
             }
 
             function getDuenoActual() {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('char')) return normH(params.get('char'));
-                const ac = window.KIXUZ_ACTIVE_CHAR;
-                if (ac && !ac.esPlaceholder && ac.handle) return normH(ac.handle);
-                try {
-                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act?.handle) return normH(act.handle);
-                } catch {}
-                return '@rol';
+                return getPersonajeActivoObj().handle;
             }
 
             function leerEstado() {
@@ -369,7 +379,7 @@
                 try { localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(arr)); } catch {}
             }
 
-            function agregarVinculoReciproco(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId }) {
+            function agregarVinculo(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId }) {
                 const owner = normH(duenoHandle);
                 const target = normH(destinoHandle);
                 if (!owner || !target) return;
@@ -379,41 +389,45 @@
                     st.familia.push({
                         id: 'fam_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                         duenoHandle: owner,
-                        nombre: destinoNombre || target.replace(/^@/, ''),
+                        nombre: destinoNombre || target.slice(1),
                         handle: target,
                         relacion: relacion || 'Familiar',
                         genId: gId
                     });
 
-                    // Reciprocidad: en el perfil del destino queda registrado el vínculo inverso hacia el dueño
-                    const ownerNombre = owner.replace(/^@/, '');
-                    const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
-                    st.familia.push({
-                        id: 'fam_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                        duenoHandle: target,
-                        nombre: ownerNombre,
-                        handle: owner,
-                        relacion: getRelacionReciproca(relacion),
-                        genId: genInversa
-                    });
+                    // Si el destino es otro perfil, agrega también su vínculo recíproco en ese perfil
+                    if (target !== owner) {
+                        const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
+                        st.familia.push({
+                            id: 'fam_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                            duenoHandle: target,
+                            nombre: owner.slice(1),
+                            handle: owner,
+                            relacion: getRelacionReciproca(relacion),
+                            genId: genInversa
+                        });
+                    }
                 } else {
                     const cNom = (clanNombre || 'Clan').trim();
                     st.clan.push({
                         id: 'clan_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                         duenoHandle: owner,
                         clanNombre: cNom,
-                        nombre: destinoNombre || target.replace(/^@/, ''),
+                        nombre: destinoNombre || target.slice(1),
                         handle: target,
                         rango: relacion || 'Miembro'
                     });
-                    st.clan.push({
-                        id: 'clan_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                        duenoHandle: target,
-                        clanNombre: cNom,
-                        nombre: owner.replace(/^@/, ''),
-                        handle: owner,
-                        rango: relacion || 'Miembro'
-                    });
+
+                    if (target !== owner) {
+                        st.clan.push({
+                            id: 'clan_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                            duenoHandle: target,
+                            clanNombre: cNom,
+                            nombre: owner.slice(1),
+                            handle: owner,
+                            rango: relacion || 'Miembro'
+                        });
+                    }
                 }
             }
 
@@ -432,7 +446,6 @@
                 if (!panel || !listEl) return;
 
                 const actual = getDuenoActual();
-                // Solo ve las solicitudes enviadas explícitamente a este @usuario
                 const mias = leerSolicitudes().filter(s => s.estado === 'pendiente' && normH(s.paraHandle) === actual);
 
                 if (!mias.length) {
@@ -463,10 +476,10 @@
                         guardarSolicitudes(all);
 
                         const st = leerEstado();
-                        agregarVinculoReciproco(st, {
+                        agregarVinculo(st, {
                             categoria: req.categoria,
                             duenoHandle: req.deHandle,
-                            destinoNombre: req.paraHandle.replace(/^@/, ''),
+                            destinoNombre: req.paraHandle.slice(1),
                             destinoHandle: req.paraHandle,
                             relacion: req.relacion,
                             clanNombre: req.clanNombre,
@@ -584,14 +597,57 @@
                 });
             }
 
+            function renderRegistroPersonajes() {
+                const grid = document.getElementById('allCharsGrid');
+                const badge = document.getElementById('registryCountBadge');
+                const filtro = (document.getElementById('registryFilterInput')?.value || '').trim().toLowerCase();
+                if (!grid) return;
+
+                const todos = window.KIXUZ_NAV?.recolectarPersonajesRegistrados
+                    ? window.KIXUZ_NAV.recolectarPersonajesRegistrados()
+                    : [];
+
+                if (badge) badge.textContent = String(todos.length);
+
+                const filtrados = filtro
+                    ? todos.filter(p =>
+                        (p.nombre || '').toLowerCase().includes(filtro) ||
+                        (p.handle || '').toLowerCase().includes(filtro) ||
+                        (p.clan || '').toLowerCase().includes(filtro)
+                    )
+                    : todos;
+
+                grid.innerHTML = filtrados.length
+                    ? filtrados.map(p => `
+                        <div class="member-card">
+                            <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="member-link">${esc(p.nombre)}</a>
+                            <div style="font-size:12.5px;opacity:0.8;">${esc(p.handle)}</div>
+                            <span class="pill-rol">${esc(p.origen || 'Registrado')}</span>
+                            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+                                <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="btn-ghost" style="text-decoration:none;">Abrir perfil</a>
+                                <button type="button" class="btn-ghost" data-quick-add-fam="${esc(p.handle)}" data-quick-name="${esc(p.nombre)}">+ Familia</button>
+                            </div>
+                        </div>
+                    `).join('')
+                    : `<p style="font-size:13px;opacity:0.7;">No se encontraron personajes con ese filtro.</p>`;
+
+                grid.querySelectorAll('[data-quick-add-fam]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('famNombre').value = btn.dataset.quickName || '';
+                        document.getElementById('famHandle').value = btn.dataset.quickAddFam || '';
+                        document.getElementById('famRelacion').focus();
+                    });
+                });
+            }
+
             function renderAll() {
                 poblarSelectorGeneraciones();
                 renderSolicitudes();
                 renderFamilia();
                 renderClanes();
+                renderRegistroPersonajes();
             }
 
-            // Pestañas Familia / Clanes
             document.getElementById('tabFamilia').addEventListener('click', () => {
                 document.getElementById('tabFamilia').classList.add('active');
                 document.getElementById('tabClanes').classList.remove('active');
@@ -610,7 +666,6 @@
                 document.getElementById('tabClanes').click();
             }
 
-            // Agregar nueva generación adicional más allá de las 3 iniciales
             document.getElementById('addGenBtn').addEventListener('click', () => {
                 const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación o Linaje Mayor):');
                 if (!titulo || !titulo.trim()) return;
@@ -620,18 +675,58 @@
                 renderAll();
             });
 
-            // Guardar en Familia
+            // Botón para agregarse a sí mismo a la Familia
+            document.getElementById('btnAddSelfFamily').addEventListener('click', () => {
+                const yo = getPersonajeActivoObj();
+                const owner = getDuenoActual();
+                const rel = prompt('Escribe tu relación / rol en esta familia (ej. Miembro fundador, Hijo/a, Madre/Padre):', 'Miembro');
+                if (!rel || !rel.trim()) return;
+                const genId = document.getElementById('famGenSelect')?.value || 'gen_2';
+                const st = leerEstado();
+                agregarVinculo(st, {
+                    categoria: 'familia',
+                    duenoHandle: owner,
+                    destinoNombre: yo.nombre,
+                    destinoHandle: yo.handle,
+                    relacion: rel.trim(),
+                    genId
+                });
+                guardarEstado(st);
+                renderAll();
+            });
+
+            // Botón para agregarse a sí mismo a un Clan
+            document.getElementById('btnAddSelfClan').addEventListener('click', () => {
+                const yo = getPersonajeActivoObj();
+                const owner = getDuenoActual();
+                const clanNom = document.getElementById('clanNombreClan')?.value.trim() || prompt('Nombre del Clan:');
+                if (!clanNom || !clanNom.trim()) return;
+                const rango = document.getElementById('clanRango')?.value.trim() || prompt('Tu rol o rango en el clan:', 'Miembro');
+                const st = leerEstado();
+                agregarVinculo(st, {
+                    categoria: 'clan',
+                    duenoHandle: owner,
+                    destinoNombre: yo.nombre,
+                    destinoHandle: yo.handle,
+                    relacion: rango || 'Miembro',
+                    clanNombre: clanNom.trim()
+                });
+                guardarEstado(st);
+                renderAll();
+            });
+
+            // Guardar en Familia (permite agregarse a sí mismo o a otro personaje, con relación libre)
             document.getElementById('addFamilyForm').addEventListener('submit', e => {
                 e.preventDefault();
                 const nombre = document.getElementById('famNombre').value.trim();
                 const handle = normH(document.getElementById('famHandle').value);
-                const relacion = document.getElementById('famRelacion').value;
+                const relacion = document.getElementById('famRelacion').value.trim();
                 const genId = document.getElementById('famGenSelect').value;
                 const modoEnvio = document.getElementById('famEnvioModo').value;
                 const owner = getDuenoActual();
-                if (!nombre || !handle) return;
+                if (!nombre || !handle || !relacion) return;
 
-                if (modoEnvio === 'solicitud') {
+                if (modoEnvio === 'solicitud' && handle !== owner) {
                     const reqs = leerSolicitudes();
                     reqs.unshift({
                         id: 'req_' + Date.now(),
@@ -646,7 +741,7 @@
                     alert(`Solicitud enviada a ${handle}. Solo ese usuario podrá verla y responderla.`);
                 } else {
                     const st = leerEstado();
-                    agregarVinculoReciproco(st, {
+                    agregarVinculo(st, {
                         categoria: 'familia',
                         duenoHandle: owner,
                         destinoNombre: nombre,
@@ -672,7 +767,7 @@
                 const owner = getDuenoActual();
                 if (!clanNombre || !nombre || !handle) return;
 
-                if (modoEnvio === 'solicitud') {
+                if (modoEnvio === 'solicitud' && handle !== owner) {
                     const reqs = leerSolicitudes();
                     reqs.unshift({
                         id: 'req_' + Date.now(),
@@ -687,7 +782,7 @@
                     alert(`Solicitud para ${clanNombre} enviada a ${handle}.`);
                 } else {
                     const st = leerEstado();
-                    agregarVinculoReciproco(st, {
+                    agregarVinculo(st, {
                         categoria: 'clan',
                         duenoHandle: owner,
                         destinoNombre: nombre,
@@ -701,6 +796,8 @@
                 e.target.reset();
                 renderAll();
             });
+
+            document.getElementById('registryFilterInput')?.addEventListener('input', renderRegistroPersonajes);
 
             window.addEventListener('DOMContentLoaded', renderAll);
             window.addEventListener('kixuz:personajes-actualizados', renderAll);
