@@ -53,20 +53,17 @@
       outline: none; cursor: pointer;
     }
 
-    /* Disposición de dos columnas: expediente fijo a la izquierda + muro a la derecha */
     .profile-layout {
       max-width: 1120px;
       margin: 24px auto 80px;
       padding: 0 18px;
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 345px 1fr;
       gap: 22px;
       align-items: start;
     }
     @media (max-width: 860px) {
-      .profile-layout {
-        grid-template-columns: 1fr;
-      }
+      .profile-layout { grid-template-columns: 1fr; }
     }
 
     .character-sidebar {
@@ -137,6 +134,15 @@
       align-items: center;
       justify-content: space-between;
     }
+    .character-sidebar summary::after {
+      content: '▾';
+      font-size: 12px;
+      color: var(--acento);
+      transition: transform 0.2s;
+    }
+    .character-sidebar details:not([open]) summary::after {
+      transform: rotate(-90deg);
+    }
 
     .profile-wall {
       display: flex;
@@ -162,6 +168,24 @@
       resize: vertical;
       min-height: 76px;
     }
+    .create-post-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .create-post-controls select,
+    .create-post-controls input {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
     .create-post-footer {
       display: flex;
       justify-content: flex-end;
@@ -184,6 +208,22 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 16px 18px;
+    }
+    .post-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .post-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-decoration: none;
+      background: rgba(108, 60, 224, 0.22);
+      border: 1px solid var(--border);
+      color: var(--acento);
     }
   </style>
 </head>
@@ -211,6 +251,16 @@
     <section class="profile-wall">
       <div class="create-post" id="profileCreatePost">
         <textarea id="profileWallInput" placeholder="Escribe una escena o crónica en este perfil..."></textarea>
+        <div class="create-post-controls">
+          <select id="profilePostUniverse" aria-label="Universo">
+            <option value="">Sin universo (solo muro/inicio)</option>
+          </select>
+          <select id="profilePostScope" aria-label="Visibilidad / Familia o Clan">
+            <option value="global">Público</option>
+            <option value="familia">Familia / Clan</option>
+          </select>
+          <input type="text" id="profilePostFamilyTag" placeholder="Vínculo familiar o clan (opcional)">
+        </div>
         <div class="create-post-footer">
           <button type="button" class="btn-publish" id="profileWallPublish">Publicar</button>
         </div>
@@ -269,13 +319,6 @@
 
       const style = document.createElement('style');
       style.textContent = `
-        .kixuz-active-pill {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
-          color: var(--acento, #2DD4C4); background: rgba(108, 60, 224, 0.16);
-          border: 1px solid rgba(108, 60, 224, 0.45); padding: 5px 12px;
-          border-radius: 18px; margin-bottom: 12px;
-        }
         .kixuz-edit-banner-btn {
           position: absolute; top: 10px; right: 10px; z-index: 3;
           background: rgba(21, 10, 36, 0.82); color: #EDE7E0;
@@ -319,8 +362,14 @@
         .kixuz-dyn-track { height: 7px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
         .kixuz-dyn-fill { height: 100%; border-radius: 6px; background: var(--acento, #2DD4C4); }
         .kixuz-dyn-fill.weak { background: #e03c6c; }
-        .kixuz-dyn-bonds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .kixuz-dyn-bond { font-size: 12px; padding: 4px 10px; border-radius: 10px; background: rgba(108, 60, 224, 0.2); border: 1px solid rgba(108, 60, 224, 0.4); }
+        .kixuz-dyn-bonds { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+        .kixuz-dyn-bond {
+          display: flex; justify-content: space-between; align-items: center; gap: 8px;
+          font-size: 12px; padding: 6px 10px; border-radius: 9px;
+          background: rgba(108, 60, 224, 0.2); border: 1px solid rgba(108, 60, 224, 0.4);
+          text-decoration: none; color: inherit;
+        }
+        .kixuz-dyn-bond:hover { border-color: var(--acento, #2DD4C4); }
         body.kixuz-custom-bg { background-size: cover !important; background-position: center !important; background-attachment: fixed !important; }
         .kixuz-modal-backdrop {
           position: fixed; inset: 0; background: rgba(10, 4, 20, 0.78); backdrop-filter: blur(6px);
@@ -547,6 +596,47 @@
         });
       }
 
+      function obtenerEnlacesFamiliaClan(handle) {
+        const target = normH(handle);
+        const items = [];
+        try {
+          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+          (fam.familia || []).forEach(m => {
+            if (normH(m?.duenoHandle) === target && m?.handle) {
+              items.push({
+                nombre: m.nombre || m.handle,
+                handle: normH(m.handle),
+                etiqueta: `Familia · ${m.relacion || 'Familiar'}`,
+                url: `perfil.html?char=${encodeURIComponent(normH(m.handle))}`
+              });
+            }
+          });
+          (fam.clan || []).forEach(m => {
+            if (normH(m?.duenoHandle) === target && m?.handle) {
+              items.push({
+                nombre: m.nombre || m.handle,
+                handle: normH(m.handle),
+                etiqueta: `${m.clanNombre || 'Clan'} · ${m.rango || 'Miembro'}`,
+                url: `perfil.html?char=${encodeURIComponent(normH(m.handle))}`
+              });
+            }
+          });
+        } catch {}
+        return items;
+      }
+
+      function poblarSelectorUniversoPost(personaje) {
+        const sel = document.getElementById('profilePostUniverse');
+        if (!sel) return;
+        const unis = new Set(['#Kixuz']);
+        (personaje.universos || []).forEach(u => { if (u) unis.add(u.startsWith('#') ? u : '#' + u.replace(/^#+/, '')); });
+        if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
+          window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => { if (u?.tag) unis.add(u.tag); });
+        }
+        sel.innerHTML = `<option value="">Sin universo (solo muro/inicio)</option>` +
+          Array.from(unis).map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+      }
+
       function renderMuroPersonaje(personaje) {
         const feed = document.getElementById('profileWallFeed');
         if (!feed) return;
@@ -557,7 +647,21 @@
           posts = [...p1, ...p2].filter(p => normH(p.autorHandle || p.handle) === normH(personaje.handle));
         } catch {}
         feed.innerHTML = posts.length
-          ? posts.map(p => `<article class="post-card"><div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${esc(p.universo || p.universe || '#KIXUZ')} · ${esc(p.time || 'Reciente')}</div><p style="line-height:1.55;white-space:pre-line;">${esc(p.texto || p.text || '')}</p></article>`).join('')
+          ? posts.map(p => {
+              const uni = p.universo || p.universe || '';
+              const famTag = p.familiaClanTag || p.alcanceValor || '';
+              const scope = p.alcanceTipo || '';
+              return `
+                <article class="post-card">
+                  <div class="post-badges">
+                    ${uni ? `<a href="universo.html?u=${encodeURIComponent(String(uni).replace(/^#/, ''))}" class="post-pill">${esc(uni)}</a>` : ''}
+                    ${(scope === 'familia' || famTag) ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="post-pill">Familia / Clan${famTag ? ': ' + esc(famTag) : ''}</a>` : ''}
+                  </div>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${esc(p.time || p.tiempo || 'Reciente')}</div>
+                  <p style="line-height:1.55;white-space:pre-line;">${esc(p.texto || p.text || p.contenido || '')}</p>
+                </article>
+              `;
+            }).join('')
           : `<div class="post-card" style="color:var(--muted);font-size:14px;">Sin publicaciones en este perfil todavía.</div>`;
       }
 
@@ -568,6 +672,7 @@
         document.title = `${personaje.nombre} (${personaje.handle}) - KIXUZ`;
         sidebar.style.backgroundImage = personaje.fondo || '';
         aplicarFondoPagina(personaje);
+        poblarSelectorUniversoPost(personaje);
 
         const composer = document.getElementById('profileCreatePost');
         if (composer) composer.style.display = (personaje.esPlaceholder || esVistaSolo) ? 'none' : 'block';
@@ -596,7 +701,7 @@
 
         const clanHTML = personaje.clan
           ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(personaje.clan)}</a>`
-          : '';
+          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} Familia / Clan</a>`;
 
         const skillsHTML = (personaje.habilidades || []).map(s => `
           <div class="kixuz-dyn-stat">
@@ -612,8 +717,21 @@
           </div>
         `).join('') || '<p style="font-size:13px;opacity:0.7;">Sin debilidades cargadas.</p>';
 
+        const enlacesFamClan = obtenerEnlacesFamiliaClan(personaje.handle);
+        const famClanSectionHTML = `
+          <details>
+            <summary>Familia & Clan Enlazados</summary>
+            <div class="kixuz-dyn-bonds">
+              ${enlacesFamClan.length
+                ? enlacesFamClan.map(l => `<a href="${esc(l.url)}" class="kixuz-dyn-bond"><span><strong>${esc(l.nombre)}</strong> <span style="opacity:0.75;">${esc(l.handle)}</span></span><span style="color:var(--acento);font-weight:700;">${esc(l.etiqueta)}</span></a>`).join('')
+                : `<p style="font-size:12.5px;opacity:0.72;">Sin vínculos enlazados todavía.</p>`}
+              <a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="kixuz-edit-btn" style="margin-top:4px;">Abrir Familia y Clan</a>
+            </div>
+          </details>
+        `;
+
         const bondsHTML = (personaje.vinculos && personaje.vinculos.length)
-          ? `<details open><summary>Vínculos Iniciales</summary><div class="kixuz-dyn-bonds">${personaje.vinculos.map(v => `<span class="kixuz-dyn-bond"><strong>${esc(v.personaje || 'Personaje')}</strong>${v.relacion ? ` · ${esc(v.relacion)}` : ''}</span>`).join('')}</div></details>`
+          ? `<details><summary>Vínculos Iniciales</summary><div class="kixuz-dyn-bonds">${personaje.vinculos.map(v => `<div class="kixuz-dyn-bond"><strong>${esc(v.personaje || 'Personaje')}</strong>${v.relacion ? `<span>${esc(v.relacion)}</span>` : ''}</div>`).join('')}</div></details>`
           : '';
 
         const loreHTML = personaje.historiaExtendida
@@ -645,7 +763,7 @@
               </div>
             ` : ''}
           </div>
-          <details open>
+          <details>
             <summary>Datos Básicos</summary>
             <div class="kixuz-dyn-meta">
               <div class="full"><strong>Especie(s):</strong> ${esc((personaje.especies || []).join(' / ') || '—')}</div>
@@ -656,17 +774,18 @@
               <div class="full"><strong>Ocupación:</strong> ${esc(personaje.ocupacion || '—')}</div>
             </div>
           </details>
-          <details open>
+          <details>
             <summary>Biografía</summary>
             <p style="font-size:13.5px;margin-top:8px;">${esc(personaje.bio || 'Sin descripción todavía.')}</p>
           </details>
           ${loreHTML}
+          ${famClanSectionHTML}
           ${bondsHTML}
-          <details open>
+          <details>
             <summary>Habilidades (1-10)</summary>
             <div style="margin-top:10px;">${skillsHTML}</div>
           </details>
-          <details open>
+          <details>
             <summary style="color:#e03c6c;">Debilidades (1-10)</summary>
             <div style="margin-top:10px;">${weakHTML}</div>
           </details>
@@ -685,17 +804,28 @@
 
       document.getElementById('profileWallPublish')?.addEventListener('click', () => {
         const input = document.getElementById('profileWallInput');
+        const uniSel = document.getElementById('profilePostUniverse');
+        const scopeSel = document.getElementById('profilePostScope');
+        const famInp = document.getElementById('profilePostFamilyTag');
+
         const txt = (input?.value || '').trim();
         const lista = obtenerPersonajes();
         const activo = obtenerActivoMenu(lista);
         if (!txt || !activo || activo.esPlaceholder) return;
+
+        const universo = (uniSel?.value || '').trim();
+        const alcanceTipo = scopeSel?.value || 'global';
+        const familiaClanTag = (famInp?.value || '').trim();
+
         let posts = [];
         try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
         posts.unshift({
           id: 'p_' + Date.now(),
           author: activo.nombre,
           handle: activo.handle,
-          universe: (activo.universos && activo.universos[0]) || '#KIXUZ',
+          universe: universo,
+          alcanceTipo,
+          familiaClanTag,
           time: 'Ahora mismo',
           text: txt,
           kix: 0,
@@ -704,6 +834,7 @@
         });
         localStorage.setItem('kixuz_posts', JSON.stringify(posts));
         input.value = '';
+        if (famInp) famInp.value = '';
         renderMuroPersonaje(activo);
       });
 
@@ -750,6 +881,7 @@
   <script src="chat.js"></script>
   <script src="theme.js"></script>
   <script src="characters.js"></script>
+  <script src="universos-core.js"></script>
   <script src="buscador-global.js"></script>
   <script src="navbar-ui.js"></script>
   <script src="notificaciones.js"></script>

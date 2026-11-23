@@ -2,7 +2,13 @@
     document.querySelectorAll('.chat-trigger, .chat-sidebar, .kixuz-chat-trigger, .kixuz-chat-sidebar, .kixuz-chat-modal-backdrop').forEach(el => el.remove());
 
     const STORAGE_KEY = 'kixuz_chat_conversaciones_v5';
-    const LEGACY_KEYS = ['kixuz_chat_conversaciones_v4', 'kixuz_chat_conversaciones_v3', 'kixuz_chat_conversaciones_v1'];
+    const ALL_CHAT_KEYS = [
+        'kixuz_chats_v1',
+        'kixuz_chat_conversaciones_v1',
+        'kixuz_chat_conversaciones_v3',
+        'kixuz_chat_conversaciones_v4',
+        'kixuz_chat_conversaciones_v5'
+    ];
     const STORAGE_LEIDOS = 'kixuz_chat_leidos_v1';
 
     const esc = str => String(str || '')
@@ -137,7 +143,6 @@
             border-radius: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
         }
 
-        /* Desplegable compacto para crear chat (sin ilustraciones grandes) */
         .kixuz-chat-modal-backdrop {
             position: fixed; inset: 0; background: rgba(10, 4, 20, 0.72); backdrop-filter: blur(3px); z-index: 10000;
             display: none; align-items: flex-start; justify-content: flex-end; padding: 62px 16px 16px;
@@ -149,9 +154,7 @@
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
         }
         html[data-theme="light"] .kixuz-chat-modal { background: #F4F1FA; color: #150A24; }
-        .kixuz-chat-modal-top {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-        }
+        .kixuz-chat-modal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .kixuz-chat-modal-top h4 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: var(--acento, #2DD4C4); margin: 0; }
         .kixuz-chat-modal label { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
         .kixuz-chat-modal select, .kixuz-chat-modal input {
@@ -179,16 +182,57 @@
         } catch { return []; }
     }
 
+    function normalizarConversacion(raw, idx = 0) {
+        if (!raw || typeof raw !== 'object') return null;
+        const id = String(raw.id || raw.convId || `chat_rec_${idx}_${Date.now()}`);
+        const nombre = String(raw.nombre || raw.titulo || raw.usuario || 'Chat').trim();
+        const usuario = String(raw.usuario || nombre).trim().toLowerCase();
+        const msgs = Array.isArray(raw.mensajes) ? raw.mensajes : (Array.isArray(raw.messages) ? raw.messages : []);
+        return {
+            ...raw,
+            id,
+            nombre,
+            usuario,
+            tipo: raw.tipo === 'grupo' ? 'grupo' : 'privado',
+            mensajes: msgs
+        };
+    }
+
     function cargarLocal() {
         const mapa = new Map();
-        [...LEGACY_KEYS.slice().reverse(), STORAGE_KEY].forEach(k => {
-            leerArregloSeguro(k).forEach(c => {
-                if (c && (c.id || c.nombre)) {
-                    const clave = String(c.id || `${c.tipo || 'chat'}_${c.nombre || ''}`);
-                    mapa.set(clave, { ...mapa.get(clave), ...c });
+        ALL_CHAT_KEYS.forEach((k, kIdx) => {
+            leerArregloSeguro(k).forEach((item, i) => {
+                const normConv = normalizarConversacion(item, kIdx * 100 + i);
+                if (!normConv) return;
+                const prev = mapa.get(normConv.id);
+                if (!prev) {
+                    mapa.set(normConv.id, normConv);
+                } else {
+                    const prevMsgs = Array.isArray(prev.mensajes) ? prev.mensajes : [];
+                    const nextMsgs = Array.isArray(normConv.mensajes) ? normConv.mensajes : [];
+                    mapa.set(normConv.id, {
+                        ...prev,
+                        ...normConv,
+                        mensajes: nextMsgs.length >= prevMsgs.length ? nextMsgs : prevMsgs
+                    });
                 }
             });
         });
+
+        // También escanear cualquier otra clave en localStorage que contenga "chat"
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key || ALL_CHAT_KEYS.includes(key) || !key.toLowerCase().includes('chat')) continue;
+                leerArregloSeguro(key).forEach((item, idx) => {
+                    const normConv = normalizarConversacion(item, 900 + idx);
+                    if (normConv && !mapa.has(normConv.id)) {
+                        mapa.set(normConv.id, normConv);
+                    }
+                });
+            }
+        } catch {}
+
         const combinadas = Array.from(mapa.values());
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(combinadas)); } catch {}
         return combinadas;
@@ -302,7 +346,7 @@
 
     function esImplicado(conv) {
         if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-        if (String(conv.id).startsWith('chat_')) return true;
+        if (String(conv.id).startsWith('chat_') || String(conv.id).startsWith('local_')) return true;
         return window.KIXUZ_DB?.esImplicadoEnChat ? window.KIXUZ_DB.esImplicadoEnChat(conv) : true;
     }
 
@@ -495,6 +539,24 @@
         actualizarBadge();
         cerrarModalCrear();
         abrirConversacion(nueva);
+
+        if (window.KIXUZ_DB?.crearConversacionChat) {
+            window.KIXUZ_DB.crearConversacionChat({
+                nombre: nombreFinal,
+                usuario,
+                tipo,
+                participantesExtra: participantes
+            }).then(creada => {
+                if (creada && creada.id && creada.id !== nueva.id) {
+                    const prevMsgs = nueva.mensajes || [];
+                    const nubeMsgs = creada.mensajes || [];
+                    const merged = { ...creada, mensajes: nubeMsgs.length >= prevMsgs.length ? nubeMsgs : prevMsgs };
+                    conversaciones = conversaciones.map(c => String(c.id) === String(nueva.id) ? merged : c);
+                    if (chatActivoId === String(nueva.id)) chatActivoId = String(merged.id);
+                    guardarLocal();
+                }
+            }).catch(() => {});
+        }
     }
 
     async function agregarPersonaAlChat() {
@@ -528,6 +590,10 @@
         renderMensajes();
         renderLista(searchInput.value);
         actualizarBadge();
+
+        if (window.KIXUZ_DB?.guardarMensajesChat && !String(conv.id).startsWith('chat_')) {
+            window.KIXUZ_DB.guardarMensajesChat(conv.id, conv.mensajes).catch(() => {});
+        }
     }
 
     function volverLista() {
@@ -570,7 +636,18 @@
             window.KIXUZ_DB.escucharChats(chatsNube => {
                 const mapa = new Map();
                 conversaciones.forEach(c => { if (c?.id && !idsEliminadosRecientemente.has(String(c.id))) mapa.set(String(c.id), c); });
-                chatsNube.forEach(c => { if (c?.id && !idsEliminadosRecientemente.has(String(c.id))) mapa.set(String(c.id), c); });
+                (chatsNube || []).forEach((rawNube, idx) => {
+                    const cn = normalizarConversacion(rawNube, idx);
+                    if (!cn || idsEliminadosRecientemente.has(String(cn.id))) return;
+                    const localExisting = mapa.get(String(cn.id));
+                    if (localExisting) {
+                        const lMsgs = Array.isArray(localExisting.mensajes) ? localExisting.mensajes : [];
+                        const nMsgs = Array.isArray(cn.mensajes) ? cn.mensajes : [];
+                        mapa.set(String(cn.id), { ...localExisting, ...cn, mensajes: nMsgs.length >= lMsgs.length ? nMsgs : lMsgs });
+                    } else {
+                        mapa.set(String(cn.id), cn);
+                    }
+                });
                 conversaciones = Array.from(mapa.values());
                 guardarLocal();
                 actualizarBadge();
