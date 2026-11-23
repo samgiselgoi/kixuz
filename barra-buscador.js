@@ -273,7 +273,7 @@
                 <div class="kixuz-search-box">
                     <span class="kixuz-search-icon" aria-hidden="true">🔍</span>
                     <input
-                        type="search"
+                        type="text"
                         id="kixuzGlobalSearchInput"
                         placeholder="Buscar @usuario, personaje, familia, clan o universo..."
                         aria-label="Buscador global de KIXUZ"
@@ -295,9 +295,15 @@
         const clearBtn = document.getElementById('kixuzGlobalSearchClear');
         const box = document.getElementById('kixuzGlobalSearchResults');
 
+        if (input) {
+            input.disabled = false;
+            input.readOnly = false;
+        }
+
         async function actualizarResultados() {
+            if (!input || !box) return;
             const val = String(input.value || '').trim();
-            clearBtn.style.display = val ? 'inline-flex' : 'none';
+            if (clearBtn) clearBtn.style.display = val ? 'inline-flex' : 'none';
             if (!val) {
                 box.classList.remove('open');
                 box.innerHTML = '';
@@ -323,20 +329,23 @@
             box.classList.add('open');
         }
 
-        if (!input.dataset.kixuzSearchBound) {
+        if (input && !input.dataset.kixuzSearchBound) {
             input.dataset.kixuzSearchBound = '1';
             input.addEventListener('input', actualizarResultados);
+            input.addEventListener('keyup', actualizarResultados);
             input.addEventListener('focus', () => {
                 if (String(input.value || '').trim()) actualizarResultados();
             });
-            clearBtn.addEventListener('click', () => {
-                input.value = '';
-                actualizarResultados();
-                input.focus();
-            });
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    input.value = '';
+                    actualizarResultados();
+                    input.focus();
+                });
+            }
             document.addEventListener('click', e => {
                 if (!e.target.closest('.kixuz-search-wrap')) {
-                    box.classList.remove('open');
+                    box?.classList.remove('open');
                 }
             });
         }

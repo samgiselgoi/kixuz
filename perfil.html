@@ -557,11 +557,18 @@
 
             function esPropio() {
                 if (!perfilChar) return false;
-                if (window.KIXUZ_CHARS?.esPersonajePropio) {
-                    return window.KIXUZ_CHARS.esPersonajePropio(perfilChar);
+                const hP = normHandle(perfilChar.handle);
+                try {
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs) && subs.some(p => normHandle(p.handle) === hP)) {
+                        return true;
+                    }
+                } catch {}
+                if (window.KIXUZ_CHARS?.esPersonajePropio && window.KIXUZ_CHARS.esPersonajePropio(perfilChar)) {
+                    return true;
                 }
                 const ac = window.KIXUZ_ACTIVE_CHAR;
-                return Boolean(ac?.handle && normHandle(ac.handle) === normHandle(perfilChar.handle));
+                return Boolean(ac?.handle && normHandle(ac.handle) === hP);
             }
 
             function puedeBorrar(uid = '', handle = '') {
@@ -1029,7 +1036,7 @@
             });
 
             document.getElementById('btnToggleEditFicha').addEventListener('click', () => {
-                if (!esPropio() || !perfilChar) return;
+                if (!perfilChar) return;
                 const pInfo = obtenerParejaDePersonaje(perfilChar.handle);
                 document.getElementById('inpNombre').value = perfilChar.nombre || '';
                 document.getElementById('inpEspecie').value = perfilChar.especie || '';
