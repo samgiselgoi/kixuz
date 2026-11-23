@@ -91,6 +91,7 @@
       display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     }
     .relationship-status-line a { color: var(--acento); text-decoration: none; font-weight: 700; }
+    .relationship-status-line a:hover { text-decoration: underline; }
 
     .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .info-tag {
@@ -349,13 +350,10 @@
            (normH(a.deHandle) === otro && normH(a.paraHandle) === yo))
         );
         if (aceptada) return { estado: 'amigo', solicitud: aceptada };
-
         const enviada = lista.find(a => a.estado === 'pendiente' && normH(a.deHandle) === yo && normH(a.paraHandle) === otro);
         if (enviada) return { estado: 'enviada', solicitud: enviada };
-
         const recibida = lista.find(a => a.estado === 'pendiente' && normH(a.deHandle) === otro && normH(a.paraHandle) === yo);
         if (recibida) return { estado: 'recibida', solicitud: recibida };
-
         return { estado: 'ninguno', solicitud: null };
       }
 
@@ -367,10 +365,8 @@
         if (!lista.some(a => normH(a.deHandle) === deH && normH(a.paraHandle) === paraH && a.estado !== 'rechazada')) {
           lista.unshift({
             id: 'ami_' + Date.now(),
-            deNombre: deObj?.nombre || deH.slice(1),
-            deHandle: deH,
-            paraNombre: paraObj?.nombre || paraH.slice(1),
-            paraHandle: paraH,
+            deNombre: deObj?.nombre || deH.slice(1), deHandle: deH,
+            paraNombre: paraObj?.nombre || paraH.slice(1), paraHandle: paraH,
             estado: 'pendiente'
           });
           guardarAmigosLocal(lista);
@@ -383,10 +379,7 @@
       async function aceptarSolicitudAmistad(id) {
         const lista = leerAmigosLocal();
         const item = lista.find(a => String(a.id) === String(id));
-        if (item) {
-          item.estado = 'aceptada';
-          guardarAmigosLocal(lista);
-        }
+        if (item) { item.estado = 'aceptada'; guardarAmigosLocal(lista); }
         if (window.KIXUZ_AMIGOS?.aceptarSolicitud) {
           try { await window.KIXUZ_AMIGOS.aceptarSolicitud(id); } catch {}
         }
@@ -491,7 +484,7 @@
                 <div class="kixuz-modal-field"><label>Especie(s)</label><input type="text" id="fEspecies" value="${esc((personaje.especies || []).join(', '))}"></div>
                 <div class="kixuz-modal-field"><label>Género</label><input type="text" id="fGenero" value="${esc(personaje.genero || '')}"></div>
                 <div class="kixuz-modal-field"><label>Edad</label><input type="text" id="fEdad" value="${esc(personaje.edadAparente || personaje.edadReal || '')}"></div>
-                <div class="kixuz-modal-field"><label>Clan / Facción</label><input type="text" id="fClan" value="${esc(personaje.clan || '')}"></div>
+                <div class="kixuz-modal-field"><label>Familia / Clan</label><input type="text" id="fClan" value="${esc(personaje.clan || '')}"></div>
                 <div class="kixuz-modal-field"><label>Estado sentimental</label>
                   <select id="fSentTipo">
                     <option value="" ${!personaje.estadoSentimentalTipo ? 'selected' : ''}>Sin estado de pareja</option>
@@ -578,25 +571,18 @@
         });
       }
 
-      function obtenerRelacionConPersonaje(duenoHandle, otroHandle) {
-        const dueno = normH(duenoHandle);
-        const otro = normH(otroHandle);
-        const etiquetas = [];
-        try {
-          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-          (fam.familia || []).forEach(m => {
-            if (normH(m?.duenoHandle) === dueno && normH(m?.handle) === otro && m?.relacion) {
-              etiquetas.push(m.relacion);
-            }
-          });
-        } catch {}
-        return etiquetas;
-      }
-
       function obtenerParejaEnlazada(personaje) {
         if (personaje.estadoSentimentalTipo && personaje.estadoSentimentalHandle) {
           return { texto: personaje.estadoSentimentalTipo, handle: normH(personaje.estadoSentimentalHandle) };
         }
+        try {
+          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+          const match = (fam.familia || []).find(m =>
+            normH(m?.duenoHandle) === normH(personaje.handle) &&
+            /pareja|espos|marido|casad/i.test(String(m?.relacion || ''))
+          );
+          if (match && match.handle) return { texto: match.relacion, handle: normH(match.handle) };
+        } catch {}
         return null;
       }
 
@@ -653,9 +639,6 @@
               const isLiked = likedSet.has(String(p.id));
               const modoPost = p.modo === 'OC' ? 'OC' : 'IC';
               const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
-              const uni = p.universo || p.universe || '';
-              const famTag = p.familiaClanTag || p.alcanceValor || '';
-              const scope = p.alcanceTipo || '';
               return `
                 <article class="post-card" data-post-id="${idPost}">
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -666,10 +649,6 @@
                       <span class="mode-badge ${modoPost === 'OC' ? 'oc' : 'ic'}">${modoPost}</span>
                     </div>
                     <span style="font-size:12px;color:var(--muted);">${esc(p.tiempo || p.time || 'Reciente')}</span>
-                  </div>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                    ${uni ? `<a href="universo.html?u=${encodeURIComponent(String(uni).replace(/^#/, ''))}" class="post-pill">${esc(uni)}</a>` : ''}
-                    ${(scope === 'familia' || famTag) ? `<a href="familia.html?char=${encodeURIComponent(p.autorHandle || p.handle || '')}" class="post-pill">Familia / Clan${famTag ? ': ' + esc(famTag) : ''}</a>` : ''}
                   </div>
                   <p style="line-height:1.55;white-space:pre-line;">${esc(p.contenido || p.text || '')}</p>
                   <div>
@@ -855,16 +834,9 @@
           ? `<div class="relationship-status-line"><span>${esc(pareja.texto)}:</span> <a href="perfil.html?char=${encodeURIComponent(pareja.handle)}">${esc(pareja.handle)}</a></div>`
           : '';
 
-        let relacionVisitaHtml = '';
         let botonAmistadHtml = '';
         if (esVistaSolo && activoMenuActual && !activoMenuActual.esPlaceholder) {
-          const lazos = obtenerRelacionConPersonaje(activoMenuActual.handle, personaje.handle);
           const relAm = obtenerEstadoAmistadLocal(activoMenuActual.handle, personaje.handle);
-          const partesRel = [...lazos];
-          if (relAm.estado === 'amigo') partesRel.push('Amigos');
-
-          relacionVisitaHtml = `<div class="relationship-status-line" style="color:var(--acento);"><span>Relación con ${esc(activoMenuActual.handle)}:</span> <span>${esc(partesRel.length ? partesRel.join(' · ') : 'Sin vínculo aún')}</span></div>`;
-
           if (relAm.estado === 'ninguno') {
             botonAmistadHtml = `<div class="kixuz-profile-edit-bar"><button type="button" class="kixuz-edit-btn accept" id="btnSolicitarAmistad">${SVG_ICON.users} Solicitar amigo</button></div>`;
           } else if (relAm.estado === 'enviada') {
@@ -881,31 +853,19 @@
           return `<a href="universo.html?u=${encodeURIComponent(slug)}" class="info-tag">${SVG_ICON.uni} ${esc(u)}</a>`;
         }).join('');
 
-        const clanHTML = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(personaje.clan || 'Familia / Clan')}</a>`;
-
-        const skillsHTML = (personaje.habilidades || []).map(s => `
-          <div style="margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:3px;"><span>${esc(s.nombre)}</span><span>${s.valor}/10</span></div>
-            <div style="height:6px;border-radius:6px;background:rgba(255,255,255,0.12);overflow:hidden;"><div style="height:100%;width:${(s.valor || 0) * 10}%;background:var(--acento);"></div></div>
-          </div>
-        `).join('') || '<p style="font-size:13px;opacity:0.7;">Sin habilidades cargadas.</p>';
-
-        const weakHTML = (personaje.debilidades || []).map(w => `
-          <div style="margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:3px;"><span>${esc(w.nombre)}</span><span>${w.valor}/10</span></div>
-            <div style="height:6px;border-radius:6px;background:rgba(255,255,255,0.12);overflow:hidden;"><div style="height:100%;width:${(w.valor || 0) * 10}%;background:#e03c6c;"></div></div>
-          </div>
-        `).join('') || '<p style="font-size:13px;opacity:0.7;">Sin debilidades cargadas.</p>';
-
         const enlacesFamClan = obtenerEnlacesFamiliaClan(personaje.handle);
+        const clanTagText = personaje.clan || (enlacesFamClan.length ? `${enlacesFamClan.length} enlazados` : 'Familia / Clan');
+        const clanHTML = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(clanTagText)}</a>`;
+
         const famClanSectionHTML = `
-          <details>
-            <summary>Familia & Clan Enlazados</summary>
+          <details open>
+            <summary>Pareja, Familia & Clan</summary>
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+              ${pareja ? `<div style="font-size:12px;padding:6px 10px;border-radius:9px;background:rgba(45,212,196,0.14);border:1px solid var(--acento);"><strong>${esc(pareja.texto)}</strong> <a href="perfil.html?char=${encodeURIComponent(pareja.handle)}" style="color:var(--acento);font-weight:700;text-decoration:none;">${esc(pareja.handle)}</a></div>` : ''}
               ${enlacesFamClan.length
                 ? enlacesFamClan.map(l => `<a href="${esc(l.url)}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;padding:6px 10px;border-radius:9px;background:rgba(108,60,224,0.2);border:1px solid var(--border);text-decoration:none;color:inherit;"><strong>${esc(l.nombre)}</strong><span style="color:var(--acento);font-weight:700;">${esc(l.etiqueta)}</span></a>`).join('')
-                : `<p style="font-size:12.5px;opacity:0.72;">Sin vínculos enlazados todavía.</p>`}
-              <a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag" style="justify-content:center;margin-top:4px;">Gestionar Familia y Clan</a>
+                : (!pareja ? `<p style="font-size:12.5px;opacity:0.72;">Sin vínculos familiares ni de clan todavía.</p>` : '')}
+              <a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag" style="justify-content:center;margin-top:4px;">Abrir Familia y Clan</a>
             </div>
           </details>
         `;
@@ -930,7 +890,6 @@
             <h1>${esc(personaje.nombre)}</h1>
             <div class="profile-username">${esc(personaje.handle)}</div>
             ${parejaHtml}
-            ${relacionVisitaHtml}
             <div class="tags-container">${universosHTML}${clanHTML}</div>
             ${botonesPropiosHtml}
             ${botonAmistadHtml}
@@ -948,14 +907,6 @@
             <p style="font-size:13px;margin-top:8px;">${esc(personaje.bio || 'Sin descripción todavía.')}</p>
           </details>
           ${famClanSectionHTML}
-          <details>
-            <summary>Habilidades (1-10)</summary>
-            <div style="margin-top:8px;">${skillsHTML}</div>
-          </details>
-          <details>
-            <summary style="color:#e03c6c;">Debilidades (1-10)</summary>
-            <div style="margin-top:8px;">${weakHTML}</div>
-          </details>
           <details open>
             <summary>${SVG_ICON.users} Amigos</summary>
             <div id="perfilAmigosLista"></div>

@@ -64,7 +64,7 @@
         }
         .user-menu select, .user-menu .dropdown, #activeCharSelect {
             height: 36px !important;
-            max-width: 210px !important;
+            max-width: 215px !important;
             padding: 0 10px !important;
             border-radius: 10px !important;
             border: 1px solid var(--borde, rgba(108, 60, 224, 0.45)) !important;
@@ -139,18 +139,15 @@
             const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
             if (Array.isArray(subs)) subs.forEach(p => add(p, 'Subpersonaje'));
         } catch {}
-
         try {
             const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
             if (act) add(act, 'Subpersonaje');
         } catch {}
-
         try {
             const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
             (fam.familia || []).forEach(m => add({ nombre: m.nombre, handle: m.handle }, 'Familia/Clan'));
             (fam.clan || []).forEach(m => add({ nombre: m.nombre, handle: m.handle, clan: m.clanNombre }, 'Familia/Clan'));
         } catch {}
-
         try {
             const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
             const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
@@ -162,37 +159,34 @@
         return Array.from(mapa.values());
     }
 
-    window.KIXUZ_NAV = {
-        recolectarPersonajesRegistrados
-    };
+    window.KIXUZ_NAV = { recolectarPersonajesRegistrados };
 
-    function sincronizarDesplegableCuentaMaestra() {
+    function garantizarCuentaMaestraFija() {
         const header = document.querySelector('header');
         if (!header) return;
 
         header.querySelectorAll('a[href*="cuenta-maestra.html"]').forEach(a => a.remove());
 
-        const sel = document.getElementById('activeCharSelect');
-        if (!sel) return;
+        document.querySelectorAll('#activeCharSelect, .user-menu select, select.dropdown').forEach(sel => {
+            let optCM = Array.from(sel.options).find(o => o.value === '__cuenta_maestra__');
+            if (!optCM) {
+                optCM = document.createElement('option');
+                optCM.value = '__cuenta_maestra__';
+                optCM.textContent = 'Mi Cuenta Maestra';
+                sel.appendChild(optCM);
+            } else {
+                optCM.textContent = 'Mi Cuenta Maestra';
+            }
 
-        let optCM = Array.from(sel.options).find(o => o.value === '__cuenta_maestra__');
-        if (!optCM) {
-            optCM = document.createElement('option');
-            optCM.value = '__cuenta_maestra__';
-            optCM.textContent = 'Mi Cuenta Maestra';
-            sel.appendChild(optCM);
-        } else {
-            optCM.textContent = 'Mi Cuenta Maestra';
-        }
-
-        if (!sel.dataset.cmNavBound) {
-            sel.dataset.cmNavBound = '1';
-            sel.addEventListener('change', () => {
-                if (sel.value === '__cuenta_maestra__') {
-                    window.location.href = 'cuenta-maestra.html';
-                }
-            }, true);
-        }
+            if (!sel.dataset.cmFixedBound) {
+                sel.dataset.cmFixedBound = '1';
+                sel.addEventListener('change', () => {
+                    if (sel.value === '__cuenta_maestra__') {
+                        window.location.href = 'cuenta-maestra.html';
+                    }
+                }, true);
+            }
+        });
     }
 
     function initNavbar() {
@@ -233,7 +227,15 @@
             authLink.innerHTML = SVGS.entrar;
         }
 
-        sincronizarDesplegableCuentaMaestra();
+        garantizarCuentaMaestraFija();
+
+        // Observar cambios en el <select> para que "Mi Cuenta Maestra" nunca se pierda al repoblar opciones
+        const selMain = document.getElementById('activeCharSelect');
+        if (selMain && !selMain.dataset.cmObserved) {
+            selMain.dataset.cmObserved = '1';
+            const obs = new MutationObserver(() => garantizarCuentaMaestraFija());
+            obs.observe(selMain, { childList: true });
+        }
 
         if (!window._kixuzScrollBound) {
             window._kixuzScrollBound = true;
@@ -255,6 +257,7 @@
     } else {
         initNavbar();
     }
-    window.addEventListener('kixuz:personajes-actualizados', sincronizarDesplegableCuentaMaestra);
+    window.addEventListener('kixuz:personajes-actualizados', garantizarCuentaMaestraFija);
+    window.addEventListener('kixuz:sesion-actualizada', garantizarCuentaMaestraFija);
     window.addEventListener('load', initNavbar);
 })();
