@@ -119,11 +119,28 @@
             flex: 1 1 auto; padding: 14px 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 14px;
         }
         .kixuz-msg {
-            padding: 10px 12px; border-radius: 12px; background-color: rgba(108, 60, 224, 0.16);
-            max-width: 88%; word-wrap: break-word; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+            padding: 10px 12px; border-radius: 12px; max-width: 84%; word-wrap: break-word;
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
         }
-        .kixuz-msg.me { background-color: rgba(108, 60, 224, 0.38); align-self: flex-end; border-bottom-right-radius: 3px; }
-        .kixuz-msg.other { border-bottom-left-radius: 3px; border-left: 2.5px solid var(--acento, #2DD4C4); }
+        /* Intervenciones propias a la derecha */
+        .kixuz-msg.me {
+            align-self: flex-end;
+            background-color: rgba(108, 60, 224, 0.44);
+            border: 1px solid rgba(45, 212, 196, 0.35);
+            border-bottom-right-radius: 3px;
+            text-align: left;
+        }
+        /* Intervenciones de otros implicados a la izquierda */
+        .kixuz-msg.other {
+            align-self: flex-start;
+            background-color: rgba(255, 255, 255, 0.07);
+            border-bottom-left-radius: 3px;
+            border-left: 3px solid var(--acento, #2DD4C4);
+            text-align: left;
+        }
+        html[data-theme="light"] .kixuz-msg.other {
+            background-color: rgba(108, 60, 224, 0.1);
+        }
         .kixuz-msg-time { display: block; font-size: 10.5px; opacity: 0.65; margin-top: 3px; }
         .kixuz-msg-del { background: none; border: none; color: #ff9bb4; font-size: 11px; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
         .kixuz-chat-input {
@@ -219,16 +236,13 @@
             });
         });
 
-        // También escanear cualquier otra clave en localStorage que contenga "chat"
         try {
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (!key || ALL_CHAT_KEYS.includes(key) || !key.toLowerCase().includes('chat')) continue;
                 leerArregloSeguro(key).forEach((item, idx) => {
                     const normConv = normalizarConversacion(item, 900 + idx);
-                    if (normConv && !mapa.has(normConv.id)) {
-                        mapa.set(normConv.id, normConv);
-                    }
+                    if (normConv && !mapa.has(normConv.id)) mapa.set(normConv.id, normConv);
                 });
             }
         } catch {}
@@ -344,17 +358,68 @@
         return chatActivoId ? conversaciones.find(c => String(c.id) === String(chatActivoId)) || null : null;
     }
 
+    function obtenerMisClaves() {
+        const set = new Set();
+        const add = v => {
+            const s = String(v || '').trim().toLowerCase();
+            if (!s) return;
+            set.add(s);
+            if (s.startsWith('@')) set.add(s.slice(1));
+            else set.add('@' + s);
+        };
+        add(window.KIXUZ_DB?.usuarioActual?.uid);
+        add(window.KIXUZ_DB?.perfilCuenta?.uid);
+        add(window.KIXUZ_DB?.perfilCuenta?.apodo);
+        add(window.KIXUZ_ACTIVE_CHAR?.handle);
+        add(window.KIXUZ_ACTIVE_CHAR?.nombre);
+        try {
+            const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+            add(act?.handle);
+            add(act?.nombre);
+            const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+            if (Array.isArray(subs)) {
+                subs.forEach(p => { add(p?.handle); add(p?.nombre); });
+            }
+        } catch {}
+        if (window.KIXUZ_DB?.obtenerMisIdentificadores) {
+            try {
+                window.KIXUZ_DB.obtenerMisIdentificadores().forEach(add);
+            } catch {}
+        }
+        return set;
+    }
+
+    // Solo los implicados en la conversación pueden verla
     function esImplicado(conv) {
         if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-        if (String(conv.id).startsWith('chat_') || String(conv.id).startsWith('local_')) return true;
-        return window.KIXUZ_DB?.esImplicadoEnChat ? window.KIXUZ_DB.esImplicadoEnChat(conv) : true;
+        if (window.KIXUZ_DB?.esImplicadoEnChat) {
+            return Boolean(window.KIXUZ_DB.esImplicadoEnChat(conv));
+        }
+        const parts = [
+            ...(Array.isArray(conv.participantes) ? conv.participantes : []),
+            ...(Array.isArray(conv.miembros) ? conv.miembros : []),
+            conv.creadorUid,
+            conv.usuario
+        ].map(x => String(x || '').trim().toLowerCase()).filter(Boolean);
+
+        if (parts.includes('todos')) return false;
+        if (!parts.length) return String(conv.id).startsWith('chat_');
+
+        const misClaves = obtenerMisClaves();
+        if (!misClaves.size) return String(conv.id).startsWith('chat_');
+        return parts.some(p => misClaves.has(p));
     }
 
     function esMensajeMio(msg) {
-        const ids = window.KIXUZ_DB?.obtenerMisIdentificadores ? window.KIXUZ_DB.obtenerMisIdentificadores() : new Set();
-        const mUid = String(msg.autorUid || '').toLowerCase();
-        const mHandle = String(msg.autorHandle || '').toLowerCase();
-        return Boolean((mUid && ids.has(mUid)) || (mHandle && ids.has(mHandle)) || (!msg.autorUid && msg.de === 'me'));
+        if (!msg) return false;
+        const misClaves = obtenerMisClaves();
+        const mUid = String(msg.autorUid || '').trim().toLowerCase();
+        const mHandle = String(msg.autorHandle || '').trim().toLowerCase();
+        const mAutor = String(msg.autor || '').trim().toLowerCase();
+        if ((mUid && misClaves.has(mUid)) || (mHandle && misClaves.has(mHandle)) || (mAutor && misClaves.has(mAutor))) {
+            return true;
+        }
+        return (!mUid && !mHandle && msg.de === 'me');
     }
 
     function contarNoLeidosDeChat(conv) {
@@ -426,7 +491,7 @@
             .filter(c => (c.nombre || '').toLowerCase().includes(texto) || (c.usuario || '').toLowerCase().includes(texto));
 
         if (!filtradas.length) {
-            chatListEl.innerHTML = `<div class="kixuz-chat-empty">No hay chats activos.<br>Toca <strong>+</strong> para iniciar uno.</div>`;
+            chatListEl.innerHTML = `<div class="kixuz-chat-empty">No hay conversaciones privadas visibles para este usuario.<br>Toca <strong>+</strong> para crear una.</div>`;
             return;
         }
 
@@ -441,7 +506,7 @@
                 <div class="kixuz-chat-avatar">${esc(inicial)}</div>
                 <div class="kixuz-chat-info">
                     <h4>${c.tipo === 'grupo' ? SVG_GROUP : SVG_LOCK}${esc(c.nombre)}</h4>
-                    <p>${ultimo ? `<strong>${esc(ultimo.autor)}:</strong> ${esc(ultimo.texto)}` : (c.tipo === 'grupo' ? 'Chat grupal' : 'Chat 1×1')}</p>
+                    <p>${ultimo ? `<strong>${esc(ultimo.autor)}:</strong> ${esc(ultimo.texto)}` : (c.tipo === 'grupo' ? 'Grupo · Solo implicados' : '1×1 Privado · Solo implicados')}</p>
                 </div>
                 ${noLeidos > 0 ? `<span class="kixuz-unread-pill">${noLeidos}</span>` : ''}
                 <button type="button" class="kixuz-del-conv-btn" title="Eliminar">✕</button>
@@ -458,14 +523,14 @@
     function actualizarCabeceraConversacion(conv) {
         const pj = window.KIXUZ_ACTIVE_CHAR && !window.KIXUZ_ACTIVE_CHAR.esPlaceholder ? window.KIXUZ_ACTIVE_CHAR : { nombre: 'Cuenta' };
         sidebar.querySelector('#kixuzConvTitle').textContent = conv.nombre || 'Chat';
-        sidebar.querySelector('#kixuzConvSub').textContent = conv.tipo === 'grupo' ? 'Grupo' : '1×1 Privado';
+        sidebar.querySelector('#kixuzConvSub').textContent = conv.tipo === 'grupo' ? 'Grupo · Solo implicados' : '1×1 Privado · Solo implicados';
         sidebar.querySelector('#kixuzSpeakingAs').textContent = `Como: ${pj.nombre}`;
         const total = Array.isArray(conv.participantes) ? conv.participantes.filter(p => p !== 'todos').length : 0;
-        sidebar.querySelector('#kixuzMembersCount').textContent = total > 0 ? `${total} miembros` : 'Privado';
+        sidebar.querySelector('#kixuzMembersCount').textContent = total > 0 ? `${total} implicados` : 'Privado';
     }
 
     function abrirConversacion(conv) {
-        if (!conv) return;
+        if (!conv || !esImplicado(conv)) return;
         chatActivoId = String(conv.id);
         marcarChatComoLeido(conv);
         actualizarBadge();
@@ -532,6 +597,7 @@
             tipo,
             creadorUid: miUid,
             participantes,
+            miembros: participantes,
             mensajes: []
         };
         conversaciones.unshift(nueva);
@@ -566,6 +632,7 @@
         if (!dato || !dato.trim()) return;
         const h = dato.trim().toLowerCase().startsWith('@') ? dato.trim().toLowerCase() : '@' + dato.trim().toLowerCase().replace(/\s+/g, '_');
         conv.participantes = Array.from(new Set([...(conv.participantes || []), h]));
+        conv.miembros = Array.from(new Set([...(conv.miembros || []), h]));
         guardarLocal();
         actualizarCabeceraConversacion(conv);
     }
@@ -653,7 +720,7 @@
                 actualizarBadge();
                 if (chatActivoId) {
                     const act = obtenerChatActivo();
-                    if (act) { marcarChatComoLeido(act); actualizarBadge(); actualizarCabeceraConversacion(act); renderMensajes(); }
+                    if (act && esImplicado(act)) { marcarChatComoLeido(act); actualizarBadge(); actualizarCabeceraConversacion(act); renderMensajes(); }
                     else volverLista();
                 } else renderLista(searchInput.value);
             });

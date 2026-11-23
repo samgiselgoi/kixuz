@@ -53,6 +53,23 @@
             gap: 10px !important;
             flex-shrink: 0 !important;
         }
+        .user-menu select {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borde, rgba(108, 60, 224, 0.45));
+            background: var(--tarjeta, rgba(34, 17, 61, 0.86));
+            color: var(--texto, #EDE7E0);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+        html[data-theme="light"] .user-menu select {
+            background: #FFFFFF;
+            color: #150A24;
+        }
         .kixuz-auth-btn {
             display: inline-flex;
             align-items: center;
@@ -88,6 +105,12 @@
     const HANDLES_PRUEBA = new Set(['@theo', '@cypher', '@elara_vance', '@liam_miller']);
 
     function limpiarSelectorPersonajes() {
+        const header = document.querySelector('header');
+        if (!header) return;
+
+        // Quitar enlaces externos sueltos de "Cuenta Maestra" / "Mi Cuenta Maestra" dentro de header para unificar con Inicio
+        header.querySelectorAll('a[href*="cuenta-maestra.html"]').forEach(a => a.remove());
+
         const sel = document.getElementById('activeCharSelect');
         if (!sel) return;
 
@@ -100,11 +123,10 @@
         const propiosHandles = new Set(propios.map(p => String(p.handle || '').trim().toLowerCase()));
         Array.from(sel.options).forEach(opt => {
             const val = String(opt.value || '').trim().toLowerCase();
-            if (val === '__cuenta_maestra__' || val === 'crear') return;
+            if (val === '__cuenta_maestra__' || val === 'crear' || val === '__nuevo__') return;
             if (HANDLES_PRUEBA.has(val) && !propiosHandles.has(val)) {
                 opt.remove();
             }
-            // Quitar cualquier emoji residual de las opciones
             opt.textContent = opt.textContent.replace(/[👑🎭🔑✨]/g, '').trim();
         });
 
