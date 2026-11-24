@@ -28,10 +28,28 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const KEY_LISTA = "kixuz_subpersonajes";
+const KEY_ACTIVO = "kixuz_personaje_activo";
+
 const normHandle = h => {
     const s = String(h || "").trim().toLowerCase().replace(/^@+/, "").replace(/\s+/g, "_");
     return s ? "@" + s : "";
 };
+
+function leerLocalSubpersonajes() {
+    try {
+        const arr = JSON.parse(localStorage.getItem(KEY_LISTA) || "[]");
+        return Array.isArray(arr) ? arr : [];
+    } catch {
+        return [];
+    }
+}
+
+function guardarLocalSubpersonajes(lista) {
+    try {
+        localStorage.setItem(KEY_LISTA, JSON.stringify(lista));
+    } catch {}
+}
 
 window.KIXUZ_DB = {
     configurado: true,
@@ -51,6 +69,7 @@ window.KIXUZ_DB = {
         await setDoc(doc(db, "cuentas", uid), perfil, { merge: true });
         this.usuarioActual = cred.user;
         this.perfilCuenta = perfil;
+        await this.sincronizarTodoDispositivo(uid);
         window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
         return perfil;
     },
@@ -70,6 +89,7 @@ window.KIXUZ_DB = {
         } catch {}
         this.usuarioActual = cred.user;
         this.perfilCuenta = perfil;
+        await this.sincronizarTodoDispositivo(uid);
         window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
         return perfil;
     },
@@ -84,28 +104,132 @@ window.KIXUZ_DB = {
     async guardarSubpersonaje(personaje) {
         if (!personaje?.handle) return;
         const h = normHandle(personaje.handle);
+        const uid = auth.currentUser?.uid || personaje.uidMaestro || "";
         const payload = {
             ...personaje,
             handle: h,
-            uidMaestro: auth.currentUser?.uid || personaje.uidMaestro || "",
+            uidMaestro: uid,
             actualizadoEn: Date.now()
         };
         try {
             await setDoc(doc(db, "personajes", h.slice(1)), payload, { merge: true });
+            if (uid) {
+                await setDoc(doc(db, "cuentas", uid, "personajes", h.slice(1)), payload, { merge: true });
+            }
+        } catch {}
+    },
+
+    async sincronizarTodoDispositivo(uidParam) {
+        const uid = uidParam || auth.currentUser?.uid || "";
+        const locales = leerLocalSubpersonajes();
+        const mapa = new Map();
+
+        locales.forEach(p => {
+            const h = normHandle(p?.handle);
+            if (h) mapa.set(h, { ...p, handle: h });
+        });
+
+        try {
+            if (uid) {
+                const subSnap = await getDocs(collection(db, "cuentas", uid, "personajes"));
+                subSnap.forEach(d => {
+                    const data = d.data();
+                    const h = normHandle(data?.handle);
+                    if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+                });
+            }
+            const pubSnap = await getDocs(collection(db, "personajes"));
+            pubSnap.forEach(d => {
+                const data = d.data();
+                const h = normHandle(data?.handle);
+                if (!h) return;
+                if ((uid && data.uidMaestro === uid) || mapa.has(h)) {
+                    mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+                }
+            });
+        } catch {}
+
+        // Subir a Firestore cualquier personaje local que aún no tuviera uidMaestro
+        if (uid) {
+            for (const p of mapa.values()) {
+                if (!p.uidMaestro || p.uidMaestro === uid) {
+                    const actualizado = { ...p, uidMaestro: uid };
+                    mapa.set(p.handle, actualizado);
+                    await this.guardarSubpersonaje(actualizado);
+                }
+            }
+        }
+
+        const fusionados = Array.from(mapa.values());
+        if (fusionados.length > 0) {
+            guardarLocalSubpersonajes(fusionados);
+            try {
+                const act = JSON.parse(localStorage.getItem(KEY_ACTIVO) || "null");
+                const actH = normHandle(act?.handle);
+                const elegido = (actH && mapa.get(actH)) || fusionados[0];
+                if (elegido) {
+                    localStorage.setItem(KEY_ACTIVO, JSON.stringify(elegido));
+                    window.KIXUZ_ACTIVE_CHAR = elegido;
+                }
+            } catch {}
+        }
+
+        await this.sincronizarPostsNube();
+        window.dispatchEvent(new Event("kixuz:personajes-actualizados"));
+        return fusionados;
+    },
+
+    async guardarPostNube(postObj) {
+        if (!postObj?.id) return;
+        try {
+            await setDoc(doc(db, "posts", String(postObj.id)), {
+                ...postObj,
+                actualizadoEn: Date.now()
+            }, { merge: true });
+        } catch {}
+    },
+
+    async sincronizarPostsNube() {
+        try {
+            const p1 = JSON.parse(localStorage.getItem("kixuz_posts") || "[]");
+            const p2 = JSON.parse(localStorage.getItem("kixuz_posts_v1") || "[]");
+            const mapa = new Map();
+            [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(it => {
+                if (it && it.id) mapa.set(String(it.id), it);
+            });
+
+            const snap = await getDocs(collection(db, "posts"));
+            snap.forEach(d => {
+                const data = d.data();
+                if (data && data.id) {
+                    const prev = mapa.get(String(data.id));
+                    if (!prev || Number(data.actualizadoEn || 0) >= Number(prev.actualizadoEn || 0)) {
+                        mapa.set(String(data.id), data);
+                    }
+                }
+            });
+
+            const todos = Array.from(mapa.values()).sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+            localStorage.setItem("kixuz_posts", JSON.stringify(todos));
+            window.dispatchEvent(new Event("kixuz:posts-actualizados"));
         } catch {}
     },
 
     async listarPersonajesPublicos() {
-        const lista = [];
-        try {
-            const subs = JSON.parse(localStorage.getItem("kixuz_subpersonajes") || "[]");
-            if (Array.isArray(subs)) lista.push(...subs);
-        } catch {}
+        const mapa = new Map();
+        leerLocalSubpersonajes().forEach(p => {
+            const h = normHandle(p?.handle);
+            if (h) mapa.set(h, { ...p, handle: h });
+        });
         try {
             const snap = await getDocs(collection(db, "personajes"));
-            snap.forEach(d => lista.push(d.data()));
+            snap.forEach(d => {
+                const data = d.data();
+                const h = normHandle(data?.handle);
+                if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+            });
         } catch {}
-        return lista;
+        return Array.from(mapa.values());
     },
 
     async buscarPersonajePublico(handle) {
@@ -133,8 +257,10 @@ onAuthStateChanged(auth, async user => {
             if (snap.exists()) perfil = { ...perfil, ...snap.data() };
         } catch {}
         window.KIXUZ_DB.perfilCuenta = perfil;
+        await window.KIXUZ_DB.sincronizarTodoDispositivo(user.uid);
     } else {
         window.KIXUZ_DB.perfilCuenta = null;
+        await window.KIXUZ_DB.sincronizarPostsNube();
     }
     window.dispatchEvent(new Event("kixuz:sesion-actualizada"));
 });
