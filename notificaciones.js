@@ -43,19 +43,21 @@
 
     function guardarNotificaciones(arr) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(arr.slice(0, 60)));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(arr.slice(0, 80)));
         } catch {}
     }
 
     function registrarNotificacion({ destinoHandle, actorNombre, actorHandle, texto, enlace, tipo }) {
         const dest = normHandle(destinoHandle);
-        if (!dest) return;
+        const actorH = normHandle(actorHandle);
+        // Solo se registra si hay un destinatario válido y distinto de quien realiza la acción
+        if (!dest || (actorH && dest === actorH)) return;
         const lista = leerNotificaciones();
         lista.unshift({
             id: 'notif_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
             destinoHandle: dest,
-            actorNombre: actorNombre || 'Alguien',
-            actorHandle: normHandle(actorHandle) || '',
+            actorNombre: actorNombre || (actorH ? actorH.slice(1) : 'Alguien'),
+            actorHandle: actorH,
             texto: String(texto || '').trim(),
             enlace: enlace || 'index.html',
             tipo: tipo || 'actividad',
@@ -66,9 +68,11 @@
         renderBellBadge();
     }
 
+    // Filtra estrictamente: solo notificaciones cuyo destinoHandle coincida con un personaje propio
     function obtenerMisNotificaciones() {
         const mios = getPersonajesPropiosSet();
-        return leerNotificaciones().filter(n => !n.destinoHandle || mios.has(normHandle(n.destinoHandle)));
+        if (!mios.size) return [];
+        return leerNotificaciones().filter(n => n && n.destinoHandle && mios.has(normHandle(n.destinoHandle)));
     }
 
     function injectStyles() {
@@ -219,7 +223,7 @@
         document.getElementById('kixuzMarkAllRead')?.addEventListener('click', e => {
             e.stopPropagation();
             const mios = getPersonajesPropiosSet();
-            const todas = leerNotificaciones().map(n => (!n.destinoHandle || mios.has(normHandle(n.destinoHandle))) ? { ...n, leida: true } : n);
+            const todas = leerNotificaciones().map(n => (n.destinoHandle && mios.has(normHandle(n.destinoHandle))) ? { ...n, leida: true } : n);
             guardarNotificaciones(todas);
             renderBellBadge();
         });

@@ -365,6 +365,13 @@
                         if (h) mapa.set(h, { nombre: p.nombre || h.slice(1), handle: h, avatar: p.avatar || '' });
                     });
                 } catch {}
+                try {
+                    const posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+                    if (Array.isArray(posts)) posts.forEach(it => {
+                        const h = normH(it?.autorHandle || it?.handle);
+                        if (h && !mapa.has(h)) mapa.set(h, { nombre: it.autorNombre || it.author || h.slice(1), handle: h, avatar: '' });
+                    });
+                } catch {}
                 if (window.KIXUZ_DB?.listarPersonajesPublicos) {
                     try {
                         const pubs = await window.KIXUZ_DB.listarPersonajesPublicos();
@@ -374,7 +381,7 @@
                         });
                     } catch {}
                 }
-                directorioPersonajes = Array.from(mapa.values());
+                directorioPersonajes = Array.from(mapa.values()).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
             }
 
             function initBuscadorPersonasUniverso() {
@@ -387,7 +394,7 @@
                     const q = (inp.value || '').trim().toLowerCase();
                     const filtrados = directorioPersonajes.filter(p =>
                         !q || p.nombre.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q)
-                    ).slice(0, 12);
+                    ).slice(0, 40);
 
                     if (!filtrados.length) {
                         drop.innerHTML = `<div style="padding:9px 12px;font-size:12px;opacity:0.7;">Sin coincidencias. Escribí el @usuario para agregarlo.</div>`;

@@ -111,8 +111,17 @@ window.KIXUZ_DB = {
             uidMaestro: uid,
             actualizadoEn: Date.now()
         };
+        const publicPayload = {
+            nombre: payload.nombre || h.slice(1),
+            handle: h,
+            avatar: payload.avatar || "",
+            clan: payload.clan || "",
+            universos: Array.isArray(payload.universos) ? payload.universos : [],
+            actualizadoEn: payload.actualizadoEn
+        };
         try {
             await setDoc(doc(db, "personajes", h.slice(1)), payload, { merge: true });
+            await setDoc(doc(db, "personajes_publicos", h.slice(1)), publicPayload, { merge: true });
             if (uid) {
                 await setDoc(doc(db, "cuentas", uid, "personajes", h.slice(1)), payload, { merge: true });
             }
@@ -149,15 +158,11 @@ window.KIXUZ_DB = {
             });
         } catch {}
 
-        // Subir a Firestore cualquier personaje local que aún no tuviera uidMaestro
-        if (uid) {
-            for (const p of mapa.values()) {
-                if (!p.uidMaestro || p.uidMaestro === uid) {
-                    const actualizado = { ...p, uidMaestro: uid };
-                    mapa.set(p.handle, actualizado);
-                    await this.guardarSubpersonaje(actualizado);
-                }
-            }
+        // Subir a Firestore cualquier personaje local o de la cuenta para que aparezca en el directorio global
+        for (const p of mapa.values()) {
+            const actualizado = uid && (!p.uidMaestro || p.uidMaestro === uid) ? { ...p, uidMaestro: uid } : p;
+            mapa.set(p.handle, actualizado);
+            await this.guardarSubpersonaje(actualizado);
         }
 
         const fusionados = Array.from(mapa.values());
@@ -222,10 +227,18 @@ window.KIXUZ_DB = {
             if (h) mapa.set(h, { ...p, handle: h });
         });
         try {
+            const pubSnap = await getDocs(collection(db, "personajes_publicos"));
+            pubSnap.forEach(d => {
+                const data = d.data();
+                const h = normHandle(data?.handle || ("@" + d.id));
+                if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+            });
+        } catch {}
+        try {
             const snap = await getDocs(collection(db, "personajes"));
             snap.forEach(d => {
                 const data = d.data();
-                const h = normHandle(data?.handle);
+                const h = normHandle(data?.handle || ("@" + d.id));
                 if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
             });
         } catch {}
