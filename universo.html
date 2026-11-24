@@ -1,369 +1,85 @@
-<!DOCTYPE html>
-<html lang="es" data-theme="dark">
-<head>
-  <title>KIXUZ — Universos</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #150A24;
-      --card: #1F1135;
-      --card-2: #281644;
-      --border: rgba(108, 60, 224, 0.35);
-      --primary: #6C3CE0;
-      --accent: #2DD4C4;
-      --texto: #EDE7E0;
-      --muted: rgba(237, 231, 224, 0.65);
-    }
-    html[data-theme="light"] {
-      --bg: #F5F2FA;
-      --card: #FFFFFF;
-      --card-2: #EFE9FA;
-      --border: rgba(108, 60, 224, 0.25);
-      --texto: #150A24;
-      --muted: rgba(21, 10, 36, 0.65);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--texto);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      transition: background 0.25s, color 0.25s;
-    }
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(21, 10, 36, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 12px 26px;
-    }
-    html[data-theme="light"] header {
-      background: rgba(255, 255, 255, 0.92);
-    }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--texto);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.04em;
-      flex-shrink: 0;
-    }
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #150A24;
-      font-weight: 800;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .char-select {
-      height: 38px;
-      padding: 0 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--texto);
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 13px;
-      outline: none;
-      cursor: pointer;
-    }
-    .container {
-      max-width: 1040px;
-      margin: 26px auto;
-      padding: 0 18px 60px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 18px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 38px;
-      padding: 0 16px;
-      border-radius: 10px;
-      border: none;
-      background: var(--primary);
-      color: #EDE7E0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 13.5px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s, opacity 0.2s;
-    }
-    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-accent { background: var(--accent); color: #150A24; }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--texto);
-    }
-    .input, .textarea, .select {
-      width: 100%;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--texto);
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      outline: none;
-    }
-    .input:focus, .textarea:focus, .select:focus { border-color: var(--accent); }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(108, 60, 224, 0.24);
-      border: 1px solid var(--border);
-      color: var(--accent);
-    }
-    .post-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-    .post-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .post-author {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .avatar-circle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-      color: #150A24;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-    }
-    .post-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-    }
-    .action-chip {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      color: var(--texto);
-      border-radius: 999px;
-      padding: 5px 12px;
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .action-chip.liked {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .comments-box {
-      margin-top: 10px;
-      padding-left: 12px;
-      border-left: 2px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .comment-item {
-      font-size: 13px;
-      background: var(--card-2);
-      padding: 7px 10px;
-      border-radius: 8px;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <a href="index.html" class="brand" aria-label="KIXUZ Inicio">
-      <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;">
-    </a>
-    <nav class="nav-links" aria-label="Navegación principal">
-      <a href="index.html" title="Inicio">Inicio</a>
-      <a href="perfil.html" title="Mi Personaje">Mi Personaje</a>
-      <a href="universo.html">Universos</a>
-      <a href="familia.html">Familia / Clan</a>
-    </nav>
-    <div class="user-menu">
-      <select id="activeCharSelect" class="char-select" aria-label="Personaje activo">
-        <option value="@theo">Theo Kwon (@theo)</option>
-        <option value="@cypher">Cypher (@cypher)</option>
-        <option value="@elara_vance">Elara Vance (@elara_vance)</option>
-        <option value="@liam_miller">Liam Miller (@liam_miller)</option>
-      </select>
-      <a href="registro.html" class="btn btn-accent">Entrar</a>
-    </div>
-  </header>
-  <main class="container">
-    <section class="card" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-      <div>
-        <h1 id="uniTitle" style="font-family:'Space Grotesk',sans-serif;font-size:22px;">Universo #NexoCentral</h1>
-        <p style="color:var(--muted);font-size:14px;margin-top:4px;">Explora y publica escenas filtradas por mundo temático.</p>
-      </div>
-      <select id="universeSelector" class="select" style="max-width:240px;">
-        <option value="NexoCentral">#NexoCentral</option>
-        <option value="Sector4">#Sector4</option>
-        <option value="Aethelgard">#Aethelgard</option>
-      </select>
-    </section>
+(() => {
+    const STORAGE_KEY = 'kixuz_universos_v1';
 
-    <section class="card">
-      <textarea id="uniPostText" class="textarea" rows="2" placeholder="Publicar directamente en este universo..."></textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-        <button id="uniPublishBtn" type="button" class="btn btn-accent">Publicar en universo</button>
-      </div>
-    </section>
+    const normTag = tag => {
+        const clean = String(tag || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+        return clean ? '#' + clean : '';
+    };
 
-    <section id="uniFeed"></section>
-  </main>
-
-  <script>
-    const uniSel = document.getElementById('universeSelector');
-    const params = new URLSearchParams(window.location.search);
-    const initialU = params.get('u');
-    if (initialU && Array.from(uniSel.options).some(o => o.value === initialU)) {
-      uniSel.value = initialU;
-    }
-
-    function renderUniverse() {
-      const tag = '#' + uniSel.value;
-      document.getElementById('uniTitle').textContent = 'Universo ' + tag;
-      const posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]').filter(p => p.universe === tag);
-      const feed = document.getElementById('uniFeed');
-      feed.innerHTML = posts.length
-        ? posts.map(p => `
-          <article class="post-card">
-            <div class="post-header">
-              <strong>${p.author} <span style="color:var(--accent);">${p.handle}</span></strong>
-              <span class="badge">${p.universe}</span>
-            </div>
-            <p style="line-height:1.5;">${p.text}</p>
-          </article>
-        `).join('')
-        : `<div class="card" style="color:var(--muted);">No hay escenas publicadas en ${tag} todavía. ¡Inicia la primera arriba!</div>`;
-    }
-
-    uniSel.addEventListener('change', renderUniverse);
-
-    document.getElementById('uniPublishBtn').addEventListener('click', () => {
-      const text = document.getElementById('uniPostText').value.trim();
-      if (!text) return;
-      const charSel = document.getElementById('activeCharSelect');
-      const opt = charSel.options[charSel.selectedIndex];
-      const author = opt ? opt.textContent.split(' (')[0] : 'Theo Kwon';
-      const handle = charSel.value;
-      const posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
-      posts.unshift({
-        id: 'u_' + Date.now(),
-        author,
-        handle,
-        universe: '#' + uniSel.value,
-        time: 'Ahora mismo',
-        text,
-        kix: 0,
-        liked: false,
-        comments: []
-      });
-      localStorage.setItem('kixuz_posts', JSON.stringify(posts));
-      document.getElementById('uniPostText').value = '';
-      renderUniverse();
-    });
-
-    renderUniverse();
-  </script>
-  <script>
-    (function() {
-      const sel = document.getElementById('activeCharSelect');
-      if (!sel) return;
-      try {
-        const extra = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-        extra.forEach(p => {
-          if (p && p.handle && !Array.from(sel.options).some(o => o.value === p.handle)) {
-            const opt = document.createElement('option');
-            opt.value = p.handle;
-            opt.textContent = `${p.nombre} (${p.handle})`;
-            sel.appendChild(opt);
-          }
-        });
-      } catch(e) {}
-      const saved = localStorage.getItem('kixuz_active_char');
-      if (saved && Array.from(sel.options).some(o => o.value === saved)) {
-        sel.value = saved;
-      }
-      function syncBadge() {
-        const badge = document.getElementById('postingAsBadge');
-        if (badge) {
-          const opt = sel.options[sel.selectedIndex];
-          badge.textContent = `Publicando como ${opt ? opt.textContent : sel.value}`;
+    function leerUniversos() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            if (!Array.isArray(raw)) return [];
+            const mapa = new Map();
+            raw.forEach(u => {
+                if (!u || !u.tag) return;
+                const tag = normTag(u.tag);
+                if (!tag) return;
+                mapa.set(tag.toLowerCase(), {
+                    ...u,
+                    tag,
+                    nombre: String(u.nombre || tag.slice(1)).trim(),
+                    descripcion: String(u.descripcion || '').trim(),
+                    reglas: String(u.reglas || '').trim(),
+                    miembros: Array.isArray(u.miembros) ? u.miembros : [],
+                    mapas: Array.isArray(u.mapas) ? u.mapas : []
+                });
+            });
+            return Array.from(mapa.values());
+        } catch {
+            return [];
         }
-      }
-      syncBadge();
-      sel.addEventListener('change', () => {
-        localStorage.setItem('kixuz_active_char', sel.value);
-        syncBadge();
-        window.dispatchEvent(new CustomEvent('kixuz:charChanged', { detail: sel.value }));
-      });
-    })();
-  </script>
-  <script src="theme.js"></script>
-  <script src="buscador-global.js"></script>
-  <script src="navbar-ui.js"></script>
-  <script src="notificaciones.js"></script>
-  <script src="chat.js"></script>
-  <script src="characters.js"></script>
-</body>
-</html>
+    }
+
+    function guardarUniversos(lista) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+            window.dispatchEvent(new Event('kixuz:universos-actualizados'));
+        } catch {}
+    }
+
+    function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle }) {
+        const tagNorm = normTag(tag || nombre);
+        if (!tagNorm) return null;
+
+        const actual = leerUniversos();
+        const key = tagNorm.toLowerCase();
+        if (actual.some(u => normTag(u.tag).toLowerCase() === key)) {
+            return actual.find(u => normTag(u.tag).toLowerCase() === key) || null;
+        }
+
+        const miembrosIniciales = creadorHandle ? [String(creadorHandle).trim()] : [];
+        const nuevo = {
+            id: 'uni_' + Date.now(),
+            nombre: String(nombre || tagNorm.slice(1)).trim(),
+            tag: tagNorm,
+            descripcion: String(descripcion || '').trim(),
+            reglas: String(reglas || '').trim(),
+            creadorHandle: String(creadorHandle || '').trim(),
+            miembros: miembrosIniciales,
+            mapas: []
+        };
+
+        actual.unshift(nuevo);
+        guardarUniversos(actual);
+        return nuevo;
+    }
+
+    function puedeVerPost(post, contexto = 'inicio') {
+        if (!post) return false;
+        const tagPost = normTag(post.universo || post.universe || '');
+        if (contexto === 'inicio') {
+            return true;
+        }
+        if (!tagPost) return false;
+        return true;
+    }
+
+    window.KIXUZ_UNIVERSOS = {
+        normTag,
+        leerUniversos,
+        guardarUniversos,
+        crearUniversoDirecto,
+        puedeVerPost
+    };
+})();
