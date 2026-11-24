@@ -253,6 +253,76 @@
             flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
             background: rgba(45, 212, 196, 0.1); border: 1px solid var(--acento); margin-top: 10px;
         }
+    
+/* === KIXUZ UNIFIED MOBILE & TABLET ADAPTATION === */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+img, video, svg {
+  max-width: 100%;
+}
+@media (max-width: 768px) {
+  header {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+  .nav-links {
+    width: 100%;
+    order: 3;
+    gap: 6px !important;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .nav-links a {
+    font-size: 12.5px !important;
+    padding: 5px 8px !important;
+    white-space: nowrap;
+  }
+  .user-menu {
+    gap: 6px !important;
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .user-menu select,
+  .dropdown {
+    max-width: 185px;
+    font-size: 12px !important;
+    height: 34px !important;
+    padding: 0 8px !important;
+  }
+  main,
+  .profile-layout {
+    margin: 14px auto 80px !important;
+    padding: 0 10px !important;
+    gap: 14px !important;
+  }
+  .panel,
+  .create-post,
+  .post-card {
+    padding: 14px !important;
+    border-radius: 14px !important;
+  }
+  .form-grid,
+  .create-post-controls,
+  .kixuz-modal-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .member-card {
+    width: 100% !important;
+    max-width: 340px;
+  }
+  .group-banner {
+    height: 130px !important;
+  }
+  .group-avatar {
+    width: 68px !important;
+    height: 68px !important;
+    font-size: 22px !important;
+  }
+}
+
     </style>
 </head>
 <body>
