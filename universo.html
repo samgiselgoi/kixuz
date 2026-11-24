@@ -177,7 +177,6 @@
             </div>
         </section>
 
-        <!-- Formulario directo para crear universo sin aprobación de terceros -->
         <section class="panel" id="createUniPanel" style="display:none;">
             <h2 style="font-size:17px;margin-bottom:10px;">Crear Universo</h2>
             <form id="createUniForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;">
@@ -189,7 +188,6 @@
             </form>
         </section>
 
-        <!-- Pestaña 1: Muro del Universo -->
         <section id="tabPanelMuro">
             <div class="panel" style="margin-bottom:16px;">
                 <div class="row-between" style="margin-bottom:8px;">
@@ -208,7 +206,6 @@
             <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
         </section>
 
-        <!-- Pestaña 2: Mapas e Imágenes -->
         <section class="panel" id="tabPanelMapas" style="display:none;">
             <h2 style="font-size:17px;">Mapas e Imágenes del Universo</h2>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
@@ -218,7 +215,6 @@
             <div id="mapsGrid" class="maps-grid"></div>
         </section>
 
-        <!-- Pestaña 3: Miembros y Reglas -->
         <section class="panel" id="tabPanelInfo" style="display:none;">
             <h2 style="font-size:17px;">Reglas del Universo</h2>
             <p id="uniRulesText" style="margin-top:8px;font-size:13.5px;opacity:0.88;"></p>
@@ -308,7 +304,6 @@
                 `;
                 if (badge) badge.textContent = `Publicando como ${actor.nombre} (${actor.handle}) en ${uni.tag}`;
 
-                // Muro filtrado por etiqueta de universo
                 let posts = [];
                 try {
                     const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
@@ -376,14 +371,12 @@
                     });
                 });
 
-                // Mapas
                 const mapsGrid = document.getElementById('mapsGrid');
                 const mapas = Array.isArray(uni.mapas) ? uni.mapas : [];
                 mapsGrid.innerHTML = mapas.length
                     ? mapas.map(m => `<div class="map-card"><img src="${esc(m.src)}" alt="${esc(m.titulo || 'Mapa')}"><div style="font-size:12.5px;font-weight:700;margin-top:6px;">${esc(m.titulo || 'Mapa')}</div></div>`).join('')
                     : `<p style="opacity:0.72;font-size:13px;grid-column:1/-1;">Sin mapas o imágenes cargadas en este universo.</p>`;
 
-                // Miembros y reglas
                 document.getElementById('uniRulesText').textContent = uni.reglas || 'Sin reglas específicas registradas.';
                 const membersEl = document.getElementById('uniMembersList');
                 membersEl.innerHTML = (uni.miembros || []).length

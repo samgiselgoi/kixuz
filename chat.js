@@ -9,6 +9,7 @@
         'kixuz_chat_conversaciones_v5'
     ];
     const STORAGE_LEIDOS = 'kixuz_chat_leidos_v1';
+    const STORAGE_BORRADOS = 'kixuz_chat_eliminados_v1';
 
     const esc = str => String(str || '')
         .replace(/&/g, '&amp;')
@@ -42,9 +43,9 @@
         .kixuz-chat-trigger:hover { transform: scale(1.06); }
         .kixuz-chat-trigger svg { width: 24px; height: 24px; }
         .kixuz-chat-badge {
-            position: absolute; top: -3px; right: -3px; background-color: #e03c6c; color: #fff;
-            font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; padding: 0 5px;
-            border-radius: 20px; font-family: 'Space Grotesk', sans-serif;
+            position: absolute; top: -4px; right: -4px; background-color: #e03c6c; color: #fff;
+            font-size: 11px; font-weight: 700; min-width: 21px; height: 21px; padding: 0 5px;
+            border-radius: 999px; font-family: 'Space Grotesk', sans-serif;
             border: 2px solid var(--bg-principal, #150A24);
             display: flex; align-items: center; justify-content: center;
         }
@@ -71,47 +72,24 @@
             padding: 5px 7px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
         }
         .kixuz-chat-icon-btn:hover { background: rgba(108, 60, 224, 0.26); color: var(--acento, #2DD4C4); }
-
-        /* Menú desplegable compacto [•••] */
         .kixuz-more-wrap { position: relative; display: inline-flex; align-items: center; }
         .kixuz-more-menu {
-            display: none;
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            min-width: 195px;
-            background: #1D0F34;
-            border: 1px solid var(--acento, #2DD4C4);
-            border-radius: 12px;
-            padding: 6px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.72);
-            z-index: 10020;
-            flex-direction: column;
-            gap: 2px;
+            display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 195px;
+            background: #1D0F34; border: 1px solid var(--acento, #2DD4C4); border-radius: 12px;
+            padding: 6px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.72); z-index: 10020;
+            flex-direction: column; gap: 2px;
         }
-        html[data-theme="light"] .kixuz-more-menu {
-            background: #FFFFFF;
-            box-shadow: 0 10px 24px rgba(21, 10, 36, 0.18);
-        }
+        html[data-theme="light"] .kixuz-more-menu { background: #FFFFFF; box-shadow: 0 10px 24px rgba(21, 10, 36, 0.18); }
         .kixuz-more-wrap.open .kixuz-more-menu { display: flex; }
         .kixuz-more-item {
-            background: none;
-            border: none;
-            color: var(--texto, #EDE7E0);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 12.5px;
-            font-weight: 600;
-            padding: 8px 10px;
-            border-radius: 8px;
-            text-align: left;
-            cursor: pointer;
-            width: 100%;
+            background: none; border: none; color: var(--texto, #EDE7E0);
+            font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 600;
+            padding: 8px 10px; border-radius: 8px; text-align: left; cursor: pointer; width: 100%;
         }
         html[data-theme="light"] .kixuz-more-item { color: #150A24; }
         .kixuz-more-item:hover { background: rgba(108, 60, 224, 0.28); color: var(--acento, #2DD4C4); }
         .kixuz-more-item.danger { color: #ff9bb4; }
         .kixuz-more-item.danger:hover { background: rgba(224, 60, 108, 0.24); color: #ffb8c9; }
-
         .kixuz-chat-toolbar {
             padding: 10px 14px; border-bottom: 1px solid rgba(108, 60, 224, 0.35);
             background: rgba(0, 0, 0, 0.2); display: flex; gap: 8px; align-items: center; flex-shrink: 0;
@@ -145,7 +123,8 @@
         .kixuz-chat-info p { margin: 0; font-size: 12px; opacity: 0.78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .kixuz-unread-pill {
             background: #e03c6c; color: #fff; font-family: 'Space Grotesk', sans-serif;
-            font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 12px; flex-shrink: 0;
+            font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; padding: 0 6px;
+            border-radius: 999px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
         }
         .kixuz-conv-meta-strip {
             padding: 6px 14px; font-size: 11.5px; background: rgba(108, 60, 224, 0.14);
@@ -234,6 +213,19 @@
         } catch { return []; }
     }
 
+    function leerBorradosPersistentes() {
+        try {
+            const arr = JSON.parse(localStorage.getItem(STORAGE_BORRADOS) || '[]');
+            return new Set(Array.isArray(arr) ? arr.map(String) : []);
+        } catch { return new Set(); }
+    }
+
+    function guardarBorradosPersistentes(setIds) {
+        try {
+            localStorage.setItem(STORAGE_BORRADOS, JSON.stringify(Array.from(setIds)));
+        } catch {}
+    }
+
     function normalizarConversacion(raw, idx = 0) {
         if (!raw || typeof raw !== 'object') return null;
         const id = String(raw.id || raw.convId || `chat_rec_${idx}_${Date.now()}`);
@@ -243,12 +235,14 @@
         return { ...raw, id, nombre, usuario, tipo: raw.tipo === 'grupo' ? 'grupo' : 'privado', mensajes: msgs };
     }
 
-    function cargarLocal() {
+    function cargarLocal(borradosSet) {
         const mapa = new Map();
         ALL_CHAT_KEYS.forEach((k, kIdx) => {
-            leerArregloSeguro(k).forEach((item, i) => {
+            const filtrados = leerArregloSeguro(k).filter(item => !borradosSet.has(String(item?.id || item?.convId || '')));
+            try { localStorage.setItem(k, JSON.stringify(filtrados)); } catch {}
+            filtrados.forEach((item, i) => {
                 const normConv = normalizarConversacion(item, kIdx * 100 + i);
-                if (!normConv) return;
+                if (!normConv || borradosSet.has(String(normConv.id))) return;
                 const prev = mapa.get(normConv.id);
                 if (!prev) mapa.set(normConv.id, normConv);
                 else {
@@ -263,8 +257,15 @@
         return combinadas;
     }
 
-    function guardarLocal() {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(conversaciones)); } catch {}
+    function guardarLocal(conversaciones, borradosSet) {
+        const activas = conversaciones.filter(c => !borradosSet.has(String(c.id)));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(activas));
+            ALL_CHAT_KEYS.forEach(k => {
+                const arr = leerArregloSeguro(k).filter(item => !borradosSet.has(String(item?.id || item?.convId || '')));
+                localStorage.setItem(k, JSON.stringify(arr));
+            });
+        } catch {}
     }
 
     function leerLeidos() {
@@ -275,8 +276,8 @@
         try { localStorage.setItem(STORAGE_LEIDOS, JSON.stringify(obj)); } catch {}
     }
 
-    let conversaciones = cargarLocal();
-    let idsEliminadosRecientemente = new Set();
+    let idsEliminadosRecientemente = leerBorradosPersistentes();
+    let conversaciones = cargarLocal(idsEliminadosRecientemente);
     let chatActivoId = null;
 
     function montarChatUI() {
@@ -381,6 +382,17 @@
         const moreBtn = sidebar.querySelector('#kixuzMoreBtn');
         const moreMenu = sidebar.querySelector('#kixuzMoreMenu');
 
+        function eliminarChatDefinitivo(id) {
+            const strId = String(id);
+            idsEliminadosRecientemente.add(strId);
+            guardarBorradosPersistentes(idsEliminadosRecientemente);
+            conversaciones = conversaciones.filter(x => String(x.id) !== strId);
+            guardarLocal(conversaciones, idsEliminadosRecientemente);
+            actualizarBadge();
+            if (chatActivoId === strId) volverLista();
+            else renderLista(searchInput.value);
+        }
+
         function renderMiembrosPendientes() {
             addedMembersBox.innerHTML = miembrosPendientes.map((m, idx) => `
                 <span class="kixuz-member-pill">
@@ -388,7 +400,6 @@
                     <button type="button" data-remove-member="${idx}" title="Quitar">✕</button>
                 </span>
             `).join('');
-
             addedMembersBox.querySelectorAll('[data-remove-member]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     miembrosPendientes.splice(Number(btn.dataset.removeMember), 1);
@@ -463,11 +474,13 @@
             return Boolean((mHandle && misPjClaves.has(mHandle)) || (mAutor && misPjClaves.has(mAutor)));
         }
 
+        // Cuenta mensajes sin leer por conversación (mensajes de otros desde la última vez que se abrió)
         function contarNoLeidosDeChat(conv) {
             if (!conv || !esImplicado(conv)) return 0;
             const msgs = Array.isArray(conv.mensajes) ? conv.mensajes : [];
             const leidosCount = Number(leerLeidos()[conv.id] || 0);
-            return Math.max(0, msgs.filter(m => !esMensajeMio(m)).length - leidosCount);
+            const recibidos = msgs.filter(m => !esMensajeMio(m)).length;
+            return Math.max(0, recibidos - leidosCount);
         }
 
         function marcarChatComoLeido(conv) {
@@ -478,9 +491,12 @@
             guardarLeidos(obj);
         }
 
+        // Actualiza el numerito en la burbuja flotante del chat
         function actualizarBadge() {
-            const total = conversaciones.filter(c => esImplicado(c)).reduce((a, c) => a + contarNoLeidosDeChat(c), 0);
-            badgeEl.textContent = total;
+            const total = conversaciones
+                .filter(c => esImplicado(c))
+                .reduce((acc, c) => acc + contarNoLeidosDeChat(c), 0);
+            badgeEl.textContent = String(total);
             badgeEl.style.display = total > 0 ? 'flex' : 'none';
         }
 
@@ -508,7 +524,7 @@
                 const nuevoNombre = prompt('Nuevo nombre para el chat:', conv.nombre || '');
                 if (nuevoNombre !== null && nuevoNombre.trim()) {
                     conv.nombre = nuevoNombre.trim();
-                    guardarLocal();
+                    guardarLocal(conversaciones, idsEliminadosRecientemente);
                     actualizarCabeceraConversacion(conv);
                     renderLista(searchInput.value);
                 }
@@ -521,7 +537,7 @@
                 const h = normHandle(dato) || normToken(dato);
                 conv.participantes = Array.from(new Set([...(conv.participantes || []), h]));
                 conv.miembros = Array.from(new Set([...(conv.miembros || []), h]));
-                guardarLocal();
+                guardarLocal(conversaciones, idsEliminadosRecientemente);
                 actualizarCabeceraConversacion(conv);
             });
 
@@ -529,27 +545,21 @@
                 moreWrap.classList.remove('open');
                 const parts = (conv.participantes || []).filter(p => p && p !== 'todos');
                 if (!parts.length) return;
-                const dato = prompt(`Participantes actuales: ${parts.join(', ')}\nEscribe el @usuario que deseas quitar:`);
+                const dato = prompt(`Participantes actuales: ${parts.join(', ')}
+Escribe el @usuario que deseas quitar:`);
                 if (!dato || !dato.trim()) return;
                 const target = normToken(dato);
                 const targetH = normHandle(dato);
                 conv.participantes = parts.filter(p => normToken(p) !== target && normToken(p) !== targetH);
                 conv.miembros = [...conv.participantes];
-                guardarLocal();
-                if (!esImplicado(conv)) {
-                    volverLista();
-                } else {
-                    actualizarCabeceraConversacion(conv);
-                }
+                guardarLocal(conversaciones, idsEliminadosRecientemente);
+                if (!esImplicado(conv)) volverLista();
+                else actualizarCabeceraConversacion(conv);
             });
 
             moreMenu.querySelector('[data-act="delete"]')?.addEventListener('click', () => {
                 moreWrap.classList.remove('open');
-                idsEliminadosRecientemente.add(String(conv.id));
-                conversaciones = conversaciones.filter(x => String(x.id) !== String(conv.id));
-                guardarLocal();
-                actualizarBadge();
-                volverLista();
+                eliminarChatDefinitivo(conv.id);
             });
         }
 
@@ -660,7 +670,7 @@
                 `;
                 div.querySelector('.kixuz-msg-del')?.addEventListener('click', () => {
                     conv.mensajes.splice(idx, 1);
-                    guardarLocal();
+                    guardarLocal(conversaciones, idsEliminadosRecientemente);
                     renderMensajes();
                 });
                 messagesBox.appendChild(div);
@@ -685,7 +695,7 @@
             const participantes = Array.from(new Set([...misPjClaves, ...miembrosPendientes].filter(Boolean)));
             const nueva = { id: 'chat_' + Date.now(), nombre: nombreFinal, usuario, tipo, participantes, miembros: participantes, mensajes: [] };
             conversaciones.unshift(nueva);
-            guardarLocal();
+            guardarLocal(conversaciones, idsEliminadosRecientemente);
             actualizarBadge();
             miembrosPendientes = [];
             renderMiembrosPendientes();
@@ -710,7 +720,7 @@
                 texto
             });
             marcarChatComoLeido(conv);
-            guardarLocal();
+            guardarLocal(conversaciones, idsEliminadosRecientemente);
             msgInput.value = '';
             renderMensajes();
             renderLista(searchInput.value);
@@ -759,6 +769,8 @@
         msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enviarMensaje(); } });
 
         const refrescarPorCambioDePersonaje = () => {
+            idsEliminadosRecientemente = leerBorradosPersistentes();
+            conversaciones = cargarLocal(idsEliminadosRecientemente);
             if (chatActivoId) {
                 const act = obtenerChatActivo();
                 if (act && esImplicado(act)) {
