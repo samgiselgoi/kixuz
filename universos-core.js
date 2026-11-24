@@ -84,10 +84,25 @@
         const target = lista.find(u => u.tag.toLowerCase() === tagNorm.toLowerCase());
         if (!target) return false;
         target.miembros = Array.isArray(target.miembros) ? target.miembros : [];
-        if (!target.miembros.some(m => (normHandle(m) || String(m).toLowerCase()) === (normHandle(h) || h.toLowerCase()))) {
+        const claveNueva = normHandle(h) || h.toLowerCase();
+        if (!target.miembros.some(m => (normHandle(m) || String(m).toLowerCase()) === claveNueva)) {
             target.miembros.push(h);
             guardarUniversos(lista);
         }
+        return true;
+    }
+
+    function quitarMiembroDeUniverso(tag, handleOrName) {
+        const tagNorm = normTag(tag);
+        const claveQuitar = normHandle(handleOrName) || String(handleOrName || '').trim().toLowerCase();
+        if (!tagNorm || !claveQuitar) return false;
+        const lista = leerUniversos();
+        const target = lista.find(u => u.tag.toLowerCase() === tagNorm.toLowerCase());
+        if (!target) return false;
+        target.miembros = (Array.isArray(target.miembros) ? target.miembros : []).filter(
+            m => (normHandle(m) || String(m).toLowerCase()) !== claveQuitar
+        );
+        guardarUniversos(lista);
         return true;
     }
 
@@ -111,6 +126,7 @@
         guardarUniversos,
         crearUniversoDirecto,
         agregarMiembroAUniverso,
+        quitarMiembroDeUniverso,
         actualizarAparienciaUniverso
     };
 })();

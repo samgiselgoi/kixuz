@@ -86,12 +86,20 @@
 
     .character-identity h1 { font-family: 'Space Grotesk', sans-serif; font-size: 21px; margin-top: 8px; }
     .profile-username { color: var(--acento); font-weight: 700; font-size: 13px; margin-top: 2px; }
+    .relationship-status-line {
+      margin-top: 6px; font-size: 12.5px; font-weight: 600;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .relationship-status-line a { color: var(--acento); text-decoration: none; font-weight: 700; }
+    .relationship-status-line a:hover { text-decoration: underline; }
+
     .tags-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .info-tag {
       display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
       border-radius: 999px; font-size: 11.5px; font-weight: 600; text-decoration: none;
       background: rgba(108, 60, 224, 0.22); border: 1px solid var(--border); color: var(--acento);
     }
+    .info-tag:hover { border-color: var(--acento); }
 
     .kixuz-profile-edit-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
     .kixuz-edit-btn {
@@ -102,12 +110,22 @@
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
     .kixuz-edit-btn:hover { background: var(--acento); color: #150A24; }
+    .kixuz-edit-btn.accept { background: var(--acento); color: #150A24; border-color: var(--acento); }
 
     .character-sidebar details { border-top: 1px solid var(--border); padding: 12px 18px; }
     .character-sidebar summary {
       font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13.5px;
       cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between;
     }
+
+    .friend-row-item, .link-row-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 6px 9px; border-radius: 8px; background: rgba(108, 60, 224, 0.16);
+      border: 1px solid var(--border); font-size: 12px; margin-top: 6px;
+      text-decoration: none; color: inherit;
+    }
+    .link-row-item:hover { border-color: var(--acento); }
+    .friend-row-item a { color: var(--acento); font-weight: 700; text-decoration: none; }
 
     .profile-wall { display: flex; flex-direction: column; gap: 16px; }
     .create-post { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; }
@@ -160,13 +178,9 @@
     .post-author-chain {
       display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 700; font-size: 13.5px;
     }
-    .post-author-chain a {
-      color: var(--acento); text-decoration: none;
-    }
+    .post-author-chain a { color: var(--acento); text-decoration: none; }
     .post-author-chain a:hover { text-decoration: underline; }
-    .post-chain-sep {
-      color: var(--muted); font-weight: 700;
-    }
+    .post-chain-sep { color: var(--muted); font-weight: 700; }
     .post-badges { display: flex; gap: 6px; flex-wrap: wrap; }
     .post-pill {
       font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
@@ -265,6 +279,7 @@
     (() => {
       const KEY_LISTA = 'kixuz_subpersonajes';
       const KEY_ACTIVO = 'kixuz_personaje_activo';
+      const KEY_AMIGOS = 'kixuz_amigos_v1';
 
       const SVG_FLAME = `
         <svg class="kix-flame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -275,8 +290,10 @@
       const SVG_ICON = {
         uni: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-25 12 12)"/></svg>`,
         clan: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.8-8 9-4.5-1.2-8-4-8-9V7l8-4z"/></svg>`,
+        rel: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
         img: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
-        edit: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`
+        edit: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+        users: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
       };
 
       const PERSONAJE_VACIO = {
@@ -326,6 +343,63 @@
           };
           reader.readAsDataURL(file);
         });
+      }
+
+      function leerAmigosLocal() {
+        try {
+          const arr = JSON.parse(localStorage.getItem(KEY_AMIGOS) || '[]');
+          return Array.isArray(arr) ? arr : [];
+        } catch { return []; }
+      }
+
+      function guardarAmigosLocal(arr) {
+        try { localStorage.setItem(KEY_AMIGOS, JSON.stringify(arr)); } catch {}
+      }
+
+      function obtenerEstadoAmistadLocal(miHandle, otroHandle) {
+        const yo = normH(miHandle);
+        const otro = normH(otroHandle);
+        if (!yo || !otro || yo === otro) return { estado: 'ninguno', solicitud: null };
+        const lista = leerAmigosLocal();
+        const aceptada = lista.find(a =>
+          a.estado === 'aceptada' &&
+          ((normH(a.deHandle) === yo && normH(a.paraHandle) === otro) ||
+           (normH(a.deHandle) === otro && normH(a.paraHandle) === yo))
+        );
+        if (aceptada) return { estado: 'amigo', solicitud: aceptada };
+        const enviada = lista.find(a => a.estado === 'pendiente' && normH(a.deHandle) === yo && normH(a.paraHandle) === otro);
+        if (enviada) return { estado: 'enviada', solicitud: enviada };
+        const recibida = lista.find(a => a.estado === 'pendiente' && normH(a.deHandle) === otro && normH(a.paraHandle) === yo);
+        if (recibida) return { estado: 'recibida', solicitud: recibida };
+        return { estado: 'ninguno', solicitud: null };
+      }
+
+      async function enviarSolicitudAmistad(deObj, paraObj) {
+        const deH = normH(deObj?.handle);
+        const paraH = normH(paraObj?.handle);
+        if (!deH || !paraH || deH === paraH) return;
+        const lista = leerAmigosLocal();
+        if (!lista.some(a => normH(a.deHandle) === deH && normH(a.paraHandle) === paraH && a.estado !== 'rechazada')) {
+          lista.unshift({
+            id: 'ami_' + Date.now(),
+            deNombre: deObj?.nombre || deH.slice(1), deHandle: deH,
+            paraNombre: paraObj?.nombre || paraH.slice(1), paraHandle: paraH,
+            estado: 'pendiente'
+          });
+          guardarAmigosLocal(lista);
+        }
+        if (window.KIXUZ_AMIGOS?.enviarSolicitud) {
+          try { await window.KIXUZ_AMIGOS.enviarSolicitud(paraObj); } catch {}
+        }
+      }
+
+      async function aceptarSolicitudAmistad(id) {
+        const lista = leerAmigosLocal();
+        const item = lista.find(a => String(a.id) === String(id));
+        if (item) { item.estado = 'aceptada'; guardarAmigosLocal(lista); }
+        if (window.KIXUZ_AMIGOS?.aceptarSolicitud) {
+          try { await window.KIXUZ_AMIGOS.aceptarSolicitud(id); } catch {}
+        }
       }
 
       function obtenerPersonajes() {
@@ -396,7 +470,7 @@
         }
         window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
         aplicarFondo(clean);
-        actualizarPerfil(clean);
+        actualizarPerfil(clean, normH(clean.handle) !== normH(activoMenuActual?.handle));
       }
 
       function aplicarFondo(personaje) {
@@ -428,6 +502,15 @@
                 <div class="kixuz-modal-field"><label>Género</label><input type="text" id="fGenero" value="${esc(personaje.genero || '')}"></div>
                 <div class="kixuz-modal-field"><label>Edad</label><input type="text" id="fEdad" value="${esc(personaje.edadAparente || personaje.edadReal || '')}"></div>
                 <div class="kixuz-modal-field"><label>Familia / Clan</label><input type="text" id="fClan" value="${esc(personaje.clan || '')}"></div>
+                <div class="kixuz-modal-field"><label>Relación / Estado sentimental</label>
+                  <select id="fSentTipo">
+                    <option value="" ${!personaje.estadoSentimentalTipo ? 'selected' : ''}>Sin relación de pareja</option>
+                    <option value="Casado/a con" ${personaje.estadoSentimentalTipo === 'Casado/a con' ? 'selected' : ''}>Casado/a con</option>
+                    <option value="En pareja con" ${personaje.estadoSentimentalTipo === 'En pareja con' ? 'selected' : ''}>En pareja con</option>
+                    <option value="Comprometido/a con" ${personaje.estadoSentimentalTipo === 'Comprometido/a con' ? 'selected' : ''}>Comprometido/a con</option>
+                  </select>
+                </div>
+                <div class="kixuz-modal-field"><label>@Usuario de relación</label><input type="text" id="fSentHandle" value="${esc(personaje.estadoSentimentalHandle || '')}" placeholder="@pareja"></div>
                 <div class="kixuz-modal-field full"><label>Universo(s) (separados por coma)</label><input type="text" id="fUniversos" value="${esc((personaje.universos || []).join(', '))}"></div>
                 <div class="kixuz-modal-field full"><label>Biografía</label><textarea id="fBio" rows="3">${esc(personaje.bio || '')}</textarea></div>
               </div>
@@ -441,6 +524,8 @@
         document.getElementById('closeModalFicha').addEventListener('click', () => backdrop.remove());
         document.getElementById('formEditarFicha').addEventListener('submit', async e => {
           e.preventDefault();
+          const sentTipo = document.getElementById('fSentTipo').value;
+          const sentHandle = normH(document.getElementById('fSentHandle').value);
           await guardarPersonajeActualizado({
             ...personaje,
             nombre: document.getElementById('fNombre').value.trim() || personaje.nombre,
@@ -448,6 +533,8 @@
             genero: document.getElementById('fGenero').value.trim(),
             edadAparente: document.getElementById('fEdad').value.trim(),
             clan: document.getElementById('fClan').value.trim(),
+            estadoSentimentalTipo: sentTipo,
+            estadoSentimentalHandle: sentTipo ? sentHandle : '',
             universos: document.getElementById('fUniversos').value.split(',').map(u => u.trim()).filter(Boolean).map(u => u.startsWith('#') ? u : '#' + u.replace(/^#+/, '')),
             bio: document.getElementById('fBio').value.trim()
           });
@@ -472,7 +559,7 @@
               <button type="button" class="kixuz-edit-btn" style="flex:0;min-width:auto;" id="closeModalImgs">Cerrar</button>
             </div>
             <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;">
-              <div class="kixuz-modal-field"><label>Foto de perfil</label><input type="file" id="upAvatarFile" accept="image/*"></div>
+              <div class="kixuz-modal-field"><label>Foto de perfil (1:1)</label><input type="file" id="upAvatarFile" accept="image/*"></div>
               <div class="kixuz-modal-field"><label>Banner del perfil</label><input type="file" id="upBannerFile" accept="image/*"></div>
               <div class="kixuz-modal-field"><label>Fondo de la página</label><input type="file" id="upFondoFile" accept="image/*"></div>
               <div style="display:flex;justify-content:flex-end;gap:8px;">
@@ -485,20 +572,80 @@
         document.getElementById('closeModalImgs').addEventListener('click', () => backdrop.remove());
         document.getElementById('upAvatarFile').addEventListener('change', async e => {
           const f = e.target.files?.[0];
-          if (f) tempAvatar = await comprimirImagen(f, 320, 0.8);
+          if (f) tempAvatar = await comprimirImagen(f, 500, 0.82);
         });
         document.getElementById('upBannerFile').addEventListener('change', async e => {
           const f = e.target.files?.[0];
-          if (f) tempBanner = await comprimirImagen(f, 900, 0.72);
+          if (f) tempBanner = await comprimirImagen(f, 1200, 0.78);
         });
         document.getElementById('upFondoFile').addEventListener('change', async e => {
           const f = e.target.files?.[0];
-          if (f) tempFondo = await comprimirImagen(f, 1100, 0.72);
+          if (f) tempFondo = await comprimirImagen(f, 1600, 0.75);
         });
         document.getElementById('saveModalImgsBtn').addEventListener('click', async () => {
           await guardarPersonajeActualizado({ ...personaje, avatar: tempAvatar, banner: tempBanner, fondoImagen: tempFondo });
           backdrop.remove();
         });
+      }
+
+      function obtenerRelacionEnlazada(personaje) {
+        if (personaje.estadoSentimentalTipo && personaje.estadoSentimentalHandle) {
+          return { texto: personaje.estadoSentimentalTipo, handle: normH(personaje.estadoSentimentalHandle) };
+        }
+        try {
+          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+          const match = (fam.familia || []).find(m =>
+            normH(m?.duenoHandle) === normH(personaje.handle) &&
+            /pareja|espos|marido|casad|compromet/i.test(String(m?.relacion || ''))
+          );
+          if (match && match.handle) return { texto: match.relacion, handle: normH(match.handle) };
+        } catch {}
+        return null;
+      }
+
+      function obtenerEnlacesFamiliaClan(handle) {
+        const target = normH(handle);
+        const items = [];
+        try {
+          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+          (fam.familia || []).forEach(m => {
+            if (normH(m?.duenoHandle) === target && m?.handle) {
+              items.push({
+                nombre: m.nombre || m.handle, handle: normH(m.handle),
+                etiqueta: `Familia · ${m.relacion || 'Familiar'}`,
+                url: `perfil.html?char=${encodeURIComponent(normH(m.handle))}`
+              });
+            }
+          });
+          (fam.clan || []).forEach(m => {
+            if (normH(m?.duenoHandle) === target && m?.handle) {
+              items.push({
+                nombre: m.nombre || m.handle, handle: normH(m.handle),
+                etiqueta: `${m.clanNombre || 'Clan'} · ${m.rango || 'Miembro'}`,
+                url: `perfil.html?char=${encodeURIComponent(normH(m.handle))}`
+              });
+            }
+          });
+        } catch {}
+        return items;
+      }
+
+      function obtenerUniversosEnlazados(personaje) {
+        const set = new Set();
+        (personaje.universos || []).forEach(u => {
+          if (u) set.add(String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, ''));
+        });
+        if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
+          try {
+            const h = normH(personaje.handle);
+            window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => {
+              if (u?.tag && Array.isArray(u.miembros) && u.miembros.some(m => normH(m) === h)) {
+                set.add(u.tag);
+              }
+            });
+          } catch {}
+        }
+        return Array.from(set);
       }
 
       function getAutorActual(modo) {
@@ -530,7 +677,6 @@
             </div>
           `;
         }
-
         return `<div class="post-author-chain">${autorLink}</div>`;
       }
 
@@ -671,7 +817,68 @@
         });
       }
 
-      function actualizarPerfil(personaje) {
+      function renderAmigosDesplegable(personaje, esVistaSolo) {
+        const listEl = document.getElementById('perfilAmigosLista');
+        if (!listEl) return;
+
+        const targetHandle = normH(personaje.handle);
+        const todas = leerAmigosLocal();
+        const amigos = [];
+        const recibidas = [];
+
+        todas.forEach(a => {
+          if (!a) return;
+          if (a.estado === 'aceptada') {
+            if (normH(a.deHandle) === targetHandle) amigos.push({ nombre: a.paraNombre || a.paraHandle, handle: normH(a.paraHandle) });
+            else if (normH(a.paraHandle) === targetHandle) amigos.push({ nombre: a.deNombre || a.deHandle, handle: normH(a.deHandle) });
+          } else if (a.estado === 'pendiente' && normH(a.paraHandle) === targetHandle) {
+            recibidas.push(a);
+          }
+        });
+
+        let html = '';
+        if (!esVistaSolo && recibidas.length) {
+          html += recibidas.map(r => `
+            <div class="friend-row-item" style="border-color:var(--acento);">
+              <div>
+                <strong>${esc(r.deNombre || r.deHandle)}</strong> <span style="opacity:0.75;">${esc(r.deHandle)}</span>
+                <div style="font-size:10.5px;color:var(--acento);">Solicitud de amistad</div>
+              </div>
+              <div style="display:flex;gap:4px;">
+                <button type="button" class="comment-btn" style="background:var(--acento);color:#150A24;padding:4px 8px;" data-acc-friend="${esc(r.id)}">Aceptar</button>
+                <button type="button" class="comment-btn" style="padding:4px 8px;" data-rej-friend="${esc(r.id)}">Rechazar</button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        if (amigos.length) {
+          html += amigos.map(a => `
+            <div class="friend-row-item">
+              <a href="perfil.html?char=${encodeURIComponent(a.handle)}">${esc(a.nombre)} <span style="opacity:0.75;">(${esc(a.handle)})</span></a>
+            </div>
+          `).join('');
+        } else if (!recibidas.length) {
+          html += `<div style="font-size:12px;opacity:0.7;margin-top:6px;">Sin amigos enlazados todavía.</div>`;
+        }
+
+        listEl.innerHTML = html;
+
+        listEl.querySelectorAll('[data-acc-friend]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            await aceptarSolicitudAmistad(btn.dataset.accFriend);
+            actualizarPerfil(personaje, esVistaSolo);
+          });
+        });
+        listEl.querySelectorAll('[data-rej-friend]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            guardarAmigosLocal(leerAmigosLocal().filter(x => String(x.id) !== String(btn.dataset.rejFriend)));
+            actualizarPerfil(personaje, esVistaSolo);
+          });
+        });
+      }
+
+      function actualizarPerfil(personaje, esVistaSolo = false) {
         const sidebar = document.getElementById('characterSidebar');
         if (!sidebar) return;
 
@@ -696,12 +903,49 @@
             Array.from(unis).map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
         }
 
-        const universosHTML = (personaje.universos || []).map(u => {
+        const relacion = obtenerRelacionEnlazada(personaje);
+        const relacionTagHtml = relacion
+          ? `<a href="perfil.html?char=${encodeURIComponent(relacion.handle)}" class="info-tag">${SVG_ICON.rel} ${esc(relacion.texto)} ${esc(relacion.handle)}</a>`
+          : '';
+
+        const universosEnlazados = obtenerUniversosEnlazados(personaje);
+        const universosHTML = universosEnlazados.map(u => {
           const slug = String(u).replace(/^#/, '');
           return `<a href="universo.html?u=${encodeURIComponent(slug)}" class="info-tag">${SVG_ICON.uni} ${esc(u)}</a>`;
         }).join('');
 
-        const clanHTML = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(personaje.clan || 'Familia / Clan')}</a>`;
+        const enlacesFamClan = obtenerEnlacesFamiliaClan(personaje.handle);
+        const clanTagText = personaje.clan || (enlacesFamClan.length ? `${enlacesFamClan.length} vínculos` : 'Familia / Clan');
+        const clanHTML = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(clanTagText)}</a>`;
+
+        let botonAmistadHtml = '';
+        if (esVistaSolo && activoMenuActual && !activoMenuActual.esPlaceholder) {
+          const relAm = obtenerEstadoAmistadLocal(activoMenuActual.handle, personaje.handle);
+          if (relAm.estado === 'ninguno') {
+            botonAmistadHtml = `<div class="kixuz-profile-edit-bar"><button type="button" class="kixuz-edit-btn accept" id="btnSolicitarAmistad">${SVG_ICON.users} Solicitar amigo</button></div>`;
+          } else if (relAm.estado === 'enviada') {
+            botonAmistadHtml = `<div class="kixuz-profile-edit-bar"><button type="button" class="kixuz-edit-btn" disabled>Solicitud de amistad enviada</button></div>`;
+          } else if (relAm.estado === 'recibida') {
+            botonAmistadHtml = `<div class="kixuz-profile-edit-bar"><button type="button" class="kixuz-edit-btn accept" id="btnAceptarAmistadPerfil">Aceptar solicitud de amistad</button></div>`;
+          } else if (relAm.estado === 'amigo') {
+            botonAmistadHtml = `<div class="kixuz-profile-edit-bar"><span class="info-tag">Amigos</span></div>`;
+          }
+        }
+
+        const vinculosDesplegableHtml = `
+          <details open>
+            <summary>Relaciones, Universos, Familia & Clan</summary>
+            <div style="margin-top:8px;">
+              ${relacion ? `<a href="perfil.html?char=${encodeURIComponent(relacion.handle)}" class="link-row-item"><span><strong>${esc(relacion.texto)}</strong></span><span style="color:var(--acento);font-weight:700;">${esc(relacion.handle)}</span></a>` : ''}
+              ${universosEnlazados.map(u => `<a href="universo.html?u=${encodeURIComponent(String(u).replace(/^#/, ''))}" class="link-row-item"><span><strong>Universo</strong></span><span style="color:var(--acento);font-weight:700;">${esc(u)}</span></a>`).join('')}
+              ${enlacesFamClan.map(l => `<a href="${esc(l.url)}" class="link-row-item"><span><strong>${esc(l.nombre)}</strong></span><span style="color:var(--acento);font-weight:700;">${esc(l.etiqueta)}</span></a>`).join('')}
+              <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                <a href="universo.html" class="info-tag">Ver Universos</a>
+                <a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">Ver Familia / Clan</a>
+              </div>
+            </div>
+          </details>
+        `;
 
         const bannerStyle = personaje.banner ? `style="background-image:url('${personaje.banner}');"` : '';
         const avatarStyle = personaje.avatar ? `style="background-image:url('${personaje.avatar}');"` : '';
@@ -722,8 +966,9 @@
             </div>
             <h1>${esc(personaje.nombre)}</h1>
             <div class="profile-username">${esc(personaje.handle)}</div>
-            <div class="tags-container">${universosHTML}${clanHTML}</div>
+            <div class="tags-container">${relacionTagHtml}${universosHTML}${clanHTML}</div>
             ${botonesEdicionHtml}
+            ${botonAmistadHtml}
           </div>
           <details open>
             <summary>Datos Básicos</summary>
@@ -737,11 +982,31 @@
             <summary>Biografía</summary>
             <p style="font-size:13px;margin-top:8px;">${esc(personaje.bio || 'Sin descripción todavía.')}</p>
           </details>
+          ${vinculosDesplegableHtml}
+          <details open>
+            <summary>${SVG_ICON.users} Amigos</summary>
+            <div id="perfilAmigosLista"></div>
+          </details>
         `;
 
         document.getElementById('btnEditarFicha')?.addEventListener('click', () => abrirModalEditarFicha(personaje));
         document.getElementById('btnEditarImagenes')?.addEventListener('click', () => abrirModalEditarImagenes(personaje));
 
+        if (esVistaSolo) {
+          document.getElementById('btnSolicitarAmistad')?.addEventListener('click', async () => {
+            await enviarSolicitudAmistad(activoMenuActual, personaje);
+            actualizarPerfil(personaje, esVistaSolo);
+          });
+          document.getElementById('btnAceptarAmistadPerfil')?.addEventListener('click', async () => {
+            const rel = obtenerEstadoAmistadLocal(activoMenuActual.handle, personaje.handle);
+            if (rel?.solicitud?.id) {
+              await aceptarSolicitudAmistad(rel.solicitud.id);
+              actualizarPerfil(personaje, esVistaSolo);
+            }
+          });
+        }
+
+        renderAmigosDesplegable(personaje, esVistaSolo);
         renderMuroPersonaje(personaje);
       }
 
@@ -789,6 +1054,7 @@
         const personajeVista = await obtenerPersonajeVista(lista, activoMenu);
         activoMenuActual = activoMenu;
         personajeVistaActual = personajeVista;
+        const esVistaSolo = normH(personajeVista.handle) !== normH(activoMenu.handle);
         guardarActivoMenu(activoMenu);
         aplicarFondo(personajeVista);
 
@@ -822,7 +1088,7 @@
           };
         });
 
-        actualizarPerfil(personajeVista);
+        actualizarPerfil(personajeVista, esVistaSolo);
       }
 
       window.addEventListener('kixuz:personajes-actualizados', sincronizarSelectores);
