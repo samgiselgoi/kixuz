@@ -144,6 +144,29 @@
         html[data-theme="light"] select { background: #fff; color: #150A24; }
         textarea { min-height: 82px; resize: vertical; margin-bottom: 10px; }
 
+        .search-picker-wrap { position: relative; flex: 1; min-width: 240px; max-width: 380px; }
+        .search-picker-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+            background: var(--bg-principal); border: 1px solid var(--acento);
+            border-radius: 12px; max-height: 230px; overflow-y: auto;
+            z-index: 999; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+            display: none;
+        }
+        .search-picker-dropdown.open { display: block; }
+        .picker-option {
+            display: flex; align-items: center; gap: 9px; padding: 8px 11px;
+            cursor: pointer; border-bottom: 1px solid rgba(108, 60, 224, 0.22); font-size: 12.5px;
+        }
+        .picker-option:last-child { border-bottom: none; }
+        .picker-option:hover { background: rgba(45, 212, 196, 0.16); }
+        .picker-mini-av {
+            width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--acento);
+            background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 11px; color: #150A24; flex-shrink: 0;
+        }
+
         .mode-switch-group {
             display: inline-flex; align-items: center; background: rgba(0, 0, 0, 0.35);
             border: 1px solid var(--borde); border-radius: 999px; padding: 2px; gap: 2px;
@@ -245,7 +268,7 @@
         </section>
 
         <section id="tabPanelMuro">
-            <div class="panel" style="margin-bottom:16px;">
+            <div class="panel" id="uniComposerPanel" style="margin-bottom:16px;">
                 <div class="row-between" style="margin-bottom:8px;">
                     <h2 style="font-size:16.5px;">Publicar en el grupo</h2>
                     <div class="mode-switch-group" id="uniPostModeSwitch" data-mode="IC">
@@ -258,6 +281,10 @@
                     <span id="activeUniBadge" style="font-size:12.5px;font-weight:700;color:var(--acento);"></span>
                     <button type="button" class="btn-accent" id="uniPublishBtn">Publicar</button>
                 </div>
+            </div>
+            <div class="panel" id="uniNotMemberBanner" style="display:none;margin-bottom:16px;text-align:center;">
+                <p style="font-size:13.5px;margin-bottom:10px;">Debés estar dentro de este universo para publicar en su muro.</p>
+                <button type="button" class="btn-accent" id="btnJoinFromBanner">Unirme a este Universo</button>
             </div>
             <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
         </section>
@@ -274,7 +301,10 @@
         <section class="panel" id="tabPanelInfo" style="display:none;">
             <h2 style="font-size:17px;">Agregar personas a este Universo</h2>
             <form id="addUniMemberForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-                <input type="text" id="newUniMemberInput" placeholder="Nombre o @usuario (ej. @kaelen)" style="max-width:300px;" required>
+                <div class="search-picker-wrap">
+                    <input type="text" id="newUniMemberInput" placeholder="Buscar personaje por nombre o @usuario..." autocomplete="off" required>
+                    <div class="search-picker-dropdown" id="uniMemberSearchDropdown"></div>
+                </div>
                 <button type="submit" class="btn-accent">Agregar persona</button>
             </form>
 
@@ -293,15 +323,15 @@
                 <button type="button" class="btn-ghost" id="closeUniMediaModal">Cerrar</button>
             </div>
             <div class="modal-field">
-                <label for="uniAvatarFile">Foto de perfil (1:1 — ej. 500×500 px)</label>
+                <label for="uniAvatarFile">Foto de perfil (1:1 — 500×500 px)</label>
                 <input type="file" id="uniAvatarFile" accept="image/*">
             </div>
             <div class="modal-field">
-                <label for="uniBannerFile">Banner (panorámico — ej. 1200×360 px o 1500×500 px)</label>
+                <label for="uniBannerFile">Banner (1200×360 px)</label>
                 <input type="file" id="uniBannerFile" accept="image/*">
             </div>
             <div class="modal-field">
-                <label for="uniBgFile">Fondo de pantalla (horizontal — ej. 1920×1080 px)</label>
+                <label for="uniBgFile">Fondo de pantalla (1920×1080 px)</label>
                 <input type="file" id="uniBgFile" accept="image/*">
             </div>
             <div style="display:flex;justify-content:flex-end;margin-top:10px;">
@@ -322,6 +352,79 @@
                 const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
                 return s ? '@' + s : '';
             };
+
+            let directorioPersonajes = [];
+            let handleSeleccionadoBuscador = '';
+
+            async function cargarDirectorioPersonajes() {
+                const mapa = new Map();
+                try {
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs)) subs.forEach(p => {
+                        const h = normH(p?.handle);
+                        if (h) mapa.set(h, { nombre: p.nombre || h.slice(1), handle: h, avatar: p.avatar || '' });
+                    });
+                } catch {}
+                if (window.KIXUZ_DB?.listarPersonajesPublicos) {
+                    try {
+                        const pubs = await window.KIXUZ_DB.listarPersonajesPublicos();
+                        pubs.forEach(p => {
+                            const h = normH(p?.handle);
+                            if (h) mapa.set(h, { ...(mapa.get(h) || {}), nombre: p.nombre || h.slice(1), handle: h, avatar: p.avatar || '' });
+                        });
+                    } catch {}
+                }
+                directorioPersonajes = Array.from(mapa.values());
+            }
+
+            function initBuscadorPersonasUniverso() {
+                const inp = document.getElementById('newUniMemberInput');
+                const drop = document.getElementById('uniMemberSearchDropdown');
+                if (!inp || !drop) return;
+
+                const renderOpciones = () => {
+                    handleSeleccionadoBuscador = '';
+                    const q = (inp.value || '').trim().toLowerCase();
+                    const filtrados = directorioPersonajes.filter(p =>
+                        !q || p.nombre.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q)
+                    ).slice(0, 12);
+
+                    if (!filtrados.length) {
+                        drop.innerHTML = `<div style="padding:9px 12px;font-size:12px;opacity:0.7;">Sin coincidencias. Escribí el @usuario para agregarlo.</div>`;
+                    } else {
+                        drop.innerHTML = filtrados.map(p => {
+                            const avStyle = p.avatar ? `style="background-image:url('${esc(p.avatar)}');"` : '';
+                            const ini = p.avatar ? '' : p.nombre.charAt(0).toUpperCase();
+                            return `
+                                <div class="picker-option" data-pick-handle="${esc(p.handle)}" data-pick-nombre="${esc(p.nombre)}">
+                                    <div class="picker-mini-av" ${avStyle}>${esc(ini)}</div>
+                                    <div>
+                                        <strong style="color:var(--acento);">${esc(p.nombre)}</strong>
+                                        <div style="font-size:11px;opacity:0.78;">${esc(p.handle)}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        drop.querySelectorAll('.picker-option').forEach(opt => {
+                            opt.addEventListener('click', () => {
+                                handleSeleccionadoBuscador = opt.dataset.pickHandle;
+                                inp.value = opt.dataset.pickHandle;
+                                drop.classList.remove('open');
+                            });
+                        });
+                    }
+                    drop.classList.add('open');
+                };
+
+                inp.addEventListener('focus', renderOpciones);
+                inp.addEventListener('input', renderOpciones);
+                document.addEventListener('click', ev => {
+                    if (!inp.contains(ev.target) && !drop.contains(ev.target)) {
+                        drop.classList.remove('open');
+                    }
+                });
+            }
 
             function comprimirImagen(file, maxAncho, calidad) {
                 return new Promise((resolve, reject) => {
@@ -395,12 +498,16 @@
                 const groupShell = document.getElementById('groupCardSection');
                 const badge = document.getElementById('activeUniBadge');
                 const joinBtn = document.getElementById('btnJoinToggle');
+                const composerPanel = document.getElementById('uniComposerPanel');
+                const notMemberBanner = document.getElementById('uniNotMemberBanner');
                 const actor = getActorActual();
 
                 if (!uni) {
                     aplicarFondoUniverso(null);
                     groupShell.innerHTML = `<div style="padding:20px;opacity:0.78;font-size:13.5px;">Todavía no creaste ningún grupo o universo. Tocá <strong>+ Crear Universo</strong> para crear uno.</div>`;
                     if (badge) badge.textContent = '';
+                    if (composerPanel) composerPanel.style.display = 'none';
+                    if (notMemberBanner) notMemberBanner.style.display = 'none';
                     document.getElementById('uniPostsFeed').innerHTML = '';
                     return;
                 }
@@ -410,6 +517,10 @@
 
                 const esMiembro = Array.isArray(uni.miembros) && uni.miembros.some(m => (normH(m) || String(m).toLowerCase()) === actor.handle);
                 if (joinBtn) joinBtn.textContent = esMiembro ? 'Salir del grupo' : 'Unirse al grupo';
+
+                // Solo si estoy dentro de ese universo puedo postear en él
+                if (composerPanel) composerPanel.style.display = esMiembro ? 'block' : 'none';
+                if (notMemberBanner) notMemberBanner.style.display = esMiembro ? 'none' : 'block';
 
                 const bannerStyle = uni.banner ? `style="background-image:url('${uni.banner}');"` : '';
                 const avatarStyle = uni.avatar ? `style="background-image:url('${uni.avatar}');"` : '';
@@ -428,8 +539,23 @@
                             </div>
                         </div>
                         ${uni.descripcion ? `<p style="margin-top:12px;font-size:13.5px;opacity:0.88;">${esc(uni.descripcion)}</p>` : ''}
+                        <div class="tabs-row">
+                            <button type="button" class="tab-btn active" data-utab="muro">Muro</button>
+                            <button type="button" class="tab-btn" data-utab="mapas">Mapas e Imágenes</button>
+                            <button type="button" class="tab-btn" data-utab="info">Miembros y Reglas</button>
+                        </div>
                     </div>
                 `;
+
+                groupShell.querySelectorAll('[data-utab]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tab = btn.dataset.utab;
+                        groupShell.querySelectorAll('[data-utab]').forEach(b => b.classList.toggle('active', b === btn));
+                        document.getElementById('tabPanelMuro').style.display = tab === 'muro' ? 'block' : 'none';
+                        document.getElementById('tabPanelMapas').style.display = tab === 'mapas' ? 'block' : 'none';
+                        document.getElementById('tabPanelInfo').style.display = tab === 'info' ? 'block' : 'none';
+                    });
+                });
 
                 if (badge) badge.textContent = `Publicando como ${actor.nombre} (${actor.handle}) en ${uni.nombre}`;
 
@@ -462,10 +588,12 @@
                                 <p style="white-space:pre-line;font-size:14px;">${esc(p.contenido || p.text || '')}</p>
                                 <div style="display:flex;flex-direction:column;gap:5px;">
                                     ${resps.map(r => `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;"><strong>${esc(r.autorNombre || r.autorHandle || 'Rol')}:</strong> ${esc(r.texto)}</div>`).join('')}
-                                    <form class="uni-comment-form" data-cid="${esc(p.id)}" style="display:flex;gap:6px;margin-top:4px;">
-                                        <input type="text" placeholder="Responder..." required style="padding:7px 10px;font-size:12.5px;">
-                                        <button type="submit" class="action-btn">Responder</button>
-                                    </form>
+                                    ${esMiembro ? `
+                                        <form class="uni-comment-form" data-cid="${esc(p.id)}" style="display:flex;gap:6px;margin-top:4px;">
+                                            <input type="text" placeholder="Responder..." required style="padding:7px 10px;font-size:12.5px;">
+                                            <button type="submit" class="action-btn">Responder</button>
+                                        </form>
+                                    ` : ''}
                                 </div>
                             </article>
                         `;
@@ -473,13 +601,14 @@
                     : `<div class="panel" style="opacity:0.75;font-size:13.5px;">No hay publicaciones en este grupo todavía.</div>`;
 
                 feedEl.querySelectorAll('.uni-comment-form').forEach(form => {
-                    form.addEventListener('submit', e => {
+                    form.addEventListener('submit', async e => {
                         e.preventDefault();
                         const postId = form.dataset.cid;
                         const inp = form.querySelector('input');
                         const txt = (inp.value || '').trim();
                         if (!txt) return;
                         const actual = getActorActual();
+                        let postMod = null;
                         ['kixuz_posts', 'kixuz_posts_v1'].forEach(key => {
                             try {
                                 const arr = JSON.parse(localStorage.getItem(key) || '[]');
@@ -489,12 +618,17 @@
                                     if (String(item.id) === String(postId)) {
                                         item.respuestas = Array.isArray(item.respuestas) ? item.respuestas : [];
                                         item.respuestas.push({ autorNombre: actual.nombre, autorHandle: actual.handle, texto: txt });
+                                        item.actualizadoEn = Date.now();
+                                        postMod = item;
                                         mod = true;
                                     }
                                 });
                                 if (mod) localStorage.setItem(key, JSON.stringify(arr));
                             } catch {}
                         });
+                        if (postMod && window.KIXUZ_DB?.guardarPostNube) {
+                            await window.KIXUZ_DB.guardarPostNube(postMod);
+                        }
                         inp.value = '';
                         renderTodo();
                     });
@@ -533,12 +667,11 @@
             }
 
             document.getElementById('btnAddPersonQuick')?.addEventListener('click', () => {
-                const uni = getUniversoSeleccionado();
-                if (!uni || !window.KIXUZ_UNIVERSOS) return;
-                const persona = prompt(`Agregar persona a ${uni.tag} (escribe su @usuario o nombre):`);
-                if (!persona || !persona.trim()) return;
-                window.KIXUZ_UNIVERSOS.agregarMiembroAUniverso(uni.tag, persona.trim());
-                renderTodo();
+                const infoTabBtn = document.querySelector('[data-utab="info"]');
+                infoTabBtn?.click();
+                const inp = document.getElementById('newUniMemberInput');
+                inp?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                inp?.focus();
             });
 
             let tempUniAvatar = '';
@@ -587,10 +720,23 @@
                 e.preventDefault();
                 const uni = getUniversoSeleccionado();
                 const inp = document.getElementById('newUniMemberInput');
-                const val = (inp?.value || '').trim();
+                const val = (handleSeleccionadoBuscador || inp?.value || '').trim();
                 if (!uni || !val || !window.KIXUZ_UNIVERSOS) return;
                 window.KIXUZ_UNIVERSOS.agregarMiembroAUniverso(uni.tag, val);
+                const actor = getActorActual();
+                const destH = normH(val);
+                if (destH && destH !== actor.handle) {
+                    window.KIXUZ_NOTIF?.registrar?.({
+                        destinoHandle: destH,
+                        actorNombre: actor.nombre,
+                        actorHandle: actor.handle,
+                        texto: `te agregó al universo ${uni.nombre} (${uni.tag}).`,
+                        enlace: `universo.html?u=${encodeURIComponent(uni.tag.slice(1))}`,
+                        tipo: 'universo'
+                    });
+                }
                 inp.value = '';
+                handleSeleccionadoBuscador = '';
                 renderTodo();
             });
 
@@ -628,7 +774,7 @@
                 }
             });
 
-            document.getElementById('btnJoinToggle')?.addEventListener('click', () => {
+            const toggleMembership = () => {
                 const uni = getUniversoSeleccionado();
                 if (!uni || !window.KIXUZ_UNIVERSOS) return;
                 const actor = getActorActual();
@@ -636,14 +782,20 @@
                 if (esMiembro) window.KIXUZ_UNIVERSOS.quitarMiembroDeUniverso(uni.tag, actor.handle);
                 else window.KIXUZ_UNIVERSOS.agregarMiembroAUniverso(uni.tag, actor.handle);
                 renderTodo();
-            });
+            };
 
-            document.getElementById('uniPublishBtn')?.addEventListener('click', () => {
+            document.getElementById('btnJoinToggle')?.addEventListener('click', toggleMembership);
+            document.getElementById('btnJoinFromBanner')?.addEventListener('click', toggleMembership);
+
+            document.getElementById('uniPublishBtn')?.addEventListener('click', async () => {
                 const uni = getUniversoSeleccionado();
                 const inp = document.getElementById('uniPostInput');
                 const txt = (inp?.value || '').trim();
                 if (!uni || !txt) return;
                 const actor = getActorActual();
+                const esMiembro = Array.isArray(uni.miembros) && uni.miembros.some(m => (normH(m) || String(m).toLowerCase()) === actor.handle);
+                if (!esMiembro) return;
+
                 const modo = document.getElementById('uniPostModeSwitch')?.dataset.mode === 'OC' ? 'OC' : 'IC';
                 const nuevo = {
                     id: 'post_' + Date.now(),
@@ -655,6 +807,7 @@
                     alcanceTipo: 'universo',
                     alcanceValor: uni.tag,
                     createdAtMs: Date.now(),
+                    actualizadoEn: Date.now(),
                     tiempo: 'Ahora mismo',
                     kixiz: 0,
                     respuestas: []
@@ -663,6 +816,9 @@
                 try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
                 posts.unshift(nuevo);
                 localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+                if (window.KIXUZ_DB?.guardarPostNube) {
+                    await window.KIXUZ_DB.guardarPostNube(nuevo);
+                }
                 inp.value = '';
                 renderTodo();
             });
@@ -687,20 +843,20 @@
                 reader.readAsDataURL(file);
             });
 
-            document.querySelectorAll('[data-utab]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tab = btn.dataset.utab;
-                    document.querySelectorAll('[data-utab]').forEach(b => b.classList.toggle('active', b === btn));
-                    document.getElementById('tabPanelMuro').style.display = tab === 'muro' ? 'block' : 'none';
-                    document.getElementById('tabPanelMapas').style.display = tab === 'mapas' ? 'block' : 'none';
-                    document.getElementById('tabPanelInfo').style.display = tab === 'info' ? 'block' : 'none';
-                });
-            });
+            async function init() {
+                await cargarDirectorioPersonajes();
+                initBuscadorPersonasUniverso();
+                renderTodo();
+            }
 
             document.getElementById('universeSelect')?.addEventListener('change', renderTodo);
-            window.addEventListener('DOMContentLoaded', renderTodo);
-            window.addEventListener('kixuz:personajes-actualizados', renderTodo);
+            window.addEventListener('DOMContentLoaded', init);
+            window.addEventListener('kixuz:personajes-actualizados', async () => {
+                await cargarDirectorioPersonajes();
+                renderTodo();
+            });
             window.addEventListener('kixuz:universos-actualizados', renderTodo);
+            window.addEventListener('kixuz:posts-actualizados', renderTodo);
         })();
     </script>
 

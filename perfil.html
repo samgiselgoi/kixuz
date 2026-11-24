@@ -1006,7 +1006,7 @@
 
         const selUni = document.getElementById('profilePostUniverse');
         if (selUni) {
-          const unis = new Set(['#Kixuz']);
+          const unis = new Set();
           (personaje.universos || []).forEach(u => { if (u) unis.add(u.startsWith('#') ? u : '#' + u.replace(/^#+/, '')); });
           if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
             try {
@@ -1023,11 +1023,15 @@
           ? `<span class="inline-partner-rel">· ${esc(pareja.texto)} <a href="perfil.html?char=${encodeURIComponent(pareja.handle)}">${esc(pareja.handle)}</a></span>`
           : '';
 
-        // Enlaces solo a los Clan / Familia a los que pertenece este personaje y sus Universos
+        // Enlaces separados: Familia va a #familia y Clan va a #clan
+        const familiaLinkHtml = personaje.familiaNombre
+          ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} Familia: ${esc(personaje.familiaNombre)}</a>`
+          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} Familia</a>`;
+
         const pertenencias = obtenerPertenenciasClanFamilia(personaje);
         const clanesLinksHtml = pertenencias.length
-          ? pertenencias.map(nom => `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} ${esc(nom)}</a>`).join('')
-          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}" class="info-tag">${SVG_ICON.clan} Familia / Clan</a>`;
+          ? pertenencias.map(nom => `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#clan" class="info-tag">${SVG_ICON.clan} Clan: ${esc(nom)}</a>`).join('')
+          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#clan" class="info-tag">${SVG_ICON.clan} Clanes</a>`;
 
         const universosEnlazados = obtenerUniversosEnlazados(personaje);
         const universosHTML = universosEnlazados.map(u => {
@@ -1073,7 +1077,7 @@
               <span class="profile-username">${esc(personaje.handle)}</span>
               ${parejaInlineHtml}
             </div>
-            <div class="tags-container">${clanesLinksHtml}${universosHTML}</div>
+            <div class="tags-container">${familiaLinkHtml}${clanesLinksHtml}${universosHTML}</div>
             ${botonesEdicionHtml}
           </div>
 

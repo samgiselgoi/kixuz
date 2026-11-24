@@ -17,7 +17,7 @@
             if (!Array.isArray(raw)) return [];
             const mapa = new Map();
             raw.forEach(u => {
-                if (!u || !u.tag) return;
+                if (!u || !u.tag || u.esDemo) return;
                 const tag = normTag(u.tag);
                 if (!tag) return;
                 mapa.set(tag.toLowerCase(), {
@@ -56,14 +56,15 @@
             return actual.find(u => normTag(u.tag).toLowerCase() === key) || null;
         }
 
-        const miembrosIniciales = creadorHandle ? [normHandle(creadorHandle) || String(creadorHandle).trim()] : [];
+        const creador = normHandle(creadorHandle) || String(creadorHandle || '').trim();
+        const miembrosIniciales = creador ? [creador] : [];
         const nuevo = {
             id: 'uni_' + Date.now(),
             nombre: String(nombre || tagNorm.slice(1)).trim(),
             tag: tagNorm,
             descripcion: String(descripcion || '').trim(),
             reglas: String(reglas || '').trim(),
-            creadorHandle: normHandle(creadorHandle) || String(creadorHandle || '').trim(),
+            creadorHandle: creador,
             avatar: String(avatar || '').trim(),
             banner: String(banner || '').trim(),
             fondo: String(fondo || '').trim(),
@@ -106,6 +107,14 @@
         return true;
     }
 
+    function eliminarUniverso(tag) {
+        const tagNorm = normTag(tag);
+        if (!tagNorm) return false;
+        const next = leerUniversos().filter(u => u.tag.toLowerCase() !== tagNorm.toLowerCase());
+        guardarUniversos(next);
+        return true;
+    }
+
     function actualizarAparienciaUniverso(tag, { avatar, banner, fondo }) {
         const tagNorm = normTag(tag);
         if (!tagNorm) return false;
@@ -127,6 +136,7 @@
         crearUniversoDirecto,
         agregarMiembroAUniverso,
         quitarMiembroDeUniverso,
+        eliminarUniverso,
         actualizarAparienciaUniverso
     };
 })();
