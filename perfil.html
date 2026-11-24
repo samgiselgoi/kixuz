@@ -752,11 +752,24 @@ img, video, svg {
         return null;
       }
 
-      // Devuelve SOLO los clanes/familias propios a los que pertenece este personaje
+      function obtenerEtiquetaFamilia(personaje) {
+        if (personaje.familiaNombre) return String(personaje.familiaNombre).trim();
+        try {
+          const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+          if (fam.familiaEtiqueta) return String(fam.familiaEtiqueta).trim();
+        } catch {}
+        return 'Mi Familia';
+      }
+
+      // Devuelve SOLO los clanes propios a los que pertenece este personaje
       function obtenerPertenenciasClanFamilia(personaje) {
         const target = normH(personaje.handle);
         const set = new Set();
-        if (personaje.clan) set.add(String(personaje.clan).trim());
+        if (Array.isArray(personaje.clanes)) {
+          personaje.clanes.forEach(c => { if (c) set.add(String(c).trim()); });
+        } else if (personaje.clan) {
+          set.add(String(personaje.clan).trim());
+        }
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           (fam.clan || []).forEach(m => {
@@ -1093,15 +1106,14 @@ img, video, svg {
           ? `<span class="inline-partner-rel">· ${esc(pareja.texto)} <a href="perfil.html?char=${encodeURIComponent(pareja.handle)}">${esc(pareja.handle)}</a></span>`
           : '';
 
-        // Enlaces separados: Familia va a #familia y Clan va a #clan
-        const familiaLinkHtml = personaje.familiaNombre
-          ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} Familia: ${esc(personaje.familiaNombre)}</a>`
-          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} Familia</a>`;
+        // Familia única (ej. Mi Familia) -> #familia; cada Clan -> #clan:NombreClan
+        const nomFamilia = obtenerEtiquetaFamilia(personaje);
+        const familiaLinkHtml = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} ${esc(nomFamilia)}</a>`;
 
         const pertenencias = obtenerPertenenciasClanFamilia(personaje);
-        const clanesLinksHtml = pertenencias.length
-          ? pertenencias.map(nom => `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#clan" class="info-tag">${SVG_ICON.clan} Clan: ${esc(nom)}</a>`).join('')
-          : `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#clan" class="info-tag">${SVG_ICON.clan} Clanes</a>`;
+        const clanesLinksHtml = pertenencias.map(nom =>
+          `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#clan:${encodeURIComponent(nom)}" class="info-tag">${SVG_ICON.clan} ${esc(nom)}</a>`
+        ).join('');
 
         const universosEnlazados = obtenerUniversosEnlazados(personaje);
         const universosHTML = universosEnlazados.map(u => {

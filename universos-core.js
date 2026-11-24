@@ -19,7 +19,7 @@
             raw.forEach(u => {
                 if (!u || !u.tag || u.esDemo) return;
                 const tag = normTag(u.tag);
-                if (!tag) return;
+                if (!tag || /^#sector4$/i.test(tag)) return;
                 mapa.set(tag.toLowerCase(), {
                     ...u,
                     tag,
