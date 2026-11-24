@@ -1,615 +1,502 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Inicio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-principal: #150A24;
-            --bg-secundario: #6C3CE0;
-            --acento: #2DD4C4;
-            --texto: #EDE7E0;
-            --tarjeta: rgba(34, 17, 61, 0.86);
-            --borde: rgba(108, 60, 224, 0.45);
-        }
-        html[data-theme="light"] {
-            --bg-principal: #F4F1FA;
-            --bg-secundario: #6C3CE0;
-            --acento: #0F9D8E;
-            --texto: #150A24;
-            --tarjeta: rgba(255, 255, 255, 0.94);
-            --borde: rgba(108, 60, 224, 0.25);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-principal);
-            color: var(--texto);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            line-height: 1.55;
-        }
-        header {
-            background: rgba(21, 10, 36, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--borde);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        html[data-theme="light"] header { background: rgba(244, 241, 250, 0.92); }
-        .logo { display: inline-flex; align-items: center; text-decoration: none; }
-        .nav-links { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-        .nav-links a {
-            color: var(--texto); text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px;
-            padding: 6px 10px; border-radius: 8px;
-        }
-        .nav-links a:hover, .nav-links a.active { background: rgba(108, 60, 224, 0.25); color: var(--acento); }
-        .user-menu { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .user-menu select {
-            background: rgba(0, 0, 0, 0.35); color: var(--texto);
-            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
-        }
-        html[data-theme="light"] .user-menu select { background: #fff; color: #150A24; }
-        .btn-auth-link {
-            background: var(--acento); color: #150A24 !important;
-            padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px; font-weight: 700; text-decoration: none;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KIXUZ — Inicio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-principal: #150A24;
+      --bg: #150A24;
+      --bg-secundario: #6C3CE0;
+      --card: #1F1135;
+      --card-2: #281644;
+      --border: rgba(108, 60, 224, 0.35);
+      --primary: #6C3CE0;
+      --accent: #2DD4C4;
+      --acento: #2DD4C4;
+      --texto: #EDE7E0;
+      --muted: rgba(237, 231, 224, 0.68);
+    }
+    html[data-theme="light"] {
+      --bg-principal: #F4F1FA;
+      --bg: #F4F1FA;
+      --card: #FFFFFF;
+      --card-2: #EFE9FA;
+      --border: rgba(108, 60, 224, 0.25);
+      --texto: #150A24;
+      --muted: rgba(21, 10, 36, 0.65);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    header {
+      background: rgba(21, 10, 36, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    html[data-theme="light"] header { background: rgba(255, 255, 255, 0.92); }
+    .brand, .logo { display: inline-flex; align-items: center; text-decoration: none; flex-shrink: 0; }
 
-        main {
-            max-width: 760px;
-            margin: 28px auto 90px;
-            padding: 0 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-        .card-box {
-            background: var(--tarjeta);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
-        }
-        h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
+    .feed-container {
+      max-width: 780px;
+      margin: 24px auto 90px;
+      padding: 0 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-        textarea, input[type="text"], select.post-opt {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.32);
-            color: var(--texto);
-            border: 1px solid var(--borde);
-            border-radius: 10px;
-            padding: 9px 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13.5px;
-            outline: none;
-        }
-        html[data-theme="light"] textarea,
-        html[data-theme="light"] input[type="text"],
-        html[data-theme="light"] select.post-opt { background: #fff; color: #150A24; }
-        textarea { min-height: 86px; resize: vertical; margin-bottom: 10px; }
+    .create-post {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .create-post textarea {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      resize: vertical;
+      min-height: 76px;
+    }
+    .create-post-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .create-post-controls select,
+    .create-post-controls input {
+      width: 100%;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+    .create-post-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+    .btn-publish {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--acento);
+      color: #150A24;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
-        .post-options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .post-footer-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    .mode-switch-group {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--texto);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .mode-btn.active.ic { background: var(--acento); color: #150A24; }
+    .mode-btn.active.oc { background: var(--bg-secundario); color: #EDE7E0; }
+    .mode-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .mode-badge.ic { background: rgba(45, 212, 196, 0.18); color: var(--acento); border: 1px solid rgba(45, 212, 196, 0.45); }
+    .mode-badge.oc { background: rgba(108, 60, 224, 0.25); color: #c4b0ff; border: 1px solid rgba(108, 60, 224, 0.55); }
 
-        /* Switch IC / OC */
-        .mode-switch-group {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--borde);
-            border-radius: 999px;
-            padding: 2px;
-            gap: 2px;
-        }
-        .mode-btn {
-            border: none;
-            background: transparent;
-            color: var(--texto);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 11.5px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 999px;
-            cursor: pointer;
-            transition: background 0.18s, color 0.18s;
-        }
-        .mode-btn.active.ic {
-            background: var(--acento);
-            color: #150A24;
-        }
-        .mode-btn.active.oc {
-            background: var(--bg-secundario);
-            color: #EDE7E0;
-        }
-        .mode-badge {
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 999px;
-            letter-spacing: 0.04em;
-        }
-        .mode-badge.ic {
-            background: rgba(45, 212, 196, 0.18);
-            color: var(--acento);
-            border: 1px solid rgba(45, 212, 196, 0.45);
-        }
-        .mode-badge.oc {
-            background: rgba(108, 60, 224, 0.25);
-            color: #c4b0ff;
-            border: 1px solid rgba(108, 60, 224, 0.55);
-        }
+    @keyframes kixFlamePulse {
+      0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 2px rgba(255, 138, 43, 0.45)); }
+      50% { transform: scale(1.13) translateY(-1px); filter: drop-shadow(0 0 7px rgba(255, 102, 51, 0.85)); }
+    }
+    .kix-flame-svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .kix-btn.liked .kix-flame-svg { animation: kixFlamePulse 1.15s ease-in-out infinite; }
 
-        /* Llama SVG animada para Kix / Kixiz */
-        @keyframes kixFlamePulse {
-            0%, 100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 2px rgba(255, 138, 43, 0.45)); }
-            50% { transform: scale(1.13) translateY(-1px); filter: drop-shadow(0 0 7px rgba(255, 102, 51, 0.85)); }
-        }
-        .kix-flame-svg {
-            width: 15px;
-            height: 15px;
-            flex-shrink: 0;
-        }
-        .action-btn.liked .kix-flame-svg {
-            animation: kixFlamePulse 1.15s ease-in-out infinite;
-        }
-
-        .btn-primary {
-            background: var(--acento); color: #150A24; border: none;
-            border-radius: 10px; padding: 9px 18px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13.5px; cursor: pointer;
-        }
-        .post-card {
-            background: var(--tarjeta); border: 1px solid var(--borde);
-            border-radius: 16px; padding: 16px 18px;
-            display: flex; flex-direction: column; gap: 10px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .post-card:hover { border-color: rgba(45, 212, 196, 0.45); }
-        .post-card.pinned-kixuz {
-            border: 1.5px solid var(--acento);
-            background: linear-gradient(135deg, rgba(108, 60, 224, 0.28), rgba(45, 212, 196, 0.12));
-        }
-        .post-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-        .post-tag-link {
-            font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
-            text-decoration: none; background: rgba(108, 60, 224, 0.24);
-            border: 1px solid var(--borde); color: var(--acento);
-        }
-        .post-img {
-            max-width: 100%; max-height: 360px; border-radius: 12px;
-            object-fit: contain; background: rgba(0, 0, 0, 0.22);
-        }
-        .action-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(108, 60, 224, 0.18); border: 1px solid var(--borde);
-            color: var(--texto); border-radius: 8px; padding: 5px 11px;
-            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
-        }
-        .action-btn.liked {
-            border-color: #ff7b39;
-            background: rgba(255, 123, 57, 0.16);
-            color: #ffa672;
-        }
-    </style>
+    .post-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .post-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .post-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-decoration: none;
+      background: rgba(108, 60, 224, 0.22);
+      border: 1px solid var(--border);
+      color: var(--acento);
+    }
+    .kix-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(108, 60, 224, 0.18);
+      border: 1px solid var(--border);
+      color: var(--texto);
+      border-radius: 8px;
+      padding: 5px 11px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .kix-btn.liked { border-color: #ff7b39; background: rgba(255, 123, 57, 0.16); color: #ffa672; }
+    .comment-form { display: flex; gap: 6px; margin-top: 6px; align-items: center; flex-wrap: wrap; }
+    .comment-form input {
+      flex: 1;
+      min-width: 150px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      color: var(--texto);
+      font-size: 12.5px;
+      outline: none;
+    }
+    .comment-btn {
+      background: rgba(108, 60, 224, 0.26);
+      border: 1px solid var(--border);
+      color: var(--texto);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px;">
-        </a>
-        <nav class="nav-links">
-            <a href="index.html" class="active">Inicio</a>
-            <a href="perfil.html">Mi Perfil</a>
-            <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
-            <a href="crear-personaje.html">+ Personaje</a>
-        </nav>
-        <div class="user-menu">
-            <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
+  <header>
+    <a href="index.html" class="brand" aria-label="KIXUZ Inicio">
+      <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;">
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="index.html">Inicio</a>
+      <a href="perfil.html">Mi Personaje</a>
+      <a href="universo.html">Universos</a>
+      <a href="familia.html">Familia / Clan</a>
+    </nav>
+    <div class="user-menu">
+      <select id="activeCharSelect" aria-label="Personaje activo"></select>
+      <a href="registro.html">Entrar</a>
+    </div>
+  </header>
+
+  <main class="feed-container">
+    <section class="create-post" id="homeCreatePost">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+        <div id="homeComposerHint" style="font-size:12px;color:var(--acento);font-weight:700;"></div>
+        <div class="mode-switch-group" id="homePostModeSwitch" data-mode="IC">
+          <button type="button" class="mode-btn ic active" data-hmode="IC">IC</button>
+          <button type="button" class="mode-btn oc" data-hmode="OC">OC</button>
         </div>
-    </header>
+      </div>
+      <textarea id="homeWallInput" placeholder="Escribe una escena o publicación para el inicio..."></textarea>
+      <div class="create-post-controls">
+        <select id="homePostUniverse" aria-label="Universo">
+          <option value="">Sin universo (solo muro/inicio)</option>
+        </select>
+        <select id="homePostScope" aria-label="Visibilidad / Familia o Clan">
+          <option value="global">Público</option>
+          <option value="familia">Familia / Clan</option>
+        </select>
+        <input type="text" id="homePostFamilyTag" placeholder="Vínculo familiar o clan (opcional)">
+      </div>
+      <div class="create-post-footer">
+        <button type="button" class="btn-publish" id="homeWallPublish">Publicar</button>
+      </div>
+    </section>
 
-    <main>
-        <section id="kixuzAnnouncementSlot"></section>
+    <div id="homeWallFeed"></div>
+  </main>
 
-        <section class="card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
-                <h2 style="font-size:17px;">Nueva publicación</h2>
-                <div class="mode-switch-group" role="group" aria-label="Modo de publicación IC u OC">
-                    <button type="button" class="mode-btn ic active" id="postModeIC" data-mode="IC">IC</button>
-                    <button type="button" class="mode-btn oc" id="postModeOC" data-mode="OC">OC</button>
-                </div>
-            </div>
+  <script>
+    (() => {
+      const SVG_FLAME = `
+        <svg class="kix-flame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2.5c2.5 3.4 5.5 5.6 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.6 1.2-4.6 2.8-6.4-.2 1.8.6 3.1 1.7 3.5-.3-2.5.4-5.2 1-7.3z"></path>
+        </svg>
+      `;
 
-            <textarea id="postInput" placeholder="Escribe una escena, diálogo o crónica..."></textarea>
+      const esc = s => String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 
-            <div class="post-options-grid">
-                <select id="postUniverseSelect" class="post-opt" aria-label="Etiqueta de Universo">
-                    <option value="">Sin etiqueta de Universo (solo Inicio)</option>
-                </select>
-                <select id="postScopeSelect" class="post-opt" aria-label="Familia o Clan">
-                    <option value="global">Público (Inicio)</option>
-                    <option value="familia">Familia</option>
-                    <option value="clan">Clan</option>
-                </select>
-                <input type="text" id="postFamilyClanLabel" placeholder="Clan o lazo familiar (opcional)">
-                <input type="file" id="postImgFile" accept="image/*" style="font-size:12px;">
-            </div>
+      const normH = v => {
+        const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+        return s ? '@' + s : '';
+      };
 
-            <div class="post-footer-bar">
-                <select id="feedOrderSelect" class="post-opt" style="width:auto; min-width:155px; padding:7px 10px; font-size:12.5px;">
-                    <option value="recientes">Más recientes</option>
-                    <option value="kixiz">Más Kixiz</option>
-                </select>
-                <button type="button" class="btn-primary" id="publishBtn">Publicar</button>
-            </div>
-        </section>
+      let likedSet = new Set();
 
-        <section id="feedList" style="display:flex; flex-direction:column; gap:14px;"></section>
-    </main>
+      document.querySelectorAll('#homePostModeSwitch .mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const m = btn.dataset.hmode;
+          const sw = document.getElementById('homePostModeSwitch');
+          sw.dataset.mode = m;
+          sw.querySelector('[data-hmode="IC"]').classList.toggle('active', m === 'IC');
+          sw.querySelector('[data-hmode="OC"]').classList.toggle('active', m === 'OC');
+        });
+      });
 
-    <script>
-        const POSTS_STORAGE_KEY = 'kixuz_posts_v1';
-        const SVG_FLAME = `
-            <svg class="kix-flame-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 2.5c2.5 3.4 5.5 5.6 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.6 1.2-4.6 2.8-6.4-.2 1.8.6 3.1 1.7 3.5-.3-2.5.4-5.2 1-7.3z"></path>
-            </svg>
-        `;
+      function getAutorActual(modo) {
+        if (modo === 'OC') {
+          return { nombre: window.KIXUZ_DB?.perfilCuenta?.apodo || 'Usuario OC', handle: '@oc' };
+        }
+        const ac = window.KIXUZ_ACTIVE_CHAR;
+        if (ac && !ac.esPlaceholder && ac.handle) {
+          return { nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
+        }
+        try {
+          const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+          if (act?.handle) return { nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
+        } catch {}
+        return { nombre: 'Invitado', handle: '@invitado' };
+      }
 
-        let postsCache = [];
-        let likedPosts = new Set();
-        let adjuntoDataUrl = '';
-        let postModoActual = 'IC';
+      function sincronizarUniversosComposer() {
+        const sel = document.getElementById('homePostUniverse');
+        const hint = document.getElementById('homeComposerHint');
+        const autor = getAutorActual('IC');
+        if (hint) hint.textContent = `Publicando como ${autor.nombre} (${autor.handle})`;
+        if (!sel) return;
+        const tags = new Set(['#Kixuz']);
+        if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
+          try {
+            window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => { if (u?.tag) tags.add(u.tag); });
+          } catch {}
+        }
+        sel.innerHTML = `<option value="">Sin universo (solo muro/inicio)</option>` +
+          Array.from(tags).map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+      }
 
-        const esc = s => String(s || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+      function renderInicioFeed() {
+        sincronizarUniversosComposer();
+        const feed = document.getElementById('homeWallFeed');
+        if (!feed) return;
 
-        const normH = h => {
-            const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
-            return s ? '@' + s : '';
+        let posts = [];
+        try {
+          const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+          const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+          const mapa = new Map();
+          [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(it => {
+            if (it && it.id) mapa.set(String(it.id), it);
+          });
+          posts = Array.from(mapa.values()).sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+        } catch {}
+
+        feed.innerHTML = posts.length
+          ? posts.map(p => {
+              const idPost = esc(p.id);
+              const count = Number(p.kixiz ?? p.kix ?? 0);
+              const labelKix = count === 1 ? 'Kix' : 'Kixiz';
+              const isLiked = likedSet.has(String(p.id));
+              const modoPost = p.modo === 'OC' ? 'OC' : 'IC';
+              const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
+              const uni = p.universo || p.universe || '';
+              const famTag = p.familiaClanTag || p.alcanceValor || '';
+              const scope = p.alcanceTipo || '';
+              const autorH = normH(p.autorHandle || p.handle || '');
+
+              return `
+                <article class="post-card" data-post-id="${idPost}">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <a href="perfil.html?char=${encodeURIComponent(autorH)}" style="text-decoration:none;color:var(--acento);font-weight:700;">
+                        ${esc(p.autorNombre || p.author || 'Personaje')} <span style="opacity:0.75;font-size:12px;">(${esc(autorH)})</span>
+                      </a>
+                      <span class="mode-badge ${modoPost === 'OC' ? 'oc' : 'ic'}">${modoPost}</span>
+                    </div>
+                    <span style="font-size:12px;color:var(--muted);">${esc(p.tiempo || p.time || 'Reciente')}</span>
+                  </div>
+                  <div class="post-badges">
+                    ${uni ? `<a href="universo.html?u=${encodeURIComponent(String(uni).replace(/^#/, ''))}" class="post-pill">${esc(uni)}</a>` : ''}
+                    ${(scope === 'familia' || famTag) ? `<a href="familia.html?char=${encodeURIComponent(autorH)}" class="post-pill">Familia / Clan${famTag ? ': ' + esc(famTag) : ''}</a>` : ''}
+                  </div>
+                  <p style="line-height:1.55;white-space:pre-line;">${esc(p.contenido || p.text || '')}</p>
+                  <div>
+                    <button type="button" class="kix-btn ${isLiked ? 'liked' : ''}" data-kix-post="${idPost}">${SVG_FLAME}<span>${esc(labelKix)} (${count})</span></button>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:5px;margin-top:2px;">
+                    ${respuestas.map(r => {
+                      const rModo = r.modo === 'OC' ? 'OC' : 'IC';
+                      return `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;"><span><strong>${esc(r.autorNombre || r.autorHandle || 'Rol')}:</strong> ${esc(r.texto)}</span><span class="mode-badge ${rModo === 'OC' ? 'oc' : 'ic'}">${rModo}</span></div>`;
+                    }).join('')}
+                    <form class="comment-form" data-comment-post-id="${idPost}">
+                      <input type="text" placeholder="Escribir comentario..." required>
+                      <div class="mode-switch-group" data-comment-mode="IC">
+                        <button type="button" class="mode-btn ic active" data-cmode="IC">IC</button>
+                        <button type="button" class="mode-btn oc" data-cmode="OC">OC</button>
+                      </div>
+                      <button type="submit" class="comment-btn">Comentar</button>
+                    </form>
+                  </div>
+                </article>
+              `;
+            }).join('')
+          : `<div class="post-card" style="color:var(--muted);font-size:14px;">Sin publicaciones en el inicio todavía.</div>`;
+
+        feed.querySelectorAll('.kix-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const postId = btn.dataset.kixPost;
+            const ya = likedSet.has(String(postId));
+            const delta = ya ? -1 : 1;
+            if (ya) likedSet.delete(String(postId));
+            else likedSet.add(String(postId));
+            ['kixuz_posts', 'kixuz_posts_v1'].forEach(key => {
+              try {
+                const arr = JSON.parse(localStorage.getItem(key) || '[]');
+                if (!Array.isArray(arr)) return;
+                let changed = false;
+                arr.forEach(item => {
+                  if (String(item.id) === String(postId)) {
+                    item.kixiz = Math.max(0, Number(item.kixiz ?? item.kix ?? 0) + delta);
+                    changed = true;
+                  }
+                });
+                if (changed) localStorage.setItem(key, JSON.stringify(arr));
+              } catch {}
+            });
+            renderInicioFeed();
+          });
+        });
+
+        feed.querySelectorAll('.comment-form').forEach(form => {
+          const cSwitch = form.querySelector('.mode-switch-group');
+          cSwitch?.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const m = btn.dataset.cmode;
+              cSwitch.dataset.commentMode = m;
+              cSwitch.querySelector('[data-cmode="IC"]').classList.toggle('active', m === 'IC');
+              cSwitch.querySelector('[data-cmode="OC"]').classList.toggle('active', m === 'OC');
+            });
+          });
+
+          form.addEventListener('submit', e => {
+            e.preventDefault();
+            const postId = form.dataset.commentPostId;
+            const inp = form.querySelector('input');
+            const texto = (inp.value || '').trim();
+            if (!texto) return;
+            const cModo = cSwitch?.dataset.commentMode === 'OC' ? 'OC' : 'IC';
+            const autor = getAutorActual(cModo);
+
+            ['kixuz_posts', 'kixuz_posts_v1'].forEach(key => {
+              try {
+                const arr = JSON.parse(localStorage.getItem(key) || '[]');
+                if (!Array.isArray(arr)) return;
+                let changed = false;
+                arr.forEach(item => {
+                  if (String(item.id) === String(postId)) {
+                    item.respuestas = Array.isArray(item.respuestas) ? item.respuestas : [];
+                    item.respuestas.push({ autorNombre: autor.nombre, autorHandle: autor.handle, modo: cModo, texto });
+                    changed = true;
+                  }
+                });
+                if (changed) localStorage.setItem(key, JSON.stringify(arr));
+              } catch {}
+            });
+            inp.value = '';
+            renderInicioFeed();
+          });
+        });
+      }
+
+      document.getElementById('homeWallPublish')?.addEventListener('click', () => {
+        const input = document.getElementById('homeWallInput');
+        const uniSel = document.getElementById('homePostUniverse');
+        const scopeSel = document.getElementById('homePostScope');
+        const famInp = document.getElementById('homePostFamilyTag');
+        const modeSw = document.getElementById('homePostModeSwitch');
+        const txt = (input?.value || '').trim();
+        if (!txt) return;
+
+        const modo = modeSw?.dataset.mode === 'OC' ? 'OC' : 'IC';
+        const autor = getAutorActual(modo);
+
+        const nuevo = {
+          id: 'post_' + Date.now(),
+          autorNombre: autor.nombre,
+          autorHandle: autor.handle,
+          modo,
+          contenido: txt,
+          universo: (uniSel?.value || '').trim(),
+          alcanceTipo: scopeSel?.value || 'global',
+          alcanceValor: (famInp?.value || '').trim(),
+          createdAtMs: Date.now(),
+          tiempo: 'Ahora mismo',
+          kixiz: 0,
+          respuestas: []
         };
 
-        function setPostModo(modo) {
-            postModoActual = modo === 'OC' ? 'OC' : 'IC';
-            document.getElementById('postModeIC')?.classList.toggle('active', postModoActual === 'IC');
-            document.getElementById('postModeOC')?.classList.toggle('active', postModoActual === 'OC');
-        }
+        let posts = [];
+        try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
+        posts.unshift(nuevo);
+        localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+        input.value = '';
+        if (famInp) famInp.value = '';
+        renderInicioFeed();
+      });
 
-        document.getElementById('postModeIC')?.addEventListener('click', () => setPostModo('IC'));
-        document.getElementById('postModeOC')?.addEventListener('click', () => setPostModo('OC'));
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderInicioFeed);
+      else renderInicioFeed();
+      window.addEventListener('kixuz:personajes-actualizados', renderInicioFeed);
+    })();
+  </script>
 
-        function obtenerAutorActual() {
-            if (postModoActual === 'OC') {
-                const apodo = window.KIXUZ_DB?.perfilCuenta?.apodo || window.KIXUZ_DB?.usuarioActual?.email?.split('@')[0] || 'Usuario OC';
-                return { nombre: apodo, handle: '@oc', modo: 'OC' };
-            }
-            const ac = window.KIXUZ_ACTIVE_CHAR;
-            if (ac && !ac.esPlaceholder && ac.handle) {
-                return { nombre: ac.nombre || ac.handle.replace(/^@/, ''), handle: normH(ac.handle), modo: 'IC' };
-            }
-            try {
-                const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                if (act?.handle) return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normH(act.handle), modo: 'IC' };
-            } catch {}
-            return { nombre: 'Personaje', handle: '@rol', modo: 'IC' };
-        }
-
-        function poblarUniversosEnPost() {
-            const sel = document.getElementById('postUniverseSelect');
-            if (!sel) return;
-            const tags = new Set();
-            if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
-                window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => {
-                    if (u?.esOficialKixuz) return;
-                    if (u?.tag) tags.add(u.tag);
-                });
-            }
-            try {
-                const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                subs.forEach(p => {
-                    (p?.universos || []).forEach(u => {
-                        if (u && String(u).toLowerCase() !== '#kixuz') {
-                            tags.add(String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, ''));
-                        }
-                    });
-                });
-            } catch {}
-
-            sel.innerHTML = `<option value="">Sin etiqueta de Universo (solo Inicio)</option>` +
-                Array.from(tags).map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
-        }
-
-        function cargarPostsLocales() {
-            let p1 = [], p2 = [];
-            try { p1 = JSON.parse(localStorage.getItem(POSTS_STORAGE_KEY) || '[]'); } catch {}
-            try { p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
-
-            const normalizadosP2 = (Array.isArray(p2) ? p2 : []).map((item, idx) => ({
-                id: item.id || ('legacy_' + idx),
-                autorNombre: item.author || item.autorNombre || 'Personaje',
-                autorHandle: normH(item.handle || item.autorHandle || '@rol'),
-                modo: item.modo === 'OC' ? 'OC' : 'IC',
-                contenido: item.text || item.contenido || '',
-                imagen: item.imagen || '',
-                universo: item.universe || item.universo || '',
-                alcanceTipo: item.alcanceTipo || 'global',
-                alcanceValor: item.familiaClanTag || item.alcanceValor || '',
-                createdAtMs: item.createdAtMs || (Date.now() - idx * 60000),
-                kixiz: Number(item.kix ?? item.kixiz ?? 0),
-                respuestas: item.respuestas || (item.comments || []).map(c => ({ autorNombre: c.author, autorHandle: c.author, modo: c.modo || 'IC', texto: c.text })),
-                tiempo: item.time || item.tiempo || 'Reciente'
-            }));
-
-            const mapa = new Map();
-            [...(Array.isArray(p1) ? p1 : []), ...normalizadosP2].forEach(p => {
-                if (p && p.id) mapa.set(String(p.id), { ...p, modo: p.modo === 'OC' ? 'OC' : 'IC' });
-            });
-            return Array.from(mapa.values());
-        }
-
-        function guardarPostsLocales(lista) {
-            try { localStorage.setItem(POSTS_STORAGE_KEY, JSON.stringify(lista.slice(0, 120))); } catch {}
-        }
-
-        function optimizarImagen(file, maxW = 1100, maxH = 900, quality = 0.82) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let { width, height } = img;
-                        if (width > maxW || height > maxH) {
-                            const r = Math.min(maxW / width, maxH / height);
-                            width = Math.round(width * r);
-                            height = Math.round(height * r);
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = () => resolve(ev.target.result);
-                    img.src = ev.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function renderFeed() {
-            const slotAnuncio = document.getElementById('kixuzAnnouncementSlot');
-            if (slotAnuncio && window.KIXUZ_UNIVERSOS?.obtenerAnuncioKixuzVigente) {
-                const anuncio = window.KIXUZ_UNIVERSOS.obtenerAnuncioKixuzVigente(postsCache);
-                if (anuncio) {
-                    slotAnuncio.innerHTML = `
-                        <article class="post-card pinned-kixuz">
-                            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--acento);">Anuncio Oficial · Kixuz (@kixuz)</span>
-                                <span style="font-size:11.5px;opacity:0.75;">Fijado 72h</span>
-                            </div>
-                            <p style="white-space:pre-wrap;font-size:14px;">${esc(anuncio.contenido || '')}</p>
-                            ${anuncio.imagen ? `<img src="${esc(anuncio.imagen)}" alt="Anuncio" class="post-img">` : ''}
-                        </article>
-                    `;
-                } else {
-                    slotAnuncio.innerHTML = '';
-                }
-            }
-
-            const feed = document.getElementById('feedList');
-            if (!feed) return;
-
-            const orden = document.getElementById('feedOrderSelect')?.value || 'recientes';
-            let visibles = postsCache.filter(p =>
-                window.KIXUZ_UNIVERSOS?.puedeVerPost ? window.KIXUZ_UNIVERSOS.puedeVerPost(p, 'inicio') : true
-            );
-
-            visibles.sort((a, b) => {
-                if (orden === 'kixiz') return Number(b.kixiz || 0) - Number(a.kixiz || 0);
-                return Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0);
-            });
-
-            if (!visibles.length) {
-                feed.innerHTML = `<div class="card-box" style="text-align:center;opacity:0.75;">Aún no hay publicaciones visibles. ¡Escribe la primera arriba!</div>`;
-                return;
-            }
-
-            feed.innerHTML = '';
-            visibles.forEach(p => {
-                const count = Number(p.kixiz || 0);
-                const labelKix = count === 1 ? 'Kix' : 'Kixiz';
-                const isLiked = likedPosts.has(String(p.id));
-                const respuestas = Array.isArray(p.respuestas) ? p.respuestas : [];
-                const uniTag = String(p.universo || '').trim();
-                const scope = p.alcanceTipo || 'global';
-                const famClanVal = String(p.alcanceValor || '').trim();
-                const modoPost = p.modo === 'OC' ? 'OC' : 'IC';
-
-                const card = document.createElement('article');
-                card.className = 'post-card';
-                card.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            <a href="perfil.html?char=${encodeURIComponent(p.autorHandle || '')}" style="text-decoration:none;color:var(--acento);font-weight:700;">
-                                ${esc(p.autorNombre || 'Personaje')} <span style="opacity:0.75;font-size:12px;">(${esc(p.autorHandle || '')})</span>
-                            </a>
-                            <span class="mode-badge ${modoPost === 'OC' ? 'oc' : 'ic'}">${modoPost}</span>
-                        </div>
-                        <span style="opacity:0.65;font-size:12px;">${esc(p.tiempo || 'Reciente')}</span>
-                    </div>
-                    <div class="post-tags">
-                        ${uniTag ? `<a href="universo.html?u=${encodeURIComponent(uniTag.replace(/^#/, ''))}" class="post-tag-link">${esc(uniTag)}</a>` : ''}
-                        ${(scope === 'familia' || scope === 'clan' || famClanVal) ? `<a href="familia.html?char=${encodeURIComponent(p.autorHandle || '')}${scope === 'clan' ? '#clan' : ''}" class="post-tag-link">${scope === 'clan' ? 'Clan' : 'Familia'}${famClanVal ? ': ' + esc(famClanVal) : ''}</a>` : ''}
-                    </div>
-                    <p style="white-space:pre-wrap;font-size:14px;">${esc(p.contenido || '')}</p>
-                    ${p.imagen ? `<img src="${esc(p.imagen)}" alt="Adjunto" class="post-img">` : ''}
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <button type="button" class="action-btn ${isLiked ? 'liked' : ''}" data-kix-id="${esc(p.id)}">${SVG_FLAME}<span>${esc(labelKix)} (${count})</span></button>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        ${respuestas.map(r => {
-                            const rModo = r.modo === 'OC' ? 'OC' : 'IC';
-                            return `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;"><span><strong>${esc(r.autorNombre || r.autorHandle)}:</strong> ${esc(r.texto)}</span><span class="mode-badge ${rModo === 'OC' ? 'oc' : 'ic'}">${rModo}</span></div>`;
-                        }).join('')}
-                        <form class="comment-form" style="display:flex;gap:6px;margin-top:4px;align-items:center;flex-wrap:wrap;">
-                            <input type="text" placeholder="Responder..." style="flex:1;min-width:160px;padding:7px 10px;font-size:12.5px;">
-                            <div class="mode-switch-group" data-comment-mode="IC">
-                                <button type="button" class="mode-btn ic active" data-cmode="IC">IC</button>
-                                <button type="button" class="mode-btn oc" data-cmode="OC">OC</button>
-                            </div>
-                            <button type="submit" class="action-btn">Responder</button>
-                        </form>
-                    </div>
-                `;
-
-                const cForm = card.querySelector('.comment-form');
-                const cSwitch = cForm.querySelector('.mode-switch-group');
-                cSwitch.querySelectorAll('.mode-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const m = btn.dataset.cmode;
-                        cSwitch.dataset.commentMode = m;
-                        cSwitch.querySelector('[data-cmode="IC"]').classList.toggle('active', m === 'IC');
-                        cSwitch.querySelector('[data-cmode="OC"]').classList.toggle('active', m === 'OC');
-                    });
-                });
-
-                card.querySelector('[data-kix-id]').addEventListener('click', async () => {
-                    const idStr = String(p.id);
-                    const yaLiked = likedPosts.has(idStr);
-                    const delta = yaLiked ? -1 : 1;
-                    if (yaLiked) likedPosts.delete(idStr);
-                    else likedPosts.add(idStr);
-                    p.kixiz = Math.max(0, Number(p.kixiz || 0) + delta);
-                    guardarPostsLocales(postsCache);
-                    renderFeed();
-                    if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.darKix) {
-                        try { await window.KIXUZ_DB.darKix(p.id, delta); } catch {}
-                    }
-                });
-
-                cForm.addEventListener('submit', async e => {
-                    e.preventDefault();
-                    const inp = e.target.querySelector('input');
-                    const texto = (inp.value || '').trim();
-                    if (!texto) return;
-                    const cModo = cSwitch.dataset.commentMode === 'OC' ? 'OC' : 'IC';
-                    const autor = cModo === 'OC'
-                        ? { nombre: window.KIXUZ_DB?.perfilCuenta?.apodo || 'Usuario OC', handle: '@oc' }
-                        : obtenerAutorActual();
-                    const resp = { autorNombre: autor.nombre, autorHandle: autor.handle, modo: cModo, texto };
-                    p.respuestas = Array.isArray(p.respuestas) ? [...p.respuestas, resp] : [resp];
-                    inp.value = '';
-                    guardarPostsLocales(postsCache);
-                    renderFeed();
-                    if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.agregarRespuestaPost) {
-                        try { await window.KIXUZ_DB.agregarRespuestaPost(p.id, resp); } catch {}
-                    }
-                });
-
-                feed.appendChild(card);
-            });
-        }
-
-        document.getElementById('postImgFile').addEventListener('change', async e => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            adjuntoDataUrl = await optimizarImagen(file);
-        });
-
-        document.getElementById('publishBtn').addEventListener('click', async () => {
-            const inp = document.getElementById('postInput');
-            const uniSel = document.getElementById('postUniverseSelect');
-            const scopeSel = document.getElementById('postScopeSelect');
-            const famInp = document.getElementById('postFamilyClanLabel');
-
-            const contenido = (inp.value || '').trim();
-            if (!contenido && !adjuntoDataUrl) return;
-
-            const autor = obtenerAutorActual();
-            const universo = (uniSel?.value || '').trim();
-            const alcanceTipo = scopeSel?.value || 'global';
-            const alcanceValor = (famInp?.value || '').trim();
-            const ahoraMs = Date.now();
-
-            const nuevo = {
-                id: 'post_' + ahoraMs,
-                autorNombre: autor.nombre,
-                autorHandle: autor.handle,
-                modo: postModoActual,
-                contenido,
-                imagen: adjuntoDataUrl,
-                universo,
-                alcanceTipo,
-                alcanceValor,
-                createdAtMs: ahoraMs,
-                kixiz: 0,
-                respuestas: [],
-                tiempo: 'Ahora mismo'
-            };
-
-            postsCache = [nuevo, ...postsCache];
-            inp.value = '';
-            if (famInp) famInp.value = '';
-            adjuntoDataUrl = '';
-            document.getElementById('postImgFile').value = '';
-            guardarPostsLocales(postsCache);
-            renderFeed();
-
-            if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.publicarPost) {
-                try {
-                    const docId = await window.KIXUZ_DB.publicarPost(nuevo);
-                    if (docId && typeof docId === 'string') {
-                        nuevo.id = docId;
-                        guardarPostsLocales(postsCache);
-                    }
-                } catch {}
-            }
-        });
-
-        document.getElementById('feedOrderSelect').addEventListener('change', renderFeed);
-
-        window.addEventListener('DOMContentLoaded', () => {
-            postsCache = cargarPostsLocales();
-            poblarUniversosEnPost();
-            renderFeed();
-        });
-
-        window.addEventListener('kixuz:personajes-actualizados', () => { poblarUniversosEnPost(); renderFeed(); });
-        window.addEventListener('kixuz:universos-actualizados', () => { poblarUniversosEnPost(); renderFeed(); });
-    </script>
-
-    <script src="chat.js"></script>
-    <script src="theme.js"></script>
-    <script src="characters.js"></script>
-    <script src="universos-core.js"></script>
-    <script src="notificaciones.js"></script>
-    <script src="buscador-global.js"></script>
-    <script src="navbar-ui.js"></script>
-    <script src="amigos.js"></script>
-    <script type="module" src="firebase-config.js"></script>
+  <script src="chat.js"></script>
+  <script src="theme.js"></script>
+  <script src="characters.js"></script>
+  <script src="universos-core.js"></script>
+  <script src="buscador-global.js"></script>
+  <script src="navbar-ui.js"></script>
+  <script src="notificaciones.js"></script>
+  <script src="amigos.js"></script>
+  <script type="module" src="firebase-config.js"></script>
 </body>
 </html>
