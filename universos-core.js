@@ -6,6 +6,11 @@
         return clean ? '#' + clean : '';
     };
 
+    const normHandle = h => {
+        const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+        return s ? '@' + s : '';
+    };
+
     function leerUniversos() {
         try {
             const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -21,6 +26,9 @@
                     nombre: String(u.nombre || tag.slice(1)).trim(),
                     descripcion: String(u.descripcion || '').trim(),
                     reglas: String(u.reglas || '').trim(),
+                    avatar: String(u.avatar || '').trim(),
+                    banner: String(u.banner || '').trim(),
+                    fondo: String(u.fondo || '').trim(),
                     miembros: Array.isArray(u.miembros) ? u.miembros : [],
                     mapas: Array.isArray(u.mapas) ? u.mapas : []
                 });
@@ -38,7 +46,7 @@
         } catch {}
     }
 
-    function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle }) {
+    function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle, avatar, banner, fondo }) {
         const tagNorm = normTag(tag || nombre);
         if (!tagNorm) return null;
 
@@ -48,14 +56,17 @@
             return actual.find(u => normTag(u.tag).toLowerCase() === key) || null;
         }
 
-        const miembrosIniciales = creadorHandle ? [String(creadorHandle).trim()] : [];
+        const miembrosIniciales = creadorHandle ? [normHandle(creadorHandle) || String(creadorHandle).trim()] : [];
         const nuevo = {
             id: 'uni_' + Date.now(),
             nombre: String(nombre || tagNorm.slice(1)).trim(),
             tag: tagNorm,
             descripcion: String(descripcion || '').trim(),
             reglas: String(reglas || '').trim(),
-            creadorHandle: String(creadorHandle || '').trim(),
+            creadorHandle: normHandle(creadorHandle) || String(creadorHandle || '').trim(),
+            avatar: String(avatar || '').trim(),
+            banner: String(banner || '').trim(),
+            fondo: String(fondo || '').trim(),
             miembros: miembrosIniciales,
             mapas: []
         };
@@ -65,21 +76,41 @@
         return nuevo;
     }
 
-    function puedeVerPost(post, contexto = 'inicio') {
-        if (!post) return false;
-        const tagPost = normTag(post.universo || post.universe || '');
-        if (contexto === 'inicio') {
-            return true;
+    function agregarMiembroAUniverso(tag, handleOrName) {
+        const tagNorm = normTag(tag);
+        const h = normHandle(handleOrName) || String(handleOrName || '').trim();
+        if (!tagNorm || !h) return false;
+        const lista = leerUniversos();
+        const target = lista.find(u => u.tag.toLowerCase() === tagNorm.toLowerCase());
+        if (!target) return false;
+        target.miembros = Array.isArray(target.miembros) ? target.miembros : [];
+        if (!target.miembros.some(m => (normHandle(m) || String(m).toLowerCase()) === (normHandle(h) || h.toLowerCase()))) {
+            target.miembros.push(h);
+            guardarUniversos(lista);
         }
-        if (!tagPost) return false;
+        return true;
+    }
+
+    function actualizarAparienciaUniverso(tag, { avatar, banner, fondo }) {
+        const tagNorm = normTag(tag);
+        if (!tagNorm) return false;
+        const lista = leerUniversos();
+        const target = lista.find(u => u.tag.toLowerCase() === tagNorm.toLowerCase());
+        if (!target) return false;
+        if (avatar !== undefined) target.avatar = avatar;
+        if (banner !== undefined) target.banner = banner;
+        if (fondo !== undefined) target.fondo = fondo;
+        guardarUniversos(lista);
         return true;
     }
 
     window.KIXUZ_UNIVERSOS = {
         normTag,
+        normHandle,
         leerUniversos,
         guardarUniversos,
         crearUniversoDirecto,
-        puedeVerPost
+        agregarMiembroAUniverso,
+        actualizarAparienciaUniverso
     };
 })();
