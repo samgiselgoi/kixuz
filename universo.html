@@ -1,85 +1,519 @@
-(() => {
-    const STORAGE_KEY = 'kixuz_universos_v1';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXUZ — Universos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-principal: #150A24;
+            --bg-secundario: #6C3CE0;
+            --acento: #2DD4C4;
+            --texto: #EDE7E0;
+            --tarjeta: rgba(34, 18, 58, 0.9);
+            --borde: rgba(108, 60, 224, 0.4);
+        }
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --bg-secundario: #6C3CE0;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --tarjeta: rgba(255, 255, 255, 0.94);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            line-height: 1.55;
+        }
+        header {
+            background: rgba(21, 10, 36, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--borde);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        html[data-theme="light"] header { background: rgba(255, 255, 255, 0.92); }
+        .logo { display: inline-flex; align-items: center; text-decoration: none; }
+        .nav-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .nav-links a {
+            color: var(--texto); text-decoration: none; padding: 6px 10px;
+            border-radius: 8px; font-size: 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+        }
+        .user-menu { display: flex; align-items: center; gap: 8px; }
+        .user-menu select {
+            background: rgba(0, 0, 0, 0.35); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+        }
+        .btn-auth-link {
+            background: var(--acento); color: #150A24 !important;
+            padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px; font-weight: 700; text-decoration: none;
+        }
 
-    const normTag = tag => {
-        const clean = String(tag || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
-        return clean ? '#' + clean : '';
-    };
+        main {
+            max-width: 980px;
+            margin: 26px auto 90px;
+            padding: 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .panel {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+        }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
+        .row-between {
+            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .btn-accent {
+            background: var(--acento); color: #150A24; border: none; border-radius: 10px;
+            padding: 8px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
+        }
+        .btn-ghost {
+            background: rgba(108, 60, 224, 0.22); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 10px; padding: 8px 14px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12.5px; cursor: pointer;
+        }
+        .tabs-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .tab-btn {
+            background: rgba(108, 60, 224, 0.18); border: 1px solid var(--borde); color: var(--texto);
+            padding: 7px 14px; border-radius: 10px; font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 12.5px; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
 
-    function leerUniversos() {
-        try {
-            const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            if (!Array.isArray(raw)) return [];
-            const mapa = new Map();
-            raw.forEach(u => {
-                if (!u || !u.tag) return;
-                const tag = normTag(u.tag);
-                if (!tag) return;
-                mapa.set(tag.toLowerCase(), {
-                    ...u,
-                    tag,
-                    nombre: String(u.nombre || tag.slice(1)).trim(),
-                    descripcion: String(u.descripcion || '').trim(),
-                    reglas: String(u.reglas || '').trim(),
-                    miembros: Array.isArray(u.miembros) ? u.miembros : [],
-                    mapas: Array.isArray(u.mapas) ? u.mapas : []
+        textarea, input[type="text"], select {
+            width: 100%; background: rgba(0, 0, 0, 0.34); color: var(--texto);
+            border: 1px solid var(--borde); border-radius: 10px; padding: 9px 12px;
+            font-family: 'Inter', sans-serif; font-size: 13.5px; outline: none;
+        }
+        html[data-theme="light"] textarea,
+        html[data-theme="light"] input[type="text"],
+        html[data-theme="light"] select { background: #fff; color: #150A24; }
+        textarea { min-height: 82px; resize: vertical; margin-bottom: 10px; }
+
+        .mode-switch-group {
+            display: inline-flex; align-items: center; background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--borde); border-radius: 999px; padding: 2px; gap: 2px;
+        }
+        .mode-btn {
+            border: none; background: transparent; color: var(--texto);
+            font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+            padding: 3px 9px; border-radius: 999px; cursor: pointer;
+        }
+        .mode-btn.active.ic { background: var(--acento); color: #150A24; }
+        .mode-btn.active.oc { background: var(--bg-secundario); color: #EDE7E0; }
+
+        .post-card {
+            background: var(--tarjeta); border: 1px solid var(--borde);
+            border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(108, 60, 224, 0.18); border: 1px solid var(--borde);
+            color: var(--texto); border-radius: 8px; padding: 5px 11px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .maps-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 12px;
+        }
+        .map-card {
+            background: rgba(0, 0, 0, 0.25); border: 1px solid var(--borde); border-radius: 12px; padding: 10px;
+        }
+        .map-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px;">
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="perfil.html">Mi Perfil</a>
+            <a href="universo.html">Universos</a>
+            <a href="familia.html">Familia / Clan</a>
+            <a href="crear-personaje.html">+ Personaje</a>
+        </nav>
+        <div class="user-menu">
+            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="panel">
+            <div class="row-between">
+                <div style="flex:1;min-width:220px;">
+                    <label for="universeSelect" style="font-size:12px;opacity:0.75;display:block;margin-bottom:4px;">Seleccionar Universo (#Etiqueta)</label>
+                    <select id="universeSelect"></select>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:flex-end;">
+                    <button type="button" class="btn-ghost" id="btnJoinToggle">Unirse</button>
+                    <button type="button" class="btn-accent" id="btnOpenCreateUni">+ Crear Universo</button>
+                </div>
+            </div>
+
+            <div id="universeHeaderInfo" style="margin-top:14px;"></div>
+
+            <div class="tabs-row">
+                <button type="button" class="tab-btn active" data-utab="muro">Muro del Universo</button>
+                <button type="button" class="tab-btn" data-utab="mapas">Mapas e Imágenes</button>
+                <button type="button" class="tab-btn" data-utab="info">Miembros y Reglas</button>
+            </div>
+        </section>
+
+        <!-- Formulario directo para crear universo sin aprobación de terceros -->
+        <section class="panel" id="createUniPanel" style="display:none;">
+            <h2 style="font-size:17px;margin-bottom:10px;">Crear Universo</h2>
+            <form id="createUniForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;">
+                <input type="text" id="uniNombreInput" placeholder="Nombre del universo" required>
+                <input type="text" id="uniTagInput" placeholder="#Etiqueta (ej. #NexoCentral)" required>
+                <input type="text" id="uniDescInput" placeholder="Descripción breve">
+                <input type="text" id="uniReglasInput" placeholder="Reglas o temática">
+                <button type="submit" class="btn-accent">Crear ahora</button>
+            </form>
+        </section>
+
+        <!-- Pestaña 1: Muro del Universo -->
+        <section id="tabPanelMuro">
+            <div class="panel" style="margin-bottom:16px;">
+                <div class="row-between" style="margin-bottom:8px;">
+                    <h2 style="font-size:16.5px;">Publicar en este Universo</h2>
+                    <div class="mode-switch-group" id="uniPostModeSwitch" data-mode="IC">
+                        <button type="button" class="mode-btn ic active" data-umode="IC">IC</button>
+                        <button type="button" class="mode-btn oc" data-umode="OC">OC</button>
+                    </div>
+                </div>
+                <textarea id="uniPostInput" placeholder="Escribe un turno o escena dentro de este universo..."></textarea>
+                <div class="row-between">
+                    <span id="activeUniBadge" style="font-size:12.5px;font-weight:700;color:var(--acento);"></span>
+                    <button type="button" class="btn-accent" id="uniPublishBtn">Publicar</button>
+                </div>
+            </div>
+            <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
+        </section>
+
+        <!-- Pestaña 2: Mapas e Imágenes -->
+        <section class="panel" id="tabPanelMapas" style="display:none;">
+            <h2 style="font-size:17px;">Mapas e Imágenes del Universo</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                <input type="text" id="mapTitleInput" placeholder="Título del mapa o imagen" style="max-width:260px;">
+                <input type="file" id="mapFileInput" accept="image/*" style="max-width:260px;">
+            </div>
+            <div id="mapsGrid" class="maps-grid"></div>
+        </section>
+
+        <!-- Pestaña 3: Miembros y Reglas -->
+        <section class="panel" id="tabPanelInfo" style="display:none;">
+            <h2 style="font-size:17px;">Reglas del Universo</h2>
+            <p id="uniRulesText" style="margin-top:8px;font-size:13.5px;opacity:0.88;"></p>
+            <h3 style="font-size:15.5px;margin-top:16px;">Miembros</h3>
+            <div id="uniMembersList" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const esc = s => String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+
+            const normH = h => {
+                const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
+                return s ? '@' + s : '';
+            };
+
+            function getActorActual() {
+                const ac = window.KIXUZ_ACTIVE_CHAR;
+                if (ac && !ac.esPlaceholder && ac.handle) {
+                    return { nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
+                }
+                try {
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act?.handle) return { nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
+                } catch {}
+                return { nombre: 'Personaje', handle: '@rol' };
+            }
+
+            function getUniversoSeleccionado() {
+                const lista = window.KIXUZ_UNIVERSOS?.leerUniversos ? window.KIXUZ_UNIVERSOS.leerUniversos() : [];
+                if (!lista.length) return null;
+                const selVal = document.getElementById('universeSelect')?.value;
+                return lista.find(u => u.tag === selVal) || lista[0];
+            }
+
+            function renderSelectUniversos() {
+                const sel = document.getElementById('universeSelect');
+                if (!sel) return;
+                const lista = window.KIXUZ_UNIVERSOS?.leerUniversos ? window.KIXUZ_UNIVERSOS.leerUniversos() : [];
+                const params = new URLSearchParams(window.location.search);
+                const paramTag = window.KIXUZ_UNIVERSOS?.normTag ? window.KIXUZ_UNIVERSOS.normTag(params.get('u') || '') : '';
+                const current = sel.value || paramTag;
+
+                if (!lista.length) {
+                    sel.innerHTML = `<option value="">Sin universos creados aún</option>`;
+                    return;
+                }
+
+                sel.innerHTML = lista.map(u => `<option value="${esc(u.tag)}">${esc(u.tag)} — ${esc(u.nombre)}</option>`).join('');
+                if (current && lista.some(u => u.tag === current)) {
+                    sel.value = current;
+                }
+            }
+
+            function renderTodo() {
+                renderSelectUniversos();
+                const uni = getUniversoSeleccionado();
+                const headerInfo = document.getElementById('universeHeaderInfo');
+                const badge = document.getElementById('activeUniBadge');
+                const joinBtn = document.getElementById('btnJoinToggle');
+                const actor = getActorActual();
+
+                if (!uni) {
+                    headerInfo.innerHTML = `<p style="opacity:0.75;font-size:13.5px;">Todavía no creaste ningún universo. Tocá <strong>+ Crear Universo</strong> para empezar.</p>`;
+                    if (badge) badge.textContent = '';
+                    document.getElementById('uniPostsFeed').innerHTML = '';
+                    return;
+                }
+
+                document.title = `${uni.tag} — KIXUZ`;
+                const esMiembro = Array.isArray(uni.miembros) && uni.miembros.some(m => normH(m) === actor.handle);
+                if (joinBtn) {
+                    joinBtn.textContent = esMiembro ? 'Salir del universo' : 'Unirse al universo';
+                }
+
+                headerInfo.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <h1 style="font-size:22px;">${esc(uni.tag)} · ${esc(uni.nombre)}</h1>
+                        <span style="font-size:12px;opacity:0.75;">${(uni.miembros || []).length} miembros</span>
+                    </div>
+                    ${uni.descripcion ? `<p style="margin-top:6px;font-size:13.5px;opacity:0.85;">${esc(uni.descripcion)}</p>` : ''}
+                `;
+                if (badge) badge.textContent = `Publicando como ${actor.nombre} (${actor.handle}) en ${uni.tag}`;
+
+                // Muro filtrado por etiqueta de universo
+                let posts = [];
+                try {
+                    const p1 = JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]');
+                    const p2 = JSON.parse(localStorage.getItem('kixuz_posts') || '[]');
+                    const mapa = new Map();
+                    [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(it => {
+                        if (it && it.id) mapa.set(String(it.id), it);
+                    });
+                    posts = Array.from(mapa.values()).filter(p => {
+                        const pTag = window.KIXUZ_UNIVERSOS?.normTag ? window.KIXUZ_UNIVERSOS.normTag(p.universo || p.universe || '') : (p.universo || p.universe || '');
+                        return pTag && pTag.toLowerCase() === uni.tag.toLowerCase();
+                    });
+                } catch {}
+
+                const feedEl = document.getElementById('uniPostsFeed');
+                feedEl.innerHTML = posts.length
+                    ? posts.map(p => {
+                        const resps = Array.isArray(p.respuestas) ? p.respuestas : [];
+                        return `
+                            <article class="post-card" data-upost-id="${esc(p.id)}">
+                                <div class="row-between">
+                                    <a href="perfil.html?char=${encodeURIComponent(p.autorHandle || p.handle || '')}" style="text-decoration:none;color:var(--acento);font-weight:700;">
+                                        ${esc(p.autorNombre || p.author || 'Personaje')} <span style="opacity:0.75;font-size:12px;">(${esc(p.autorHandle || p.handle || '')})</span>
+                                    </a>
+                                    <span style="font-size:12px;opacity:0.68;">${esc(p.tiempo || p.time || 'Reciente')}</span>
+                                </div>
+                                <p style="white-space:pre-line;font-size:14px;">${esc(p.contenido || p.text || '')}</p>
+                                <div style="display:flex;flex-direction:column;gap:5px;">
+                                    ${resps.map(r => `<div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 10px;font-size:12.5px;"><strong>${esc(r.autorNombre || r.autorHandle || 'Rol')}:</strong> ${esc(r.texto)}</div>`).join('')}
+                                    <form class="uni-comment-form" data-cid="${esc(p.id)}" style="display:flex;gap:6px;margin-top:4px;">
+                                        <input type="text" placeholder="Responder..." required style="padding:7px 10px;font-size:12.5px;">
+                                        <button type="submit" class="action-btn">Responder</button>
+                                    </form>
+                                </div>
+                            </article>
+                        `;
+                    }).join('')
+                    : `<div class="panel" style="opacity:0.75;font-size:13.5px;">No hay publicaciones con ${esc(uni.tag)} todavía.</div>`;
+
+                feedEl.querySelectorAll('.uni-comment-form').forEach(form => {
+                    form.addEventListener('submit', e => {
+                        e.preventDefault();
+                        const postId = form.dataset.cid;
+                        const inp = form.querySelector('input');
+                        const txt = (inp.value || '').trim();
+                        if (!txt) return;
+                        const actual = getActorActual();
+                        ['kixuz_posts', 'kixuz_posts_v1'].forEach(key => {
+                            try {
+                                const arr = JSON.parse(localStorage.getItem(key) || '[]');
+                                if (!Array.isArray(arr)) return;
+                                let mod = false;
+                                arr.forEach(item => {
+                                    if (String(item.id) === String(postId)) {
+                                        item.respuestas = Array.isArray(item.respuestas) ? item.respuestas : [];
+                                        item.respuestas.push({ autorNombre: actual.nombre, autorHandle: actual.handle, texto: txt });
+                                        mod = true;
+                                    }
+                                });
+                                if (mod) localStorage.setItem(key, JSON.stringify(arr));
+                            } catch {}
+                        });
+                        inp.value = '';
+                        renderTodo();
+                    });
+                });
+
+                // Mapas
+                const mapsGrid = document.getElementById('mapsGrid');
+                const mapas = Array.isArray(uni.mapas) ? uni.mapas : [];
+                mapsGrid.innerHTML = mapas.length
+                    ? mapas.map(m => `<div class="map-card"><img src="${esc(m.src)}" alt="${esc(m.titulo || 'Mapa')}"><div style="font-size:12.5px;font-weight:700;margin-top:6px;">${esc(m.titulo || 'Mapa')}</div></div>`).join('')
+                    : `<p style="opacity:0.72;font-size:13px;grid-column:1/-1;">Sin mapas o imágenes cargadas en este universo.</p>`;
+
+                // Miembros y reglas
+                document.getElementById('uniRulesText').textContent = uni.reglas || 'Sin reglas específicas registradas.';
+                const membersEl = document.getElementById('uniMembersList');
+                membersEl.innerHTML = (uni.miembros || []).length
+                    ? uni.miembros.map(m => `<a href="perfil.html?char=${encodeURIComponent(normH(m))}" class="action-btn" style="text-decoration:none;">${esc(m)}</a>`).join('')
+                    : `<span style="opacity:0.72;font-size:13px;">Aún no hay miembros unidos.</span>`;
+            }
+
+            document.querySelectorAll('#uniPostModeSwitch .mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const m = btn.dataset.umode;
+                    const sw = document.getElementById('uniPostModeSwitch');
+                    sw.dataset.mode = m;
+                    sw.querySelector('[data-umode="IC"]').classList.toggle('active', m === 'IC');
+                    sw.querySelector('[data-umode="OC"]').classList.toggle('active', m === 'OC');
                 });
             });
-            return Array.from(mapa.values());
-        } catch {
-            return [];
-        }
-    }
 
-    function guardarUniversos(lista) {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
-            window.dispatchEvent(new Event('kixuz:universos-actualizados'));
-        } catch {}
-    }
+            document.getElementById('btnOpenCreateUni')?.addEventListener('click', () => {
+                const p = document.getElementById('createUniPanel');
+                p.style.display = p.style.display === 'none' ? 'block' : 'none';
+            });
 
-    function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle }) {
-        const tagNorm = normTag(tag || nombre);
-        if (!tagNorm) return null;
+            document.getElementById('createUniForm')?.addEventListener('submit', e => {
+                e.preventDefault();
+                const nombre = document.getElementById('uniNombreInput').value.trim();
+                const tag = document.getElementById('uniTagInput').value.trim();
+                const descripcion = document.getElementById('uniDescInput').value.trim();
+                const reglas = document.getElementById('uniReglasInput').value.trim();
+                const actor = getActorActual();
+                const creado = window.KIXUZ_UNIVERSOS?.crearUniversoDirecto({
+                    nombre, tag, descripcion, reglas, creadorHandle: actor.handle
+                });
+                if (creado) {
+                    e.target.reset();
+                    document.getElementById('createUniPanel').style.display = 'none';
+                    renderSelectUniversos();
+                    document.getElementById('universeSelect').value = creado.tag;
+                    renderTodo();
+                }
+            });
 
-        const actual = leerUniversos();
-        const key = tagNorm.toLowerCase();
-        if (actual.some(u => normTag(u.tag).toLowerCase() === key)) {
-            return actual.find(u => normTag(u.tag).toLowerCase() === key) || null;
-        }
+            document.getElementById('btnJoinToggle')?.addEventListener('click', () => {
+                const uni = getUniversoSeleccionado();
+                if (!uni || !window.KIXUZ_UNIVERSOS) return;
+                const actor = getActorActual();
+                const lista = window.KIXUZ_UNIVERSOS.leerUniversos();
+                const target = lista.find(u => u.tag === uni.tag);
+                if (!target) return;
+                target.miembros = Array.isArray(target.miembros) ? target.miembros : [];
+                const idx = target.miembros.findIndex(m => normH(m) === actor.handle);
+                if (idx >= 0) target.miembros.splice(idx, 1);
+                else target.miembros.push(actor.handle);
+                window.KIXUZ_UNIVERSOS.guardarUniversos(lista);
+                renderTodo();
+            });
 
-        const miembrosIniciales = creadorHandle ? [String(creadorHandle).trim()] : [];
-        const nuevo = {
-            id: 'uni_' + Date.now(),
-            nombre: String(nombre || tagNorm.slice(1)).trim(),
-            tag: tagNorm,
-            descripcion: String(descripcion || '').trim(),
-            reglas: String(reglas || '').trim(),
-            creadorHandle: String(creadorHandle || '').trim(),
-            miembros: miembrosIniciales,
-            mapas: []
-        };
+            document.getElementById('uniPublishBtn')?.addEventListener('click', () => {
+                const uni = getUniversoSeleccionado();
+                const inp = document.getElementById('uniPostInput');
+                const txt = (inp?.value || '').trim();
+                if (!uni || !txt) return;
+                const actor = getActorActual();
+                const modo = document.getElementById('uniPostModeSwitch')?.dataset.mode === 'OC' ? 'OC' : 'IC';
+                const nuevo = {
+                    id: 'post_' + Date.now(),
+                    autorNombre: modo === 'OC' ? (window.KIXUZ_DB?.perfilCuenta?.apodo || 'Usuario OC') : actor.nombre,
+                    autorHandle: modo === 'OC' ? '@oc' : actor.handle,
+                    modo,
+                    contenido: txt,
+                    universo: uni.tag,
+                    alcanceTipo: 'universo',
+                    alcanceValor: uni.tag,
+                    createdAtMs: Date.now(),
+                    tiempo: 'Ahora mismo',
+                    kixiz: 0,
+                    respuestas: []
+                };
+                let posts = [];
+                try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
+                posts.unshift(nuevo);
+                localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+                inp.value = '';
+                renderTodo();
+            });
 
-        actual.unshift(nuevo);
-        guardarUniversos(actual);
-        return nuevo;
-    }
+            document.getElementById('mapFileInput')?.addEventListener('change', e => {
+                const file = e.target.files?.[0];
+                const uni = getUniversoSeleccionado();
+                if (!file || !uni || !window.KIXUZ_UNIVERSOS) return;
+                const titulo = document.getElementById('mapTitleInput')?.value.trim() || file.name;
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const lista = window.KIXUZ_UNIVERSOS.leerUniversos();
+                    const target = lista.find(u => u.tag === uni.tag);
+                    if (!target) return;
+                    target.mapas = Array.isArray(target.mapas) ? target.mapas : [];
+                    target.mapas.unshift({ titulo, src: ev.target.result });
+                    window.KIXUZ_UNIVERSOS.guardarUniversos(lista);
+                    document.getElementById('mapTitleInput').value = '';
+                    e.target.value = '';
+                    renderTodo();
+                };
+                reader.readAsDataURL(file);
+            });
 
-    function puedeVerPost(post, contexto = 'inicio') {
-        if (!post) return false;
-        const tagPost = normTag(post.universo || post.universe || '');
-        if (contexto === 'inicio') {
-            return true;
-        }
-        if (!tagPost) return false;
-        return true;
-    }
+            document.querySelectorAll('[data-utab]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.utab;
+                    document.querySelectorAll('[data-utab]').forEach(b => b.classList.toggle('active', b === btn));
+                    document.getElementById('tabPanelMuro').style.display = tab === 'muro' ? 'block' : 'none';
+                    document.getElementById('tabPanelMapas').style.display = tab === 'mapas' ? 'block' : 'none';
+                    document.getElementById('tabPanelInfo').style.display = tab === 'info' ? 'block' : 'none';
+                });
+            });
 
-    window.KIXUZ_UNIVERSOS = {
-        normTag,
-        leerUniversos,
-        guardarUniversos,
-        crearUniversoDirecto,
-        puedeVerPost
-    };
-})();
+            document.getElementById('universeSelect')?.addEventListener('change', renderTodo);
+            window.addEventListener('DOMContentLoaded', renderTodo);
+            window.addEventListener('kixuz:personajes-actualizados', renderTodo);
+            window.addEventListener('kixuz:universos-actualizados', renderTodo);
+        })();
+    </script>
+
+    <script src="universos-core.js"></script>
+    <script src="chat.js"></script>
+    <script src="theme.js"></script>
+    <script src="characters.js"></script>
+    <script src="buscador-global.js"></script>
+    <script src="navbar-ui.js"></script>
+    <script src="notificaciones.js"></script>
+    <script src="amigos.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+</body>
+</html>
