@@ -227,32 +227,65 @@ window.KIXUZ_DB = {
             if (h) mapa.set(h, { ...p, handle: h });
         });
         try {
+            const postsLocal = JSON.parse(localStorage.getItem("kixuz_posts") || "[]");
+            if (Array.isArray(postsLocal)) {
+                postsLocal.forEach(it => {
+                    const h = normHandle(it?.autorHandle || it?.handle);
+                    if (h && !mapa.has(h)) {
+                        mapa.set(h, { nombre: it.autorNombre || it.author || h.slice(1), handle: h });
+                    }
+                });
+            }
+        } catch {}
+        try {
             const pubSnap = await getDocs(collection(db, "personajes_publicos"));
             pubSnap.forEach(d => {
-                const data = d.data();
-                const h = normHandle(data?.handle || ("@" + d.id));
-                if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+                const data = d.data() || {};
+                const h = normHandle(data.handle || ("@" + d.id));
+                if (h) {
+                    mapa.set(h, {
+                        ...(mapa.get(h) || {}),
+                        ...data,
+                        nombre: data.nombre || mapa.get(h)?.nombre || h.slice(1),
+                        handle: h
+                    });
+                }
             });
         } catch {}
         try {
             const snap = await getDocs(collection(db, "personajes"));
             snap.forEach(d => {
-                const data = d.data();
-                const h = normHandle(data?.handle || ("@" + d.id));
-                if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
+                const data = d.data() || {};
+                const h = normHandle(data.handle || ("@" + d.id));
+                if (h) {
+                    mapa.set(h, {
+                        ...(mapa.get(h) || {}),
+                        ...data,
+                        nombre: data.nombre || mapa.get(h)?.nombre || h.slice(1),
+                        handle: h
+                    });
+                }
             });
         } catch {}
-        return Array.from(mapa.values());
+        return Array.from(mapa.values()).sort((a, b) =>
+            String(a.nombre || a.handle).localeCompare(String(b.nombre || b.handle), "es")
+        );
     },
 
     async buscarPersonajePublico(handle) {
         const h = normHandle(handle);
         if (!h) return null;
+        const idDoc = h.slice(1);
         try {
-            const snap = await getDoc(doc(db, "personajes", h.slice(1)));
-            if (snap.exists()) return snap.data();
+            const pubSnap = await getDoc(doc(db, "personajes_publicos", idDoc));
+            if (pubSnap.exists()) return { handle: h, ...pubSnap.data() };
         } catch {}
-        return null;
+        try {
+            const snap = await getDoc(doc(db, "personajes", idDoc));
+            if (snap.exists()) return { handle: h, ...snap.data() };
+        } catch {}
+        const lista = await this.listarPersonajesPublicos();
+        return lista.find(p => normHandle(p.handle) === h) || null;
     }
 };
 
