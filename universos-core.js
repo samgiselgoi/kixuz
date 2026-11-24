@@ -11,15 +11,26 @@
         return s ? '@' + s : '';
     };
 
+    const esUniversoPrueba = (u, tagNorm) => {
+        if (!u || !tagNorm) return true;
+        if (u.esDemo || u.esPrueba) return true;
+        const t = tagNorm.toLowerCase();
+        const nom = String(u.nombre || '').trim().toLowerCase();
+        return t === '#sector4' || nom === 'sector4' || nom === 'sector 4';
+    };
+
     function leerUniversos() {
         try {
             const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             if (!Array.isArray(raw)) return [];
             const mapa = new Map();
+            let huboPrueba = false;
             raw.forEach(u => {
-                if (!u || !u.tag || u.esDemo) return;
-                const tag = normTag(u.tag);
-                if (!tag || /^#sector4$/i.test(tag)) return;
+                const tag = normTag(u?.tag);
+                if (esUniversoPrueba(u, tag)) {
+                    huboPrueba = true;
+                    return;
+                }
                 mapa.set(tag.toLowerCase(), {
                     ...u,
                     tag,
@@ -33,7 +44,11 @@
                     mapas: Array.isArray(u.mapas) ? u.mapas : []
                 });
             });
-            return Array.from(mapa.values());
+            const limpios = Array.from(mapa.values());
+            if (huboPrueba) {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(limpios)); } catch {}
+            }
+            return limpios;
         } catch {
             return [];
         }
@@ -41,14 +56,18 @@
 
     function guardarUniversos(lista) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+            const filtrados = (Array.isArray(lista) ? lista : []).filter(u => {
+                const tag = normTag(u?.tag);
+                return !esUniversoPrueba(u, tag);
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(filtrados));
             window.dispatchEvent(new Event('kixuz:universos-actualizados'));
         } catch {}
     }
 
     function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle, avatar, banner, fondo }) {
         const tagNorm = normTag(tag || nombre);
-        if (!tagNorm) return null;
+        if (!tagNorm || esUniversoPrueba({ nombre, tag: tagNorm }, tagNorm)) return null;
 
         const actual = leerUniversos();
         const key = tagNorm.toLowerCase();
@@ -80,7 +99,7 @@
     function agregarMiembroAUniverso(tag, handleOrName) {
         const tagNorm = normTag(tag);
         const h = normHandle(handleOrName) || String(handleOrName || '').trim();
-        if (!tagNorm || !h) return false;
+        if (!tagNorm || !h || esUniversoPrueba({ tag: tagNorm }, tagNorm)) return false;
         const lista = leerUniversos();
         const target = lista.find(u => u.tag.toLowerCase() === tagNorm.toLowerCase());
         if (!target) return false;

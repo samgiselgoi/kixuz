@@ -683,12 +683,34 @@ img, video, svg {
                             { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
                             { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
                         ];
+                    const ownerActual = getDuenoActual();
+                    const familiaLimpia = (Array.isArray(raw.familia) ? raw.familia : []).filter(m => {
+                        const n = String(m?.nombre || '').toLowerCase();
+                        const h = String(m?.handle || '').toLowerCase();
+                        return !n.includes('prueba') && !h.includes('sector4');
+                    });
+                    const clanLimpio = (Array.isArray(raw.clan) ? raw.clan : []).filter(m => {
+                        const c = String(m?.clanNombre || '').toLowerCase();
+                        const n = String(m?.nombre || '').toLowerCase();
+                        return !c.includes('prueba') && !c.includes('sector4') && !n.includes('prueba');
+                    });
+                    const clanesDelOwner = Array.from(new Set(
+                        clanLimpio
+                            .filter(m => normH(m.duenoHandle) === ownerActual || normH(m.handle) === ownerActual)
+                            .map(m => String(m.clanNombre || '').trim())
+                            .filter(Boolean)
+                    ));
+                    const registradosRaw = Array.isArray(raw.clanesRegistrados) ? raw.clanesRegistrados : [];
+                    const clanesRegistradosFinal = Array.from(new Set([
+                        ...registradosRaw.filter(t => !/prueba|sector4/i.test(String(t || ''))),
+                        ...clanesDelOwner
+                    ]));
                     return {
                         generaciones: gens,
                         familiaEtiqueta: String(raw.familiaEtiqueta || 'Mi Familia').trim(),
-                        clanesRegistrados: Array.isArray(raw.clanesRegistrados) ? raw.clanesRegistrados : [],
-                        familia: Array.isArray(raw.familia) ? raw.familia : [],
-                        clan: Array.isArray(raw.clan) ? raw.clan : []
+                        clanesRegistrados: clanesRegistradosFinal,
+                        familia: familiaLimpia,
+                        clan: clanLimpio
                     };
                 } catch {
                     return {

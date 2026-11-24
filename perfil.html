@@ -753,23 +753,22 @@ img, video, svg {
       }
 
       function obtenerEtiquetaFamilia(personaje) {
+        const target = normH(personaje.handle);
         if (personaje.familiaNombre) return String(personaje.familiaNombre).trim();
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-          if (fam.familiaEtiqueta) return String(fam.familiaEtiqueta).trim();
+          const perteneceFamilia = Array.isArray(fam.familia) && fam.familia.some(
+            m => normH(m?.handle) === target || normH(m?.duenoHandle) === target
+          );
+          if (perteneceFamilia && fam.familiaEtiqueta) return String(fam.familiaEtiqueta).trim();
         } catch {}
-        return 'Mi Familia';
+        return '';
       }
 
-      // Devuelve SOLO los clanes propios a los que pertenece este personaje
+      // Devuelve SOLO los clanes a los que pertenece este personaje
       function obtenerPertenenciasClanFamilia(personaje) {
         const target = normH(personaje.handle);
         const set = new Set();
-        if (Array.isArray(personaje.clanes)) {
-          personaje.clanes.forEach(c => { if (c) set.add(String(c).trim()); });
-        } else if (personaje.clan) {
-          set.add(String(personaje.clan).trim());
-        }
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           (fam.clan || []).forEach(m => {
@@ -778,24 +777,39 @@ img, video, svg {
             }
           });
         } catch {}
+        if (!set.size) {
+          if (Array.isArray(personaje.clanes)) {
+            personaje.clanes.forEach(c => { if (c) set.add(String(c).trim()); });
+          } else if (personaje.clan) {
+            set.add(String(personaje.clan).trim());
+          }
+        }
         return Array.from(set);
       }
 
       function obtenerUniversosEnlazados(personaje) {
         const set = new Set();
-        (personaje.universos || []).forEach(u => {
-          if (u) set.add(String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, ''));
-        });
+        const h = normH(personaje.handle);
+        const miembrosUniversos = new Set();
         if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
           try {
-            const h = normH(personaje.handle);
             window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => {
-              if (u?.tag && Array.isArray(u.miembros) && u.miembros.some(m => normH(m) === h)) {
+              if (!u?.tag || /^#sector4$/i.test(String(u.tag).trim())) return;
+              if (Array.isArray(u.miembros) && u.miembros.some(m => normH(m) === h)) {
+                miembrosUniversos.add(u.tag.toLowerCase());
                 set.add(u.tag);
               }
             });
           } catch {}
         }
+        (personaje.universos || []).forEach(u => {
+          if (!u) return;
+          const tag = String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, '');
+          if (/^#sector4$/i.test(tag.trim())) return;
+          if (miembrosUniversos.has(tag.toLowerCase()) || !window.KIXUZ_UNIVERSOS?.leerUniversos) {
+            set.add(tag);
+          }
+        });
         return Array.from(set);
       }
 
@@ -1106,9 +1120,11 @@ img, video, svg {
           ? `<span class="inline-partner-rel">· ${esc(pareja.texto)} <a href="perfil.html?char=${encodeURIComponent(pareja.handle)}">${esc(pareja.handle)}</a></span>`
           : '';
 
-        // Familia única (ej. Mi Familia) -> #familia; cada Clan -> #clan:NombreClan
+        // Solo muestra etiqueta de Familia o Clan si le corresponde al personaje
         const nomFamilia = obtenerEtiquetaFamilia(personaje);
-        const familiaLinkHtml = `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} ${esc(nomFamilia)}</a>`;
+        const familiaLinkHtml = nomFamilia
+          ? `<a href="familia.html?char=${encodeURIComponent(personaje.handle)}#familia" class="info-tag">${SVG_ICON.clan} ${esc(nomFamilia)}</a>`
+          : '';
 
         const pertenencias = obtenerPertenenciasClanFamilia(personaje);
         const clanesLinksHtml = pertenencias.map(nom =>
