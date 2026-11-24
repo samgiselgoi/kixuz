@@ -1,116 +1,85 @@
 (() => {
-    const UNIS_KEY = 'kixuz_universos_v1';
-    const norm = v => String(v || '').trim().toLowerCase();
-    const normTag = v => {
-        const s = norm(v).replace(/^#+/, '').replace(/\s+/g, '');
-        return s ? '#' + s : '';
-    };
-    const normHandle = v => {
-        const s = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
-        return s ? '@' + s : '';
+    const STORAGE_KEY = 'kixuz_universos_v1';
+
+    const normTag = tag => {
+        const clean = String(tag || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+        return clean ? '#' + clean : '';
     };
 
     function leerUniversos() {
         try {
-            const arr = JSON.parse(localStorage.getItem(UNIS_KEY) || '[]');
-            return Array.isArray(arr) ? arr : [];
+            const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            if (!Array.isArray(raw)) return [];
+            const mapa = new Map();
+            raw.forEach(u => {
+                if (!u || !u.tag) return;
+                const tag = normTag(u.tag);
+                if (!tag) return;
+                mapa.set(tag.toLowerCase(), {
+                    ...u,
+                    tag,
+                    nombre: String(u.nombre || tag.slice(1)).trim(),
+                    descripcion: String(u.descripcion || '').trim(),
+                    reglas: String(u.reglas || '').trim(),
+                    miembros: Array.isArray(u.miembros) ? u.miembros : [],
+                    mapas: Array.isArray(u.mapas) ? u.mapas : []
+                });
+            });
+            return Array.from(mapa.values());
         } catch {
             return [];
         }
     }
 
-    function guardarUniversos(arr) {
-        try { localStorage.setItem(UNIS_KEY, JSON.stringify(arr)); } catch {}
+    function guardarUniversos(lista) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+            window.dispatchEvent(new Event('kixuz:universos-actualizados'));
+        } catch {}
     }
 
-    function crearUniverso({ nombre, tag, descripcion = '', reglas = '', creadorHandle = '' }) {
-        const nom = String(nombre || '').trim();
-        const tg = normTag(tag || nom);
-        if (!nom || !tg) return null;
+    function crearUniversoDirecto({ nombre, tag, descripcion, reglas, creadorHandle }) {
+        const tagNorm = normTag(tag || nombre);
+        if (!tagNorm) return null;
 
-        const lista = leerUniversos();
-        const existente = lista.find(u => normTag(u.tag) === tg || norm(u.nombre) === norm(nom));
-        if (existente) return existente;
+        const actual = leerUniversos();
+        const key = tagNorm.toLowerCase();
+        if (actual.some(u => normTag(u.tag).toLowerCase() === key)) {
+            return actual.find(u => normTag(u.tag).toLowerCase() === key) || null;
+        }
 
-        const h = normHandle(creadorHandle);
+        const miembrosIniciales = creadorHandle ? [String(creadorHandle).trim()] : [];
         const nuevo = {
             id: 'uni_' + Date.now(),
-            nombre: nom,
-            tag: tg,
+            nombre: String(nombre || tagNorm.slice(1)).trim(),
+            tag: tagNorm,
             descripcion: String(descripcion || '').trim(),
             reglas: String(reglas || '').trim(),
-            creadoPorHandle: h,
-            miembros: h ? [h] : [],
+            creadorHandle: String(creadorHandle || '').trim(),
+            miembros: miembrosIniciales,
             mapas: []
         };
-        lista.unshift(nuevo);
-        guardarUniversos(lista);
-        window.dispatchEvent(new Event('kixuz:universos-actualizados'));
+
+        actual.unshift(nuevo);
+        guardarUniversos(actual);
         return nuevo;
     }
 
-    function obtenerUniversosDePersonaje(handle) {
-        const h = normHandle(handle);
-        const set = new Set();
-        if (!h) return set;
-        leerUniversos().forEach(u => {
-            const miembros = Array.isArray(u.miembros) ? u.miembros.map(normHandle) : [];
-            if (miembros.includes(h) || normHandle(u.creadoPorHandle) === h) {
-                set.add(normTag(u.tag));
-            }
-        });
-        try {
-            const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-            subs.forEach(p => {
-                if (normHandle(p.handle) === h) {
-                    const arr = Array.isArray(p.universos) ? p.universos : (p.universo ? [p.universo] : []);
-                    arr.forEach(x => { const t = normTag(x); if (t) set.add(t); });
-                }
-            });
-        } catch {}
-        return set;
-    }
-
-    function puedeVerPublicacion(post) {
+    function puedeVerPost(post, contexto = 'inicio') {
         if (!post) return false;
-        const tipo = norm(post.alcanceTipo || 'general');
-        if (!tipo || tipo === 'general') return true;
-        const ac = window.KIXUZ_ACTIVE_CHAR;
-        const miH = normHandle(ac?.handle || '');
-        if (miH && normHandle(post.autorHandle) === miH) return true;
-
-        const destino = norm(post.alcanceDestino || post.universo || '');
-        if (!destino) return true;
-
-        if (tipo === 'universo') {
-            return obtenerUniversosDePersonaje(miH).has(normTag(destino));
+        const tagPost = normTag(post.universo || post.universe || '');
+        if (contexto === 'inicio') {
+            return true;
         }
-        if (tipo === 'familia') {
-            try {
-                const famData = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-                const fams = Array.isArray(famData.familia) ? famData.familia : [];
-                return fams.some(f => normHandle(f.duenoHandle) === miH || normHandle(f.handle) === miH);
-            } catch { return false; }
-        }
-        if (tipo === 'clan') {
-            try {
-                const famData = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
-                const clans = Array.isArray(famData.clan) ? famData.clan : [];
-                return clans.some(c =>
-                    norm(c.clanNombre) === destino &&
-                    (normHandle(c.duenoHandle) === miH || normHandle(c.handle) === miH)
-                );
-            } catch { return false; }
-        }
+        if (!tagPost) return false;
         return true;
     }
 
     window.KIXUZ_UNIVERSOS = {
+        normTag,
         leerUniversos,
         guardarUniversos,
-        crearUniverso,
-        obtenerUniversosDePersonaje,
-        puedeVerPublicacion,
-        normTag
+        crearUniversoDirecto,
+        puedeVerPost
     };
 })();
