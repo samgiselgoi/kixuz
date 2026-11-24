@@ -81,6 +81,18 @@
         }
         .tab-btn.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
 
+        .tags-manager-row {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center;
+        }
+        .tag-badge-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700;
+            background: rgba(45, 212, 196, 0.14); border: 1px solid var(--acento); color: var(--acento);
+        }
+        .tag-badge-chip button {
+            background: none; border: none; color: inherit; font-weight: 700; cursor: pointer; font-size: 12px;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
@@ -116,7 +128,6 @@
             font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
         }
 
-        /* Animación flotante para las tarjetas centradas */
         @keyframes kixuzCardFloat {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-6px); }
@@ -131,10 +142,7 @@
             margin-bottom: 14px; gap: 10px; flex-wrap: wrap; text-align: center;
         }
         .cards-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
         }
         .member-card {
             width: 245px;
@@ -213,12 +221,21 @@
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
                 <div>
                     <h1 style="font-size:22px;">Familia y Clanes</h1>
-                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Crea tu etiqueta de Familia o Clan para el perfil, gestiona generaciones y enlaza personajes.</p>
+                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Crea etiquetas para tu perfil y para elegir fácilmente al agregar personas.</p>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <button type="button" class="btn-ghost" id="btnSetProfileTag">Crear / Asignar etiqueta al perfil</button>
                     <button type="button" class="btn-ghost" id="addGenBtn">+ Nueva Generación</button>
                 </div>
+            </div>
+
+            <!-- Gestor de etiquetas creadas para el perfil y para seleccionar en formularios -->
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--borde);">
+                <h2 style="font-size:15.5px;">Etiquetas creadas de Familia / Clan</h2>
+                <form id="createTagForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                    <input type="text" id="newTagNameInput" placeholder="Nombre de la etiqueta (ej. Linaje Vance o Clan Eclipse)" style="max-width:320px;" required>
+                    <button type="submit" class="btn-accent">Crear y asignar al perfil</button>
+                </form>
+                <div class="tags-manager-row" id="createdTagsList"></div>
             </div>
 
             <div class="tabs-row">
@@ -227,7 +244,6 @@
             </div>
         </section>
 
-        <!-- Solicitudes dirigidas exclusivamente al destinatario -->
         <section class="panel" id="inboxRequestsPanel" style="display:none;">
             <h2 style="font-size:16px;">Solicitudes recibidas</h2>
             <div id="inboxRequestsList"></div>
@@ -243,8 +259,9 @@
                 <form id="addFamilyForm" class="form-grid">
                     <input type="text" id="famNombre" placeholder="Nombre del miembro" required>
                     <input type="text" id="famHandle" placeholder="@usuario (ej. @kaelen)" required>
-                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Hijo/a, Tío/a, Pareja)" required>
+                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Hijo/a, Pareja)" required>
                     <datalist id="relacionesSugeridas">
+                        <option value="Pareja">
                         <option value="Madre">
                         <option value="Padre">
                         <option value="Hijo/a">
@@ -254,11 +271,11 @@
                         <option value="Tío/a">
                         <option value="Sobrino/a">
                         <option value="Primo/a">
-                        <option value="Pareja">
                     </datalist>
+                    <select id="famEtiquetaSelect" aria-label="Etiqueta de familia"></select>
                     <select id="famGenSelect" aria-label="Generación"></select>
                     <select id="famEnvioModo" aria-label="Agregar directo o enviar solicitud">
-                        <option value="directo">Agregar directo a mi ficha</option>
+                        <option value="directo">Agregar directo</option>
                         <option value="solicitud">Enviar solicitud al @usuario</option>
                     </select>
                     <button type="submit" class="btn-accent">Guardar en Familia</button>
@@ -268,7 +285,7 @@
             <div id="familiaGenerationsContainer"></div>
         </section>
 
-        <!-- Vista Clanes -->
+        <!-- Vista Clanes (jerarquía militar de arriba hacia abajo con Líder múltiple) -->
         <section id="viewClanes" style="display:none;">
             <div class="panel">
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -276,10 +293,21 @@
                     <button type="button" class="btn-ghost" id="btnAddSelfClan">Agregarme a mí a este Clan</button>
                 </div>
                 <form id="addClanForm" class="form-grid">
-                    <input type="text" id="clanNombreClan" placeholder="Nombre del Clan (ej. Clan Eclipse)" required>
+                    <select id="clanEtiquetaSelect" aria-label="Escoger clan creado"></select>
+                    <input type="text" id="clanNombreClan" placeholder="O escribir nombre del Clan" required>
                     <input type="text" id="clanMiembroNombre" placeholder="Nombre del personaje" required>
                     <input type="text" id="clanMiembroHandle" placeholder="@usuario" required>
-                    <input type="text" id="clanRango" placeholder="Relación o rango (ej. Líder, Guardia)">
+                    <select id="clanRangoSelect" aria-label="Rango militar jerárquico">
+                        <option value="Líder">1. Líder</option>
+                        <option value="Sublíder / Segundo al Mando">2. Sublíder / Segundo al Mando</option>
+                        <option value="Comandante">3. Comandante</option>
+                        <option value="Capitán">4. Capitán</option>
+                        <option value="Teniente">5. Teniente</option>
+                        <option value="Sargento">6. Sargento</option>
+                        <option value="Cabo">7. Cabo</option>
+                        <option value="Soldado / Miembro">8. Soldado / Miembro</option>
+                        <option value="Recluta">9. Recluta</option>
+                    </select>
                     <select id="clanEnvioModo" aria-label="Agregar directo o enviar solicitud">
                         <option value="directo">Agregar directo al Clan</option>
                         <option value="solicitud">Enviar solicitud al @usuario</option>
@@ -297,6 +325,35 @@
             const KEY_FAM_CLAN = 'kixuz_familia_clan_v1';
             const KEY_SOLICITUDES = 'kixuz_solicitudes_vinculo_v1';
             const KEY_FOTOS = 'kixuz_perfil_fotos_v1';
+
+            // Orden militar estricto de arriba hacia abajo (Líder puede haber más de uno)
+            const ORDEN_RANGOS_MILITARES = [
+                'Líder',
+                'Sublíder / Segundo al Mando',
+                'Comandante',
+                'Capitán',
+                'Teniente',
+                'Sargento',
+                'Cabo',
+                'Soldado / Miembro',
+                'Recluta'
+            ];
+
+            function getPesoRango(rango) {
+                const limpio = String(rango || '').trim().toLowerCase();
+                if (!limpio) return 99;
+                if (limpio.includes('líder') || limpio.includes('lider')) return 1;
+                const idx = ORDEN_RANGOS_MILITARES.findIndex(r => r.toLowerCase() === limpio);
+                if (idx >= 0) return idx + 1;
+                if (limpio.includes('sublíder') || limpio.includes('sublider') || limpio.includes('segundo')) return 2;
+                if (limpio.includes('comandante') || limpio.includes('general') || limpio.includes('coronel')) return 3;
+                if (limpio.includes('capitán') || limpio.includes('capitan')) return 4;
+                if (limpio.includes('teniente')) return 5;
+                if (limpio.includes('sargento')) return 6;
+                if (limpio.includes('cabo')) return 7;
+                if (limpio.includes('recluta') || limpio.includes('cadete')) return 9;
+                return 8;
+            }
 
             const esc = s => String(s || '')
                 .replace(/&/g, '&amp;')
@@ -389,6 +446,7 @@
                         ];
                     return {
                         generaciones: gens,
+                        etiquetas: Array.isArray(raw.etiquetas) ? raw.etiquetas : [],
                         familia: Array.isArray(raw.familia) ? raw.familia : [],
                         clan: Array.isArray(raw.clan) ? raw.clan : []
                     };
@@ -399,6 +457,7 @@
                             { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
                             { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
                         ],
+                        etiquetas: [],
                         familia: [],
                         clan: []
                     };
@@ -441,7 +500,82 @@
                 window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
             }
 
-            function agregarVinculo(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId }) {
+            function actualizarParejaEnPerfil(handleDueno, handlePareja, relacion) {
+                if (!/pareja|espos|marido|casad|compromet/i.test(String(relacion || ''))) return;
+                const hD = normH(handleDueno);
+                const hP = normH(handlePareja);
+                if (!hD || !hP || hD === hP) return;
+
+                try {
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs)) {
+                        const nextSubs = subs.map(p => normH(p?.handle) === hD
+                            ? { ...p, estadoSentimentalTipo: relacion.trim(), estadoSentimentalHandle: hP }
+                            : p);
+                        localStorage.setItem('kixuz_subpersonajes', JSON.stringify(nextSubs));
+                    }
+                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                    if (act && normH(act.handle) === hD) {
+                        const nextAct = { ...act, estadoSentimentalTipo: relacion.trim(), estadoSentimentalHandle: hP };
+                        localStorage.setItem('kixuz_personaje_activo', JSON.stringify(nextAct));
+                        window.KIXUZ_ACTIVE_CHAR = nextAct;
+                    }
+                } catch {}
+                window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+            }
+
+            function renderEtiquetasYSelectores() {
+                const st = leerEstado();
+                const listEl = document.getElementById('createdTagsList');
+                const famTagSel = document.getElementById('famEtiquetaSelect');
+                const clanTagSel = document.getElementById('clanEtiquetaSelect');
+
+                const tags = st.etiquetas || [];
+                if (listEl) {
+                    listEl.innerHTML = tags.length
+                        ? tags.map((t, idx) => `
+                            <span class="tag-badge-chip">
+                                <span>${esc(t)}</span>
+                                <button type="button" data-use-tag="${esc(t)}" title="Asignar a mi perfil">★</button>
+                                <button type="button" data-del-tag="${idx}" title="Quitar etiqueta">✕</button>
+                            </span>
+                        `).join('')
+                        : `<span style="font-size:12.5px;opacity:0.7;">Todavía no creaste etiquetas. Creá una arriba para usarla en tu perfil y al agregar personas.</span>`;
+
+                    listEl.querySelectorAll('[data-use-tag]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const yo = getPersonajeActivoObj();
+                            asignarEtiquetaAlPerfil(yo.handle, btn.dataset.useTag);
+                        });
+                    });
+
+                    listEl.querySelectorAll('[data-del-tag]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const next = leerEstado();
+                            next.etiquetas.splice(Number(btn.dataset.delTag), 1);
+                            guardarEstado(next);
+                            renderAll();
+                        });
+                    });
+                }
+
+                if (famTagSel) {
+                    famTagSel.innerHTML = `<option value="">Etiqueta de perfil (opcional)</option>` +
+                        tags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+                }
+
+                if (clanTagSel) {
+                    clanTagSel.innerHTML = `<option value="">Elegir clan creado...</option>` +
+                        tags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+                    clanTagSel.onchange = () => {
+                        if (clanTagSel.value) {
+                            document.getElementById('clanNombreClan').value = clanTagSel.value;
+                        }
+                    };
+                }
+            }
+
+            function agregarVinculo(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, genId, etiquetaPerfil }) {
                 const owner = normH(duenoHandle);
                 const target = normH(destinoHandle);
                 if (!owner || !target) return;
@@ -457,7 +591,11 @@
                         genId: gId
                     });
 
+                    if (etiquetaPerfil) {
+                        asignarEtiquetaAlPerfil(owner, etiquetaPerfil);
+                    }
                     if (target !== owner) {
+                        actualizarParejaEnPerfil(owner, target, relacion);
                         const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
                         st.familia.push({
                             id: 'fam_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -470,13 +608,14 @@
                     }
                 } else {
                     const cNom = (clanNombre || 'Clan').trim();
+                    const rangoLimpio = (relacion || 'Soldado / Miembro').trim();
                     st.clan.push({
                         id: 'clan_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                         duenoHandle: owner,
                         clanNombre: cNom,
                         nombre: destinoNombre || target.slice(1),
                         handle: target,
-                        rango: relacion || 'Miembro'
+                        rango: rangoLimpio
                     });
                     asignarEtiquetaAlPerfil(target, cNom);
 
@@ -487,7 +626,7 @@
                             clanNombre: cNom,
                             nombre: owner.slice(1),
                             handle: owner,
-                            rango: relacion || 'Miembro'
+                            rango: rangoLimpio
                         });
                     }
                 }
@@ -602,9 +741,7 @@
                             const nuevaRel = prompt('Nueva relación familiar:', item.relacion || '');
                             if (nuevaRel !== null && nuevaRel.trim()) item.relacion = nuevaRel.trim();
                         } else {
-                            const nuevoClan = prompt('Nombre del Clan:', item.clanNombre || '');
-                            if (nuevoClan !== null && nuevoClan.trim()) item.clanNombre = nuevoClan.trim();
-                            const nuevoRango = prompt('Nuevo rango o relación:', item.rango || '');
+                            const nuevoRango = prompt('Nuevo rango militar (ej. Líder, Sublíder / Segundo al Mando, Comandante, Capitán, Teniente, Sargento, Cabo, Soldado / Miembro, Recluta):', item.rango || '');
                             if (nuevoRango !== null && nuevoRango.trim()) item.rango = nuevoRango.trim();
                         }
                         guardarEstado(st);
@@ -646,6 +783,7 @@
                 bindCardActions(container);
             }
 
+            // Ordena los miembros del clan en jerarquía militar de arriba hacia abajo (Líder primero, pudiendo haber más de uno)
             function renderClanes() {
                 const container = document.getElementById('clanesCardsContainer');
                 if (!container) return;
@@ -665,33 +803,63 @@
                     return;
                 }
 
-                container.innerHTML = Array.from(agrupados.entries()).map(([nombreClan, lista]) => `
-                    <div class="panel gen-block">
-                        <div class="gen-head">
-                            <h3 style="font-size:16px;">${esc(nombreClan)}</h3>
-                            <span style="font-size:12px;opacity:0.72;">${lista.length} ${lista.length === 1 ? 'miembro' : 'miembros'}</span>
+                container.innerHTML = Array.from(agrupados.entries()).map(([nombreClan, lista]) => {
+                    const ordenada = [...lista].sort((a, b) => {
+                        const pa = getPesoRango(a.rango);
+                        const pb = getPesoRango(b.rango);
+                        if (pa !== pb) return pa - pb;
+                        return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es');
+                    });
+
+                    return `
+                        <div class="panel gen-block">
+                            <div class="gen-head">
+                                <h3 style="font-size:16px;">${esc(nombreClan)}</h3>
+                                <span style="font-size:12px;opacity:0.72;">${ordenada.length} ${ordenada.length === 1 ? 'miembro' : 'miembros'} · Jerarquía descendente</span>
+                            </div>
+                            <div class="cards-grid">
+                                ${ordenada.map(m => tarjetaHtml({
+                                    id: m.id,
+                                    nombre: m.nombre,
+                                    handle: m.handle,
+                                    subEtiqueta: `${m.rango || 'Soldado / Miembro'} · ${nombreClan}`,
+                                    tipoLista: 'clan'
+                                })).join('')}
+                            </div>
                         </div>
-                        <div class="cards-grid">
-                            ${lista.map(m => tarjetaHtml({
-                                id: m.id,
-                                nombre: m.nombre,
-                                handle: m.handle,
-                                subEtiqueta: `${m.rango || 'Miembro'} · ${nombreClan}`,
-                                tipoLista: 'clan'
-                            })).join('')}
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 bindCardActions(container);
             }
 
             function renderAll() {
+                renderEtiquetasYSelectores();
                 poblarSelectorGeneraciones();
                 renderSolicitudes();
                 renderFamilia();
                 renderClanes();
             }
+
+            document.getElementById('createTagForm')?.addEventListener('submit', e => {
+                e.preventDefault();
+                const inp = document.getElementById('newTagNameInput');
+                const tagVal = (inp?.value || '').trim();
+                if (!tagVal) return;
+
+                const st = leerEstado();
+                st.etiquetas = Array.isArray(st.etiquetas) ? st.etiquetas : [];
+                if (!st.etiquetas.some(t => t.toLowerCase() === tagVal.toLowerCase())) {
+                    st.etiquetas.push(tagVal);
+                }
+                guardarEstado(st);
+
+                const yo = getPersonajeActivoObj();
+                asignarEtiquetaAlPerfil(yo.handle, tagVal);
+
+                inp.value = '';
+                renderAll();
+            });
 
             document.getElementById('tabFamilia').addEventListener('click', () => {
                 document.getElementById('tabFamilia').classList.add('active');
@@ -711,14 +879,6 @@
                 document.getElementById('tabClanes').click();
             }
 
-            document.getElementById('btnSetProfileTag').addEventListener('click', () => {
-                const yo = getPersonajeActivoObj();
-                const nuevaEtiqueta = prompt('Escribe el nombre de tu Familia o Clan para mostrar como etiqueta en el perfil:', yo.clan || '');
-                if (nuevaEtiqueta === null || !nuevaEtiqueta.trim()) return;
-                asignarEtiquetaAlPerfil(yo.handle, nuevaEtiqueta.trim());
-                alert(`Etiqueta "${nuevaEtiqueta.trim()}" asignada al perfil ${yo.handle}.`);
-            });
-
             document.getElementById('addGenBtn').addEventListener('click', () => {
                 const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación):');
                 if (!titulo || !titulo.trim()) return;
@@ -734,6 +894,7 @@
                 const rel = prompt('Tu relación / rol en la familia:', 'Miembro');
                 if (!rel || !rel.trim()) return;
                 const genId = document.getElementById('famGenSelect')?.value || 'gen_2';
+                const etq = document.getElementById('famEtiquetaSelect')?.value || '';
                 const st = leerEstado();
                 agregarVinculo(st, {
                     categoria: 'familia',
@@ -741,7 +902,8 @@
                     destinoNombre: yo.nombre,
                     destinoHandle: yo.handle,
                     relacion: rel.trim(),
-                    genId
+                    genId,
+                    etiquetaPerfil: etq
                 });
                 guardarEstado(st);
                 renderAll();
@@ -750,16 +912,16 @@
             document.getElementById('btnAddSelfClan').addEventListener('click', () => {
                 const yo = getPersonajeActivoObj();
                 const owner = getDuenoActual();
-                const clanNom = document.getElementById('clanNombreClan')?.value.trim() || prompt('Nombre del Clan:');
+                const clanNom = document.getElementById('clanNombreClan')?.value.trim() || document.getElementById('clanEtiquetaSelect')?.value.trim() || prompt('Nombre del Clan:');
                 if (!clanNom || !clanNom.trim()) return;
-                const rango = document.getElementById('clanRango')?.value.trim() || prompt('Tu rol o rango en el clan:', 'Miembro');
+                const rango = document.getElementById('clanRangoSelect')?.value || 'Soldado / Miembro';
                 const st = leerEstado();
                 agregarVinculo(st, {
                     categoria: 'clan',
                     duenoHandle: owner,
                     destinoNombre: yo.nombre,
                     destinoHandle: yo.handle,
-                    relacion: rango || 'Miembro',
+                    relacion: rango,
                     clanNombre: clanNom.trim()
                 });
                 guardarEstado(st);
@@ -771,6 +933,7 @@
                 const nombre = document.getElementById('famNombre').value.trim();
                 const handle = normH(document.getElementById('famHandle').value);
                 const relacion = document.getElementById('famRelacion').value.trim();
+                const etiquetaPerfil = document.getElementById('famEtiquetaSelect').value;
                 const genId = document.getElementById('famGenSelect').value;
                 const modoEnvio = document.getElementById('famEnvioModo').value;
                 const owner = getDuenoActual();
@@ -797,7 +960,8 @@
                         destinoNombre: nombre,
                         destinoHandle: handle,
                         relacion,
-                        genId
+                        genId,
+                        etiquetaPerfil
                     });
                     guardarEstado(st);
                 }
@@ -808,10 +972,10 @@
 
             document.getElementById('addClanForm').addEventListener('submit', e => {
                 e.preventDefault();
-                const clanNombre = document.getElementById('clanNombreClan').value.trim();
+                const clanNombre = document.getElementById('clanNombreClan').value.trim() || document.getElementById('clanEtiquetaSelect').value.trim();
                 const nombre = document.getElementById('clanMiembroNombre').value.trim();
                 const handle = normH(document.getElementById('clanMiembroHandle').value);
-                const rango = document.getElementById('clanRango').value.trim() || 'Miembro';
+                const rango = document.getElementById('clanRangoSelect').value || 'Soldado / Miembro';
                 const modoEnvio = document.getElementById('clanEnvioModo').value;
                 const owner = getDuenoActual();
                 if (!clanNombre || !nombre || !handle) return;
