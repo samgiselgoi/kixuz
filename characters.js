@@ -1,145 +1,116 @@
 (() => {
     const STORAGE_LIST = 'kixuz_subpersonajes';
     const STORAGE_ACTIVE = 'kixuz_personaje_activo';
+    const MASTER_VALUE = '__cuenta_maestra__';
+    const CREATE_VALUE = '__crear_personaje__';
 
     const norm = v => String(v || '').trim().toLowerCase();
-    const normHandle = v => {
-        const limp = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
-        return limp ? '@' + limp : '';
+    const normHandle = h => {
+        const s = norm(h).replace(/^@+/, '').replace(/\s+/g, '_');
+        return s ? '@' + s : '';
     };
 
-    function esCuentaKixuz() {
-        if (window.KIXUZ_DB?.esAdmin) return true;
-        const p = window.KIXUZ_DB?.perfilCuenta || {};
-        const u = window.KIXUZ_DB?.usuarioActual || {};
-        let loc = {};
-        try { loc = JSON.parse(localStorage.getItem('kixuz_usuario_local') || '{}') || {}; } catch {}
-        const n = norm(p.nombreMaestro || u.displayName || loc.nombreMaestro || loc.nombre || '');
-        const e = norm(p.email || u.email || loc.email || '');
-        return p.rolSistema === 'admin' || loc.rolSistema === 'admin' || n === 'kixuz' || e.startsWith('kixuz@');
-    }
-
-    function obtenerSubpersonajes() {
+    // Sin límite de cantidad de personajes: conserva todos los personajes creados
+    function leerPersonajes() {
         try {
-            const list = JSON.parse(localStorage.getItem(STORAGE_LIST) || '[]');
-            return Array.isArray(list) ? list : [];
+            const raw = JSON.parse(localStorage.getItem(STORAGE_LIST) || '[]');
+            if (!Array.isArray(raw)) return [];
+            const mapa = new Map();
+            raw.forEach(p => {
+                if (!p) return;
+                const h = normHandle(p.handle || '');
+                const nom = String(p.nombre || '').trim();
+                if (!h && !nom) return;
+                const key = h || norm(nom);
+                mapa.set(key, {
+                    ...p,
+                    nombre: nom || h.slice(1),
+                    handle: h || ('@' + norm(nom).replace(/\s+/g, '_'))
+                });
+            });
+            return Array.from(mapa.values());
         } catch {
             return [];
         }
     }
 
-    function obtenerPersonajeActivo() {
-        const lista = obtenerSubpersonajes();
+    function obtenerActivo(lista) {
         try {
-            const act = JSON.parse(localStorage.getItem(STORAGE_ACTIVE) || 'null');
-            if (act && act.handle) {
-                const match = lista.find(p => normHandle(p.handle) === normHandle(act.handle));
-                if (match) return match;
-                return act;
+            const raw = JSON.parse(localStorage.getItem(STORAGE_ACTIVE) || 'null');
+            if (raw && raw.handle) {
+                const found = lista.find(p => normHandle(p.handle) === normHandle(raw.handle));
+                if (found) return found;
             }
         } catch {}
-        if (lista.length > 0) {
-            try { localStorage.setItem(STORAGE_ACTIVE, JSON.stringify(lista[0])); } catch {}
-            return lista[0];
-        }
-        return null;
+        return lista[0] || { nombre: 'Sin personaje', handle: '@nuevo', esPlaceholder: true };
     }
 
-    function esPersonajePropio(personaje) {
-        if (!personaje) return false;
-        const miUid = norm(window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || '');
-        const duenioUid = norm(personaje.uidMaestro || '');
-        if (duenioUid && miUid && duenioUid === miUid) return true;
-        const lista = obtenerSubpersonajes();
-        return lista.some(p => normHandle(p.handle) === normHandle(personaje.handle));
-    }
-
-    async function obtenerPersonajeParaVista(charParam = '') {
-        const activo = obtenerPersonajeActivo();
-        const raw = String(charParam || '').trim();
-        if (!raw) return activo;
-
-        const targetHandle = normHandle(raw);
-        const lista = obtenerSubpersonajes();
-        const propio = lista.find(p => normHandle(p.handle) === targetHandle || norm(p.nombre) === norm(raw));
-        if (propio) return propio;
-
-        if (window.KIXUZ_DB?.buscarPersonajePublico) {
-            try {
-                const pub = await window.KIXUZ_DB.buscarPersonajePublico(targetHandle);
-                if (pub) return pub;
-            } catch {}
-        }
-
-        return {
-            nombre: raw.replace(/^@/, ''),
-            handle: targetHandle || '@rol',
-            bio: 'Perfil consultado en KIXUZ.'
-        };
-    }
-
-    function sincronizarSelector() {
-        const select = document.getElementById('activeCharSelect') || document.querySelector('.user-menu select');
-        if (!select) return;
-
-        const lista = obtenerSubpersonajes();
-        const activo = obtenerPersonajeActivo();
+    function sincronizarDesplegable() {
+        const lista = leerPersonajes();
+        const activo = obtenerActivo(lista);
         window.KIXUZ_ACTIVE_CHAR = activo;
 
-        select.innerHTML = '';
-        if (!lista.length) {
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = 'Sin personaje activo';
-            select.appendChild(opt);
-        } else {
+        document.querySelectorAll('#activeCharSelect, .user-menu select, select.dropdown').forEach(select => {
+            select.innerHTML = '';
+
+            const optMaster = document.createElement('option');
+            optMaster.value = MASTER_VALUE;
+            optMaster.textContent = 'Mi Cuenta Maestra';
+            select.appendChild(optMaster);
+
             lista.forEach(p => {
                 const opt = document.createElement('option');
-                opt.value = p.handle || p.nombre;
-                opt.textContent = `${p.nombre} (${p.handle || '@rol'})`;
-                if (activo && normHandle(p.handle) === normHandle(activo.handle)) {
-                    opt.selected = true;
-                }
+                opt.value = p.handle;
+                opt.textContent = `${p.nombre} (${p.handle})`;
                 select.appendChild(opt);
             });
-        }
 
-        const optCrear = document.createElement('option');
-        optCrear.value = '__crear__';
-        optCrear.textContent = '+ Crear personaje';
-        select.appendChild(optCrear);
+            const optCreate = document.createElement('option');
+            optCreate.value = CREATE_VALUE;
+            optCreate.textContent = '+ Crear personaje';
+            select.appendChild(optCreate);
 
-        if (!select.dataset.kixuzBound) {
-            select.dataset.kixuzBound = '1';
-            select.addEventListener('change', e => {
-                if (e.target.value === '__crear__') {
-                    window.location.href = 'crear-personaje.html';
-                    return;
-                }
-                const elegida = obtenerSubpersonajes().find(
-                    p => normHandle(p.handle || p.nombre) === normHandle(e.target.value)
-                );
-                if (elegida) {
-                    try { localStorage.setItem(STORAGE_ACTIVE, JSON.stringify(elegida)); } catch {}
-                    window.KIXUZ_ACTIVE_CHAR = elegida;
-                    window.dispatchEvent(new CustomEvent('kixuz:personaje-cambiado', { detail: elegida }));
-                    window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
-                }
-            });
-        }
+            const page = window.location.pathname.split('/').pop() || '';
+            if (page === 'cuenta-maestra.html') {
+                select.value = MASTER_VALUE;
+            } else if (activo && !activo.esPlaceholder) {
+                select.value = activo.handle;
+            } else {
+                select.value = MASTER_VALUE;
+            }
+
+            if (!select.dataset.kixuzUnifiedBound) {
+                select.dataset.kixuzUnifiedBound = '1';
+                select.addEventListener('change', e => {
+                    const val = e.target.value;
+                    if (val === MASTER_VALUE) {
+                        window.location.href = 'cuenta-maestra.html';
+                        return;
+                    }
+                    if (val === CREATE_VALUE) {
+                        window.location.href = 'crear-personaje.html';
+                        return;
+                    }
+                    const actualLista = leerPersonajes();
+                    const elegido = actualLista.find(p => normHandle(p.handle) === normHandle(val));
+                    if (elegido) {
+                        try { localStorage.setItem(STORAGE_ACTIVE, JSON.stringify(elegido)); } catch {}
+                        window.KIXUZ_ACTIVE_CHAR = elegido;
+                        window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
+                        if (window.location.pathname.endsWith('perfil.html')) {
+                            window.location.href = `perfil.html?char=${encodeURIComponent(elegido.handle)}`;
+                        }
+                    }
+                });
+            }
+        });
     }
 
-    window.KIXUZ_CHARS = {
-        obtenerSubpersonajes,
-        obtenerPersonajeActivo,
-        esPersonajePropio,
-        obtenerPersonajeParaVista,
-        sincronizarSelector,
-        esCuentaKixuz
-    };
-
-    window.KIXUZ_ACTIVE_CHAR = obtenerPersonajeActivo();
-    window.addEventListener('DOMContentLoaded', sincronizarSelector);
-    window.addEventListener('kixuz:personajes-actualizados', sincronizarSelector);
-    window.addEventListener('kixuz:sesion-actualizada', sincronizarSelector);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', sincronizarDesplegable);
+    } else {
+        sincronizarDesplegable();
+    }
+    window.addEventListener('kixuz:personajes-actualizados', sincronizarDesplegable);
+    window.addEventListener('load', sincronizarDesplegable);
 })();
