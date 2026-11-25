@@ -774,9 +774,7 @@ img, video, svg {
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           const mapF = fam.miembrosFamiliaEtiquetas?.[target];
-          const tieneMapaExplicit = mapF && typeof mapF === 'object' && Object.keys(mapF).length > 0;
-
-          if (tieneMapaExplicit) {
+          if (mapF && typeof mapF === 'object') {
             Object.entries(mapF).forEach(([etq, ok]) => {
               const val = String(etq || '').trim();
               if (ok && val && !/prueba|sector4/i.test(val)) set.add(val);
@@ -788,23 +786,25 @@ img, video, svg {
               if (normH(m?.handle) === target) {
                 const etqM = String(m.etiquetaFamilia || '').trim();
                 if (etqM && !/prueba|sector4/i.test(etqM)) {
-                  if (!tieneMapaExplicit || (mapF && mapF[etqM])) {
-                    set.add(etqM);
-                  }
+                  set.add(etqM);
                 }
               }
             });
           }
 
-          if (!set.size && !tieneMapaExplicit) {
-            if (Array.isArray(personaje.familias)) {
-              personaje.familias.forEach(x => {
-                const val = String(x || '').trim();
+          // Solo tomar de la ficha del personaje si no tiene familia asignada en kixuz_familia_clan_v1 y figura en su propia ficha
+          if (!set.size) {
+            const tieneAlgunaFamiliaEnMapa = fam.miembrosFamiliaEtiquetas && Object.keys(fam.miembrosFamiliaEtiquetas).length > 0;
+            if (!tieneAlgunaFamiliaEnMapa) {
+              if (Array.isArray(personaje.familias)) {
+                personaje.familias.forEach(x => {
+                  const val = String(x || '').trim();
+                  if (val && !/prueba|sector4/i.test(val)) set.add(val);
+                });
+              } else if (personaje.familiaNombre) {
+                const val = String(personaje.familiaNombre).trim();
                 if (val && !/prueba|sector4/i.test(val)) set.add(val);
-              });
-            } else if (personaje.familiaNombre) {
-              const val = String(personaje.familiaNombre).trim();
-              if (val && !/prueba|sector4/i.test(val)) set.add(val);
+              }
             }
           }
         } catch {}

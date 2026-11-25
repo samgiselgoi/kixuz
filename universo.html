@@ -70,7 +70,7 @@
             margin: 26px auto 90px;
             padding: 0 18px;
             display: grid;
-            grid-template-columns: 310px 1fr;
+            grid-template-columns: 300px 1fr;
             gap: 20px;
             align-items: start;
         }
@@ -82,7 +82,7 @@
             top: 76px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
         @media (max-width: 860px) {
             .uni-sidebar { position: static; }
@@ -124,7 +124,7 @@
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.24);
             padding: 10px 12px;
-            margin-top: 12px;
+            margin-top: 10px;
         }
         details.side-dropdown > summary {
             font-family: 'Space Grotesk', sans-serif;
@@ -147,26 +147,37 @@
             margin-bottom: 16px;
         }
         .group-banner {
-            height: 165px;
+            height: 170px;
             background: linear-gradient(135deg, #3A1C71, #6C3CE0, #165B6D);
             background-size: cover;
             background-position: center;
         }
-        .group-body { padding: 0 22px 20px; }
+        .group-body { padding: 0 22px 18px; }
         .group-top-row {
             display: flex; justify-content: space-between; align-items: flex-end;
             gap: 14px; flex-wrap: wrap; margin-top: -42px;
         }
         .group-avatar-wrap { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
         .group-avatar {
-            width: 84px; height: 84px; border-radius: 20px; border: 3px solid var(--acento);
+            width: 84px; height: 84px; border-radius: 50%; border: 3px solid var(--acento);
             background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
             background-size: cover; background-position: center;
             display: flex; align-items: center; justify-content: center;
             font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 28px; color: #150A24; flex-shrink: 0;
         }
+        .group-tag-pill {
+            display: inline-block;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: rgba(45, 212, 196, 0.16);
+            border: 1px solid rgba(45, 212, 196, 0.45);
+            color: var(--acento);
+            margin-top: 4px;
+        }
 
-        .tabs-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .tabs-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; border-top: 1px solid var(--borde); padding-top: 12px; }
         .tab-btn {
             background: rgba(108, 60, 224, 0.18); border: 1px solid var(--borde); color: var(--texto);
             padding: 7px 14px; border-radius: 10px; font-family: 'Space Grotesk', sans-serif;
@@ -337,7 +348,7 @@ img, video, svg {
                 <select id="universeSelect"></select>
             </div>
 
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                 <button type="button" class="btn-accent" style="flex:1;" id="btnJoinToggle">Unirse</button>
                 <button type="button" class="btn-ghost" id="btnEditUniMedia">Fotos</button>
             </div>
@@ -391,7 +402,7 @@ img, video, svg {
                     </div>
                 </div>
                 <div class="panel" id="uniNotMemberBanner" style="display:none;margin-bottom:16px;text-align:center;">
-                    <p style="font-size:13.5px;margin-bottom:10px;">Debés estar dentro de este universo para publicar, agregar o quitar personas.</p>
+                    <p style="font-size:13.5px;margin-bottom:10px;">Tocá <strong>Unirse</strong> para entrar a este universo y poder publicar.</p>
                     <button type="button" class="btn-accent" id="btnJoinFromBanner">Unirme a este Universo</button>
                 </div>
                 <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
@@ -576,6 +587,10 @@ img, video, svg {
                 try {
                     const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
                     if (act?.handle) return { nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
+                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                    if (Array.isArray(subs) && subs[0]?.handle) {
+                        return { nombre: subs[0].nombre || subs[0].handle.slice(1), handle: normH(subs[0].handle) };
+                    }
                 } catch {}
                 return { nombre: 'Personaje', handle: '@rol' };
             }
@@ -678,13 +693,17 @@ img, video, svg {
                                 <div class="group-avatar" ${avatarStyle}>${uni.avatar ? '' : esc(inicial)}</div>
                                 <div style="padding-top:46px;">
                                     <h1 style="font-size:22px;">${esc(uni.nombre)}</h1>
-                                    <div style="font-size:12.5px;opacity:0.8;">${esc(uni.tag)} · ${(uni.miembros || []).length} ${(uni.miembros || []).length === 1 ? 'persona' : 'personas'}</div>
+                                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;">
+                                        <span class="group-tag-pill">${esc(uni.tag)}</span>
+                                        <span style="font-size:12.5px;opacity:0.8;">${(uni.miembros || []).length} ${(uni.miembros || []).length === 1 ? 'miembro' : 'miembros'}</span>
+                                        <span style="font-size:12px;color:var(--acento);font-weight:700;">${esMiembro ? '● Dentro del grupo' : '○ Visitante'}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         ${uni.descripcion ? `<p style="margin-top:12px;font-size:13.5px;opacity:0.88;">${esc(uni.descripcion)}</p>` : ''}
                         <div class="tabs-row">
-                            <button type="button" class="tab-btn active" data-utab="muro">Muro</button>
+                            <button type="button" class="tab-btn active" data-utab="muro">Muro del Grupo</button>
                             <button type="button" class="tab-btn" data-utab="mapas">Mapas e Imágenes</button>
                             <button type="button" class="tab-btn" data-utab="info">Miembros y Reglas</button>
                         </div>
@@ -701,7 +720,7 @@ img, video, svg {
                     });
                 });
 
-                if (badge) badge.textContent = `Publicando como ${actor.nombre} (${actor.handle}) en ${uni.nombre}`;
+                if (badge) badge.textContent = `Publicando como ${actor.nombre} (${actor.handle}) en ${uni.nombre} (${uni.tag})`;
 
                 let posts = [];
                 try {
@@ -711,10 +730,13 @@ img, video, svg {
                     [...(Array.isArray(p1) ? p1 : []), ...(Array.isArray(p2) ? p2 : [])].forEach(it => {
                         if (it && it.id) mapa.set(String(it.id), it);
                     });
-                    posts = Array.from(mapa.values()).filter(p => {
-                        const pTag = window.KIXUZ_UNIVERSOS?.normTag ? window.KIXUZ_UNIVERSOS.normTag(p.universo || p.universe || '') : (p.universo || p.universe || '');
-                        return pTag && pTag.toLowerCase() === uni.tag.toLowerCase();
-                    });
+                    posts = Array.from(mapa.values())
+                        .filter(p => {
+                            const rawTag = p.universo || p.universe || p.alcanceValor || '';
+                            const pTag = window.KIXUZ_UNIVERSOS?.normTag ? window.KIXUZ_UNIVERSOS.normTag(rawTag) : String(rawTag).trim();
+                            return pTag && pTag.toLowerCase() === uni.tag.toLowerCase();
+                        })
+                        .sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
                 } catch {}
 
                 const feedEl = document.getElementById('uniPostsFeed');
@@ -966,6 +988,7 @@ img, video, svg {
                     modo,
                     contenido: txt,
                     universo: uni.tag,
+                    universe: uni.tag,
                     alcanceTipo: 'universo',
                     alcanceValor: uni.tag,
                     createdAtMs: Date.now(),
@@ -974,13 +997,20 @@ img, video, svg {
                     kixiz: 0,
                     respuestas: []
                 };
-                let posts = [];
-                try { posts = JSON.parse(localStorage.getItem('kixuz_posts') || '[]'); } catch {}
-                posts.unshift(nuevo);
-                localStorage.setItem('kixuz_posts', JSON.stringify(posts));
+
+                ['kixuz_posts', 'kixuz_posts_v1'].forEach(key => {
+                    try {
+                        const arr = JSON.parse(localStorage.getItem(key) || '[]');
+                        const base = Array.isArray(arr) ? arr : [];
+                        base.unshift(nuevo);
+                        localStorage.setItem(key, JSON.stringify(base));
+                    } catch {}
+                });
+
                 if (window.KIXUZ_DB?.guardarPostNube) {
-                    await window.KIXUZ_DB.guardarPostNube(nuevo);
+                    try { await window.KIXUZ_DB.guardarPostNube(nuevo); } catch {}
                 }
+
                 inp.value = '';
                 renderTodo();
             });
