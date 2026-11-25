@@ -705,10 +705,75 @@ img, video, svg {
                         ...registradosRaw.filter(t => !/prueba|sector4/i.test(String(t || ''))),
                         ...clanesDelOwner
                     ]));
+                    const famEtqBase = String(raw.familiaEtiqueta || 'Mi Familia').trim();
+                    const famEtiquetasLista = Array.isArray(raw.familiaEtiquetas)
+                        ? Array.from(new Set(raw.familiaEtiquetas.map(x => String(x || '').trim()).filter(Boolean)))
+                        : (famEtqBase ? [famEtqBase] : []);
+
+                    const mapaFamMiembros = {};
+                    if (raw.miembrosFamiliaEtiquetas && typeof raw.miembrosFamiliaEtiquetas === 'object') {
+                        Object.entries(raw.miembrosFamiliaEtiquetas).forEach(([hKey, objE]) => {
+                            const nh = normH(hKey);
+                            if (!nh) return;
+                            mapaFamMiembros[nh] = {};
+                            if (Array.isArray(objE)) {
+                                objE.forEach(e => { if (String(e || '').trim()) mapaFamMiembros[nh][String(e).trim()] = true; });
+                            } else if (objE && typeof objE === 'object') {
+                                Object.entries(objE).forEach(([e, v]) => { if (v && String(e || '').trim()) mapaFamMiembros[nh][String(e).trim()] = true; });
+                            }
+                        });
+                    }
+                    // Derivar pertenencia familiar desde los registros de familia existentes si no estaba mapeada
+                    familiaLimpia.forEach(m => {
+                        const etqM = String(m.etiquetaFamilia || famEtqBase || 'Mi Familia').trim();
+                        if (!etqM) return;
+                        const hDest = normH(m.handle);
+                        const hDueno = normH(m.duenoHandle);
+                        if (hDest) {
+                            mapaFamMiembros[hDest] = mapaFamMiembros[hDest] || {};
+                            mapaFamMiembros[hDest][etqM] = true;
+                        }
+                        if (hDueno) {
+                            mapaFamMiembros[hDueno] = mapaFamMiembros[hDueno] || {};
+                            mapaFamMiembros[hDueno][etqM] = true;
+                        }
+                    });
+
+                    const mapaClanMiembros = {};
+                    if (raw.miembrosClanEtiquetas && typeof raw.miembrosClanEtiquetas === 'object') {
+                        Object.entries(raw.miembrosClanEtiquetas).forEach(([hKey, objC]) => {
+                            const nh = normH(hKey);
+                            if (!nh) return;
+                            mapaClanMiembros[nh] = {};
+                            if (Array.isArray(objC)) {
+                                objC.forEach(c => { if (String(c || '').trim()) mapaClanMiembros[nh][String(c).trim()] = true; });
+                            } else if (objC && typeof objC === 'object') {
+                                Object.entries(objC).forEach(([c, v]) => { if (v && String(c || '').trim()) mapaClanMiembros[nh][String(c).trim()] = true; });
+                            }
+                        });
+                    }
+                    clanLimpio.forEach(m => {
+                        const cNom = String(m.clanNombre || '').trim();
+                        if (!cNom || /prueba|sector4/i.test(cNom)) return;
+                        const hDest = normH(m.handle);
+                        const hDueno = normH(m.duenoHandle);
+                        if (hDest) {
+                            mapaClanMiembros[hDest] = mapaClanMiembros[hDest] || {};
+                            mapaClanMiembros[hDest][cNom] = true;
+                        }
+                        if (hDueno) {
+                            mapaClanMiembros[hDueno] = mapaClanMiembros[hDueno] || {};
+                            mapaClanMiembros[hDueno][cNom] = true;
+                        }
+                    });
+
                     return {
                         generaciones: gens,
-                        familiaEtiqueta: String(raw.familiaEtiqueta || 'Mi Familia').trim(),
+                        familiaEtiqueta: famEtqBase,
+                        familiaEtiquetas: famEtiquetasLista,
                         clanesRegistrados: clanesRegistradosFinal,
+                        miembrosFamiliaEtiquetas: mapaFamMiembros,
+                        miembrosClanEtiquetas: mapaClanMiembros,
                         familia: familiaLimpia,
                         clan: clanLimpio
                     };
@@ -748,11 +813,28 @@ img, video, svg {
                 if (!h || !tagClean) return;
 
                 try {
+                    const st = leerEstado();
+                    if (tipo === 'familia') {
+                        st.miembrosFamiliaEtiquetas[h] = st.miembrosFamiliaEtiquetas[h] || {};
+                        st.miembrosFamiliaEtiquetas[h][tagClean] = true;
+                    } else if (tipo === 'clan') {
+                        st.miembrosClanEtiquetas[h] = st.miembrosClanEtiquetas[h] || {};
+                        st.miembrosClanEtiquetas[h][tagClean] = true;
+                    }
+                    guardarEstado(st);
+                } catch {}
+
+                try {
                     const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
                     if (Array.isArray(subs)) {
                         const nextSubs = subs.map(p => {
                             if (normH(p?.handle) !== h) return p;
-                            if (tipo === 'familia') return { ...p, familiaNombre: tagClean };
+                            if (tipo === 'familia') {
+                                const prevF = Array.isArray(p.familias) ? p.familias : (p.familiaNombre ? [p.familiaNombre] : []);
+                                const setF = new Set(prevF.map(x => String(x).trim()).filter(Boolean));
+                                setF.add(tagClean);
+                                return { ...p, familiaNombre: tagClean, familias: Array.from(setF) };
+                            }
                             const prevClanes = Array.isArray(p.clanes) ? p.clanes : (p.clan ? [p.clan] : []);
                             const setC = new Set(prevClanes.map(x => String(x).trim()).filter(Boolean));
                             setC.add(tagClean);
@@ -764,9 +846,12 @@ img, video, svg {
                     if (act && normH(act.handle) === h) {
                         const prevClanes = Array.isArray(act.clanes) ? act.clanes : (act.clan ? [act.clan] : []);
                         const setC = new Set(prevClanes.map(x => String(x).trim()).filter(Boolean));
+                        const prevF = Array.isArray(act.familias) ? act.familias : (act.familiaNombre ? [act.familiaNombre] : []);
+                        const setF = new Set(prevF.map(x => String(x).trim()).filter(Boolean));
                         if (tipo === 'clan') setC.add(tagClean);
+                        if (tipo === 'familia') setF.add(tagClean);
                         const nextAct = tipo === 'familia'
-                            ? { ...act, familiaNombre: tagClean }
+                            ? { ...act, familiaNombre: tagClean, familias: Array.from(setF) }
                             : { ...act, clan: tagClean, clanes: Array.from(setC) };
                         localStorage.setItem('kixuz_personaje_activo', JSON.stringify(nextAct));
                         window.KIXUZ_ACTIVE_CHAR = nextAct;
@@ -918,16 +1003,21 @@ img, video, svg {
 
                 if (categoria === 'familia') {
                     const gId = genId || st.generaciones[1]?.id || st.generaciones[0]?.id || 'gen_2';
+                    const etqFamActiva = String(st.familiaEtiqueta || 'Mi Familia').trim();
                     st.familia.push({
                         id: 'fam_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
                         duenoHandle: owner,
                         nombre: destinoNombre || target.slice(1),
                         handle: target,
                         relacion: relacion || 'Familiar',
+                        etiquetaFamilia: etqFamActiva,
                         genId: gId
                     });
 
-                    if (st.familiaEtiqueta) asignarEtiquetaAlPerfil(owner, 'familia', st.familiaEtiqueta);
+                    if (etqFamActiva) {
+                        asignarEtiquetaAlPerfil(owner, 'familia', etqFamActiva);
+                        asignarEtiquetaAlPerfil(target, 'familia', etqFamActiva);
+                    }
 
                     if (target !== owner) {
                         actualizarParejaEnPerfil(owner, target, relacion);
@@ -938,6 +1028,7 @@ img, video, svg {
                             nombre: owner.slice(1),
                             handle: owner,
                             relacion: getRelacionReciproca(relacion),
+                            etiquetaFamilia: etqFamActiva,
                             genId: genInversa
                         });
                     }
