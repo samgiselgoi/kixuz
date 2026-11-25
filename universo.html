@@ -65,24 +65,39 @@
             font-size: 13px; font-weight: 700; text-decoration: none;
         }
 
-        main {
-            max-width: 980px;
+        .uni-layout {
+            max-width: 1120px;
             margin: 26px auto 90px;
             padding: 0 18px;
+            display: grid;
+            grid-template-columns: 310px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 860px) {
+            .uni-layout { grid-template-columns: 1fr; }
+        }
+        .uni-sidebar {
+            position: sticky;
+            top: 76px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 14px;
         }
+        @media (max-width: 860px) {
+            .uni-sidebar { position: static; }
+        }
+
         .panel {
             background: var(--tarjeta);
             border: 1px solid var(--borde);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
         }
         h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
         .row-between {
-            display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+            display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
         }
         .btn-accent {
             background: var(--acento); color: #150A24; border: none; border-radius: 10px;
@@ -90,13 +105,37 @@
         }
         .btn-ghost {
             background: rgba(108, 60, 224, 0.22); color: var(--texto);
-            border: 1px solid var(--borde); border-radius: 10px; padding: 8px 14px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12.5px; cursor: pointer;
+            border: 1px solid var(--borde); border-radius: 10px; padding: 7px 12px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer;
+        }
+        .btn-danger {
+            background: rgba(224, 60, 108, 0.2); color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5); border-radius: 10px; padding: 7px 12px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer;
         }
         .btn-danger-sm {
             background: rgba(224, 60, 108, 0.18); color: #ff9bb4;
             border: 1px solid rgba(224, 60, 108, 0.45); border-radius: 999px;
-            padding: 3px 9px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;
+            padding: 2px 8px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer;
+        }
+
+        details.side-dropdown {
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.24);
+            padding: 10px 12px;
+            margin-top: 12px;
+        }
+        details.side-dropdown > summary {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--acento);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .group-card-shell {
@@ -105,9 +144,10 @@
             border-radius: 18px;
             overflow: hidden;
             box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+            margin-bottom: 16px;
         }
         .group-banner {
-            height: 170px;
+            height: 165px;
             background: linear-gradient(135deg, #3A1C71, #6C3CE0, #165B6D);
             background-size: cover;
             background-position: center;
@@ -144,7 +184,7 @@
         html[data-theme="light"] select { background: #fff; color: #150A24; }
         textarea { min-height: 82px; resize: vertical; margin-bottom: 10px; }
 
-        .search-picker-wrap { position: relative; flex: 1; min-width: 240px; max-width: 380px; }
+        .search-picker-wrap { position: relative; flex: 1; min-width: 220px; }
         .search-picker-dropdown {
             position: absolute; top: calc(100% + 4px); left: 0; right: 0;
             background: var(--bg-principal); border: 1px solid var(--acento);
@@ -218,7 +258,7 @@
             display: block; font-family: 'Space Grotesk', sans-serif; font-size: 12px;
             font-weight: 700; margin-bottom: 4px; color: var(--acento);
         }
-    
+
 /* === KIXUZ UNIFIED MOBILE & TABLET ADAPTATION === */
 html, body {
   max-width: 100%;
@@ -257,8 +297,7 @@ img, video, svg {
     height: 34px !important;
     padding: 0 8px !important;
   }
-  main,
-  .profile-layout {
+  .uni-layout {
     margin: 14px auto 80px !important;
     padding: 0 10px !important;
     gap: 14px !important;
@@ -269,25 +308,7 @@ img, video, svg {
     padding: 14px !important;
     border-radius: 14px !important;
   }
-  .form-grid,
-  .create-post-controls,
-  .kixuz-modal-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .member-card {
-    width: 100% !important;
-    max-width: 340px;
-  }
-  .group-banner {
-    height: 130px !important;
-  }
-  .group-avatar {
-    width: 68px !important;
-    height: 68px !important;
-    font-size: 22px !important;
-  }
 }
-
     </style>
 </head>
 <body>
@@ -308,81 +329,104 @@ img, video, svg {
         </div>
     </header>
 
-    <main>
-        <section class="panel">
-            <div class="row-between">
-                <div style="flex:1;min-width:220px;">
-                    <label for="universeSelect" style="font-size:12px;opacity:0.75;display:block;margin-bottom:4px;">Seleccionar Universo / Grupo</label>
-                    <select id="universeSelect"></select>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:flex-end;">
-                    <button type="button" class="btn-ghost" id="btnAddPersonQuick">+ Agregar persona</button>
-                    <button type="button" class="btn-ghost" id="btnEditUniMedia">Editar fotos</button>
-                    <button type="button" class="btn-ghost" id="btnJoinToggle">Unirse</button>
-                    <button type="button" class="btn-accent" id="btnOpenCreateUni">+ Crear Universo</button>
-                </div>
+    <main class="uni-layout">
+        <!-- Columna lateral izquierda con desplegable para agregar / editar / eliminar universos -->
+        <aside class="panel uni-sidebar">
+            <div>
+                <label for="universeSelect" style="font-size:12px;opacity:0.78;display:block;margin-bottom:5px;">Universo / Grupo</label>
+                <select id="universeSelect"></select>
             </div>
-        </section>
 
-        <section class="group-card-shell" id="groupCardSection"></section>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                <button type="button" class="btn-accent" style="flex:1;" id="btnJoinToggle">Unirse</button>
+                <button type="button" class="btn-ghost" id="btnEditUniMedia">Fotos</button>
+            </div>
 
-        <section class="panel" id="createUniPanel" style="display:none;">
-            <h2 style="font-size:17px;margin-bottom:10px;">Crear Universo / Grupo</h2>
-            <form id="createUniForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;">
-                <input type="text" id="uniNombreInput" placeholder="Nombre del grupo o universo" required>
-                <input type="text" id="uniTagInput" placeholder="#Etiqueta (ej. #NexoCentral)" required>
-                <input type="text" id="uniDescInput" placeholder="Descripción del grupo">
-                <input type="text" id="uniReglasInput" placeholder="Reglas o temática">
-                <button type="submit" class="btn-accent">Crear grupo</button>
-            </form>
-        </section>
+            <details class="side-dropdown" id="manageUniverseDropdown">
+                <summary>
+                    <span>Gestionar Universos</span>
+                    <span style="font-size:11px;opacity:0.75;">▾</span>
+                </summary>
+                <div style="margin-top:10px;display:flex;flex-direction:column;gap:12px;">
+                    <form id="createUniForm" style="display:flex;flex-direction:column;gap:8px;">
+                        <div style="font-size:12px;font-weight:700;color:var(--acento);">Crear nuevo Universo</div>
+                        <input type="text" id="uniNombreInput" placeholder="Nombre del grupo o universo" required>
+                        <input type="text" id="uniTagInput" placeholder="#Etiqueta (ej. #NexoCentral)" required>
+                        <input type="text" id="uniDescInput" placeholder="Descripción">
+                        <input type="text" id="uniReglasInput" placeholder="Reglas">
+                        <button type="submit" class="btn-accent">Agregar Universo</button>
+                    </form>
 
-        <section id="tabPanelMuro">
-            <div class="panel" id="uniComposerPanel" style="margin-bottom:16px;">
-                <div class="row-between" style="margin-bottom:8px;">
-                    <h2 style="font-size:16.5px;">Publicar en el grupo</h2>
-                    <div class="mode-switch-group" id="uniPostModeSwitch" data-mode="IC">
-                        <button type="button" class="mode-btn ic active" data-umode="IC">IC</button>
-                        <button type="button" class="mode-btn oc" data-umode="OC">OC</button>
+                    <div style="border-top:1px solid var(--borde);padding-top:10px;display:flex;flex-direction:column;gap:8px;">
+                        <div style="font-size:12px;font-weight:700;color:var(--acento);">Editar Universo actual</div>
+                        <input type="text" id="editUniNombreInput" placeholder="Nuevo nombre">
+                        <input type="text" id="editUniDescInput" placeholder="Nueva descripción">
+                        <input type="text" id="editUniReglasInput" placeholder="Nuevas reglas">
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            <button type="button" class="btn-ghost" style="flex:1;" id="btnSaveEditUni">Guardar edición</button>
+                            <button type="button" class="btn-danger" id="btnDeleteCurrentUni">Eliminar</button>
+                        </div>
                     </div>
                 </div>
-                <textarea id="uniPostInput" placeholder="Escribe un turno o publicación dentro de este grupo..."></textarea>
-                <div class="row-between">
-                    <span id="activeUniBadge" style="font-size:12.5px;font-weight:700;color:var(--acento);"></span>
-                    <button type="button" class="btn-accent" id="uniPublishBtn">Publicar</button>
+            </details>
+        </aside>
+
+        <!-- Contenido principal del universo -->
+        <section>
+            <section class="group-card-shell" id="groupCardSection"></section>
+
+            <section id="tabPanelMuro">
+                <div class="panel" id="uniComposerPanel" style="margin-bottom:16px;">
+                    <div class="row-between" style="margin-bottom:8px;">
+                        <h2 style="font-size:16.5px;">Publicar en el grupo</h2>
+                        <div class="mode-switch-group" id="uniPostModeSwitch" data-mode="IC">
+                            <button type="button" class="mode-btn ic active" data-umode="IC">IC</button>
+                            <button type="button" class="mode-btn oc" data-umode="OC">OC</button>
+                        </div>
+                    </div>
+                    <textarea id="uniPostInput" placeholder="Escribe un turno o publicación dentro de este grupo..."></textarea>
+                    <div class="row-between">
+                        <span id="activeUniBadge" style="font-size:12.5px;font-weight:700;color:var(--acento);"></span>
+                        <button type="button" class="btn-accent" id="uniPublishBtn">Publicar</button>
+                    </div>
                 </div>
-            </div>
-            <div class="panel" id="uniNotMemberBanner" style="display:none;margin-bottom:16px;text-align:center;">
-                <p style="font-size:13.5px;margin-bottom:10px;">Debés estar dentro de este universo para publicar en su muro.</p>
-                <button type="button" class="btn-accent" id="btnJoinFromBanner">Unirme a este Universo</button>
-            </div>
-            <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
-        </section>
-
-        <section class="panel" id="tabPanelMapas" style="display:none;">
-            <h2 style="font-size:17px;">Mapas e Imágenes</h2>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-                <input type="text" id="mapTitleInput" placeholder="Título del mapa o imagen" style="max-width:260px;">
-                <input type="file" id="mapFileInput" accept="image/*" style="max-width:260px;">
-            </div>
-            <div id="mapsGrid" class="maps-grid"></div>
-        </section>
-
-        <section class="panel" id="tabPanelInfo" style="display:none;">
-            <h2 style="font-size:17px;">Agregar personas a este Universo</h2>
-            <form id="addUniMemberForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-                <div class="search-picker-wrap">
-                    <input type="text" id="newUniMemberInput" placeholder="Buscar personaje por nombre o @usuario..." autocomplete="off" required>
-                    <div class="search-picker-dropdown" id="uniMemberSearchDropdown"></div>
+                <div class="panel" id="uniNotMemberBanner" style="display:none;margin-bottom:16px;text-align:center;">
+                    <p style="font-size:13.5px;margin-bottom:10px;">Debés estar dentro de este universo para publicar, agregar o quitar personas.</p>
+                    <button type="button" class="btn-accent" id="btnJoinFromBanner">Unirme a este Universo</button>
                 </div>
-                <button type="submit" class="btn-accent">Agregar persona</button>
-            </form>
+                <div id="uniPostsFeed" style="display:flex;flex-direction:column;gap:14px;"></div>
+            </section>
 
-            <h3 style="font-size:16px;margin-top:18px;">Personas en este Universo</h3>
-            <div id="uniMembersList" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+            <section class="panel" id="tabPanelMapas" style="display:none;">
+                <h2 style="font-size:17px;">Mapas e Imágenes</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                    <input type="text" id="mapTitleInput" placeholder="Título del mapa o imagen" style="max-width:260px;">
+                    <input type="file" id="mapFileInput" accept="image/*" style="max-width:260px;">
+                </div>
+                <div id="mapsGrid" class="maps-grid"></div>
+            </section>
 
-            <h3 style="font-size:16px;margin-top:18px;">Reglas</h3>
-            <p id="uniRulesText" style="margin-top:8px;font-size:13.5px;opacity:0.88;"></p>
+            <section class="panel" id="tabPanelInfo" style="display:none;">
+                <div id="uniMemberManageBox" style="display:none;">
+                    <h2 style="font-size:17px;">Agregar personas a este Universo</h2>
+                    <form id="addUniMemberForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                        <div class="search-picker-wrap">
+                            <input type="text" id="newUniMemberInput" placeholder="Buscar personaje por nombre o @usuario..." autocomplete="off" required>
+                            <div class="search-picker-dropdown" id="uniMemberSearchDropdown"></div>
+                        </div>
+                        <button type="submit" class="btn-accent">Agregar persona</button>
+                    </form>
+                </div>
+                <div id="uniMemberLockedNotice" style="display:none;padding:10px 12px;border-radius:10px;background:rgba(108,60,224,0.16);border:1px solid var(--borde);font-size:13px;">
+                    Unite a este universo para poder agregar o eliminar personas.
+                </div>
+
+                <h3 style="font-size:16px;margin-top:18px;">Personas en este Universo</h3>
+                <div id="uniMembersList" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+
+                <h3 style="font-size:16px;margin-top:18px;">Reglas</h3>
+                <p id="uniRulesText" style="margin-top:8px;font-size:13.5px;opacity:0.88;"></p>
+            </section>
         </section>
     </main>
 
@@ -569,22 +613,43 @@ img, video, svg {
                 if (current && lista.some(u => u.tag === current)) sel.value = current;
             }
 
+            function sincronizarCamposEdicionUni(uni) {
+                const nInp = document.getElementById('editUniNombreInput');
+                const dInp = document.getElementById('editUniDescInput');
+                const rInp = document.getElementById('editUniReglasInput');
+                if (!uni) {
+                    if (nInp) nInp.value = '';
+                    if (dInp) dInp.value = '';
+                    if (rInp) rInp.value = '';
+                    return;
+                }
+                if (nInp && document.activeElement !== nInp) nInp.value = uni.nombre || '';
+                if (dInp && document.activeElement !== dInp) dInp.value = uni.descripcion || '';
+                if (rInp && document.activeElement !== rInp) rInp.value = uni.reglas || '';
+            }
+
             function renderTodo() {
                 renderSelectUniversos();
                 const uni = getUniversoSeleccionado();
+                sincizarCamposEdicionUni(uni);
+
                 const groupShell = document.getElementById('groupCardSection');
                 const badge = document.getElementById('activeUniBadge');
                 const joinBtn = document.getElementById('btnJoinToggle');
                 const composerPanel = document.getElementById('uniComposerPanel');
                 const notMemberBanner = document.getElementById('uniNotMemberBanner');
+                const memberManageBox = document.getElementById('uniMemberManageBox');
+                const memberLockedNotice = document.getElementById('uniMemberLockedNotice');
                 const actor = getActorActual();
 
                 if (!uni) {
                     aplicarFondoUniverso(null);
-                    groupShell.innerHTML = `<div style="padding:20px;opacity:0.78;font-size:13.5px;">Todavía no creaste ningún grupo o universo. Tocá <strong>+ Crear Universo</strong> para crear uno.</div>`;
+                    groupShell.innerHTML = `<div style="padding:20px;opacity:0.78;font-size:13.5px;">Todavía no creaste ningún grupo o universo. Desplegá <strong>Gestionar Universos</strong> a la izquierda para crear uno.</div>`;
                     if (badge) badge.textContent = '';
                     if (composerPanel) composerPanel.style.display = 'none';
                     if (notMemberBanner) notMemberBanner.style.display = 'none';
+                    if (memberManageBox) memberManageBox.style.display = 'none';
+                    if (memberLockedNotice) memberLockedNotice.style.display = 'none';
                     document.getElementById('uniPostsFeed').innerHTML = '';
                     return;
                 }
@@ -593,11 +658,13 @@ img, video, svg {
                 document.title = `${uni.nombre} (${uni.tag}) — KIXUZ`;
 
                 const esMiembro = Array.isArray(uni.miembros) && uni.miembros.some(m => (normH(m) || String(m).toLowerCase()) === actor.handle);
-                if (joinBtn) joinBtn.textContent = esMiembro ? 'Salir del grupo' : 'Unirse al grupo';
+                if (joinBtn) joinBtn.textContent = esMiembro ? 'Salir' : 'Unirse';
 
-                // Solo si estoy dentro de ese universo puedo postear en él
+                // Solo si estás dentro del universo podés publicar y agregar/eliminar personas
                 if (composerPanel) composerPanel.style.display = esMiembro ? 'block' : 'none';
                 if (notMemberBanner) notMemberBanner.style.display = esMiembro ? 'none' : 'block';
+                if (memberManageBox) memberManageBox.style.display = esMiembro ? 'block' : 'none';
+                if (memberLockedNotice) memberLockedNotice.style.display = esMiembro ? 'none' : 'block';
 
                 const bannerStyle = uni.banner ? `style="background-image:url('${uni.banner}');"` : '';
                 const avatarStyle = uni.avatar ? `style="background-image:url('${uni.avatar}');"` : '';
@@ -725,10 +792,13 @@ img, video, svg {
                         const labelHtml = h
                             ? `<a href="perfil.html?char=${encodeURIComponent(h)}">${esc(m)}</a>`
                             : `<span>${esc(m)}</span>`;
+                        const removeBtnHtml = esMiembro
+                            ? `<button type="button" class="btn-danger-sm" data-remove-uni-member="${esc(m)}" title="Quitar">✕</button>`
+                            : '';
                         return `
                             <span class="member-chip">
                                 ${labelHtml}
-                                <button type="button" class="btn-danger-sm" data-remove-uni-member="${esc(m)}" title="Quitar">✕</button>
+                                ${removeBtnHtml}
                             </span>
                         `;
                     }).join('')
@@ -736,19 +806,37 @@ img, video, svg {
 
                 membersEl.querySelectorAll('[data-remove-uni-member]').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        if (!window.KIXUZ_UNIVERSOS) return;
+                        if (!esMiembro || !window.KIXUZ_UNIVERSOS) return;
                         window.KIXUZ_UNIVERSOS.quitarMiembroDeUniverso(uni.tag, btn.dataset.removeUniMember);
                         renderTodo();
                     });
                 });
             }
 
-            document.getElementById('btnAddPersonQuick')?.addEventListener('click', () => {
-                const infoTabBtn = document.querySelector('[data-utab="info"]');
-                infoTabBtn?.click();
-                const inp = document.getElementById('newUniMemberInput');
-                inp?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                inp?.focus();
+            document.getElementById('btnSaveEditUni')?.addEventListener('click', () => {
+                const uni = getUniversoSeleccionado();
+                if (!uni || !window.KIXUZ_UNIVERSOS) return;
+                const lista = window.KIXUZ_UNIVERSOS.leerUniversos();
+                const target = lista.find(u => u.tag === uni.tag);
+                if (!target) return;
+                const nuevoNom = (document.getElementById('editUniNombreInput')?.value || '').trim();
+                const nuevaDesc = (document.getElementById('editUniDescInput')?.value || '').trim();
+                const nuevasReglas = (document.getElementById('editUniReglasInput')?.value || '').trim();
+                if (nuevoNom) target.nombre = nuevoNom;
+                target.descripcion = nuevaDesc;
+                target.reglas = nuevasReglas;
+                window.KIXUZ_UNIVERSOS.guardarUniversos(lista);
+                renderTodo();
+            });
+
+            document.getElementById('btnDeleteCurrentUni')?.addEventListener('click', () => {
+                const uni = getUniversoSeleccionado();
+                if (!uni || !window.KIXUZ_UNIVERSOS) return;
+                if (!confirm(`¿Eliminar el universo ${uni.nombre} (${uni.tag})?`)) return;
+                window.KIXUZ_UNIVERSOS.eliminarUniverso(uni.tag);
+                const sel = document.getElementById('universeSelect');
+                if (sel) sel.value = '';
+                renderTodo();
             });
 
             let tempUniAvatar = '';
@@ -796,11 +884,14 @@ img, video, svg {
             document.getElementById('addUniMemberForm')?.addEventListener('submit', e => {
                 e.preventDefault();
                 const uni = getUniversoSeleccionado();
+                const actor = getActorActual();
+                const esMiembro = uni && Array.isArray(uni.miembros) && uni.miembros.some(m => (normH(m) || String(m).toLowerCase()) === actor.handle);
+                if (!esMiembro) return;
+
                 const inp = document.getElementById('newUniMemberInput');
                 const val = (handleSeleccionadoBuscador || inp?.value || '').trim();
-                if (!uni || !val || !window.KIXUZ_UNIVERSOS) return;
+                if (!val || !window.KIXUZ_UNIVERSOS) return;
                 window.KIXUZ_UNIVERSOS.agregarMiembroAUniverso(uni.tag, val);
-                const actor = getActorActual();
                 const destH = normH(val);
                 if (destH && destH !== actor.handle) {
                     window.KIXUZ_NOTIF?.registrar?.({
@@ -827,11 +918,6 @@ img, video, svg {
                 });
             });
 
-            document.getElementById('btnOpenCreateUni')?.addEventListener('click', () => {
-                const p = document.getElementById('createUniPanel');
-                p.style.display = p.style.display === 'none' ? 'block' : 'none';
-            });
-
             document.getElementById('createUniForm')?.addEventListener('submit', e => {
                 e.preventDefault();
                 const nombre = document.getElementById('uniNombreInput').value.trim();
@@ -844,7 +930,6 @@ img, video, svg {
                 });
                 if (creado) {
                     e.target.reset();
-                    document.getElementById('createUniPanel').style.display = 'none';
                     renderSelectUniversos();
                     document.getElementById('universeSelect').value = creado.tag;
                     renderTodo();

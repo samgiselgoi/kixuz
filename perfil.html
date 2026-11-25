@@ -771,77 +771,88 @@ img, video, svg {
         if (!target || personaje?.esPlaceholder) return [];
         const set = new Set();
 
-        // 1. Etiquetas guardadas explícitamente en la ficha de ESTE personaje
-        if (Array.isArray(personaje.familias)) {
-          personaje.familias.forEach(x => {
-            const val = String(x || '').trim();
-            if (val && !/prueba|sector4/i.test(val)) set.add(val);
-          });
-        } else if (personaje.familiaNombre) {
-          const val = String(personaje.familiaNombre).trim();
-          if (val && !/prueba|sector4/i.test(val)) set.add(val);
-        }
-
-        // 2. Pertenencia explícita por @handle en kixuz_familia_clan_v1 (solo si ESTE @handle fue agregado o asignado)
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           const mapF = fam.miembrosFamiliaEtiquetas?.[target];
-          if (mapF && typeof mapF === 'object') {
+          const tieneMapaExplicit = mapF && typeof mapF === 'object' && Object.keys(mapF).length > 0;
+
+          if (tieneMapaExplicit) {
             Object.entries(mapF).forEach(([etq, ok]) => {
               const val = String(etq || '').trim();
               if (ok && val && !/prueba|sector4/i.test(val)) set.add(val);
             });
           }
+
           if (Array.isArray(fam.familia)) {
             fam.familia.forEach(m => {
-              // Solo si ESTE personaje es miembro (handle === target) o tiene registros propios en su árbol (duenoHandle === target)
-              const esMiembro = normH(m?.handle) === target;
-              const tieneArbolPropio = normH(m?.duenoHandle) === target;
-              if (esMiembro || tieneArbolPropio) {
+              if (normH(m?.handle) === target) {
                 const etqM = String(m.etiquetaFamilia || '').trim();
-                if (etqM && !/prueba|sector4/i.test(etqM)) set.add(etqM);
+                if (etqM && !/prueba|sector4/i.test(etqM)) {
+                  if (!tieneMapaExplicit || (mapF && mapF[etqM])) {
+                    set.add(etqM);
+                  }
+                }
               }
             });
+          }
+
+          if (!set.size && !tieneMapaExplicit) {
+            if (Array.isArray(personaje.familias)) {
+              personaje.familias.forEach(x => {
+                const val = String(x || '').trim();
+                if (val && !/prueba|sector4/i.test(val)) set.add(val);
+              });
+            } else if (personaje.familiaNombre) {
+              const val = String(personaje.familiaNombre).trim();
+              if (val && !/prueba|sector4/i.test(val)) set.add(val);
+            }
           }
         } catch {}
 
         return Array.from(set);
       }
 
-      // Devuelve SOLO los clanes a los que pertenece ESTE personaje (@handle)
+      // Devuelve SOLO los clanes donde ESTE personaje (@handle) figura como miembro
       function obtenerPertenenciasClanFamilia(personaje) {
         const target = normH(personaje?.handle);
         if (!target || personaje?.esPlaceholder) return [];
         const set = new Set();
 
-        // 1. Clanes guardados explícitamente en la ficha de ESTE personaje
-        if (Array.isArray(personaje.clanes)) {
-          personaje.clanes.forEach(c => {
-            const val = String(c || '').trim();
-            if (val && !/prueba|sector4/i.test(val)) set.add(val);
-          });
-        } else if (personaje.clan) {
-          const val = String(personaje.clan).trim();
-          if (val && !/prueba|sector4/i.test(val)) set.add(val);
-        }
-
-        // 2. Pertenencia explícita por @handle en kixuz_familia_clan_v1
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           const mapC = fam.miembrosClanEtiquetas?.[target];
-          if (mapC && typeof mapC === 'object') {
+          const tieneMapaClan = mapC && typeof mapC === 'object' && Object.keys(mapC).length > 0;
+
+          if (tieneMapaClan) {
             Object.entries(mapC).forEach(([cNom, ok]) => {
               const val = String(cNom || '').trim();
               if (ok && val && !/prueba|sector4/i.test(val)) set.add(val);
             });
           }
+
           if (Array.isArray(fam.clan)) {
             fam.clan.forEach(m => {
               if (normH(m?.handle) === target && m?.clanNombre) {
                 const val = String(m.clanNombre).trim();
-                if (val && !/prueba|sector4/i.test(val)) set.add(val);
+                if (val && !/prueba|sector4/i.test(val)) {
+                  if (!tieneMapaClan || (mapC && mapC[val])) {
+                    set.add(val);
+                  }
+                }
               }
             });
+          }
+
+          if (!set.size && !tieneMapaClan) {
+            if (Array.isArray(personaje.clanes)) {
+              personaje.clanes.forEach(c => {
+                const val = String(c || '').trim();
+                if (val && !/prueba|sector4/i.test(val)) set.add(val);
+              });
+            } else if (personaje.clan) {
+              const val = String(personaje.clan).trim();
+              if (val && !/prueba|sector4/i.test(val)) set.add(val);
+            }
           }
         } catch {}
 
@@ -865,7 +876,6 @@ img, video, svg {
           } catch {}
         }
 
-        // También respetar universos guardados explícitamente en la ficha de este personaje
         if (Array.isArray(personaje.universos)) {
           personaje.universos.forEach(u => {
             if (!u) return;
