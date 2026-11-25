@@ -667,16 +667,30 @@ img, video, svg {
           e.preventDefault();
           const sentTipo = document.getElementById('fSentTipo').value;
           const sentHandle = normH(document.getElementById('fSentHandle').value);
+          const nuevosUnis = document.getElementById('fUniversos').value
+            .split(',').map(u => u.trim()).filter(Boolean)
+            .map(u => u.startsWith('#') ? u : '#' + u.replace(/^#+/, ''))
+            .filter(u => !/^#sector4$/i.test(u));
+          const clanEditado = document.getElementById('fClan').value.trim();
+          const clanesEditados = clanEditado ? [clanEditado] : [];
+
+          if (window.KIXUZ_UNIVERSOS?.agregarMiembroAUniverso) {
+            nuevosUnis.forEach(tagU => {
+              try { window.KIXUZ_UNIVERSOS.agregarMiembroAUniverso(tagU, personaje.handle); } catch {}
+            });
+          }
+
           await guardarPersonajeActualizado({
             ...personaje,
             nombre: document.getElementById('fNombre').value.trim() || personaje.nombre,
             especies: document.getElementById('fEspecies').value.split(',').map(s => s.trim()).filter(Boolean),
             genero: document.getElementById('fGenero').value.trim(),
             edadAparente: document.getElementById('fEdad').value.trim(),
-            clan: document.getElementById('fClan').value.trim(),
+            clan: clanEditado,
+            clanes: clanesEditados,
             estadoSentimentalTipo: sentTipo,
             estadoSentimentalHandle: sentTipo ? sentHandle : '',
-            universos: document.getElementById('fUniversos').value.split(',').map(u => u.trim()).filter(Boolean).map(u => u.startsWith('#') ? u : '#' + u.replace(/^#+/, '')),
+            universos: nuevosUnis,
             bio: document.getElementById('fBio').value.trim(),
             habilidades: parseStatsText(document.getElementById('fHab').value),
             debilidades: parseStatsText(document.getElementById('fDeb').value)
@@ -753,84 +767,114 @@ img, video, svg {
       }
 
       function obtenerEtiquetasFamiliaPersonaje(personaje) {
-        const target = normH(personaje.handle);
+        const target = normH(personaje?.handle);
+        if (!target || personaje?.esPlaceholder) return [];
         const set = new Set();
+
+        // 1. Etiquetas guardadas explícitamente en la ficha de ESTE personaje
         if (Array.isArray(personaje.familias)) {
-          personaje.familias.forEach(x => { if (String(x || '').trim()) set.add(String(x).trim()); });
+          personaje.familias.forEach(x => {
+            const val = String(x || '').trim();
+            if (val && !/prueba|sector4/i.test(val)) set.add(val);
+          });
         } else if (personaje.familiaNombre) {
-          set.add(String(personaje.familiaNombre).trim());
+          const val = String(personaje.familiaNombre).trim();
+          if (val && !/prueba|sector4/i.test(val)) set.add(val);
         }
+
+        // 2. Pertenencia explícita por @handle en kixuz_familia_clan_v1 (solo si ESTE @handle fue agregado o asignado)
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           const mapF = fam.miembrosFamiliaEtiquetas?.[target];
           if (mapF && typeof mapF === 'object') {
             Object.entries(mapF).forEach(([etq, ok]) => {
-              if (ok && String(etq || '').trim()) set.add(String(etq).trim());
+              const val = String(etq || '').trim();
+              if (ok && val && !/prueba|sector4/i.test(val)) set.add(val);
             });
           }
-          (fam.familia || []).forEach(m => {
-            if (normH(m?.handle) === target || normH(m?.duenoHandle) === target) {
-              const etqM = String(m.etiquetaFamilia || fam.familiaEtiqueta || '').trim();
-              if (etqM) set.add(etqM);
-            }
-          });
+          if (Array.isArray(fam.familia)) {
+            fam.familia.forEach(m => {
+              // Solo si ESTE personaje es miembro (handle === target) o tiene registros propios en su árbol (duenoHandle === target)
+              const esMiembro = normH(m?.handle) === target;
+              const tieneArbolPropio = normH(m?.duenoHandle) === target;
+              if (esMiembro || tieneArbolPropio) {
+                const etqM = String(m.etiquetaFamilia || '').trim();
+                if (etqM && !/prueba|sector4/i.test(etqM)) set.add(etqM);
+              }
+            });
+          }
         } catch {}
+
         return Array.from(set);
       }
 
-      // Devuelve SOLO los clanes a los que pertenece este personaje
+      // Devuelve SOLO los clanes a los que pertenece ESTE personaje (@handle)
       function obtenerPertenenciasClanFamilia(personaje) {
-        const target = normH(personaje.handle);
+        const target = normH(personaje?.handle);
+        if (!target || personaje?.esPlaceholder) return [];
         const set = new Set();
+
+        // 1. Clanes guardados explícitamente en la ficha de ESTE personaje
+        if (Array.isArray(personaje.clanes)) {
+          personaje.clanes.forEach(c => {
+            const val = String(c || '').trim();
+            if (val && !/prueba|sector4/i.test(val)) set.add(val);
+          });
+        } else if (personaje.clan) {
+          const val = String(personaje.clan).trim();
+          if (val && !/prueba|sector4/i.test(val)) set.add(val);
+        }
+
+        // 2. Pertenencia explícita por @handle en kixuz_familia_clan_v1
         try {
           const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
           const mapC = fam.miembrosClanEtiquetas?.[target];
           if (mapC && typeof mapC === 'object') {
             Object.entries(mapC).forEach(([cNom, ok]) => {
-              if (ok && String(cNom || '').trim() && !/prueba|sector4/i.test(String(cNom))) {
-                set.add(String(cNom).trim());
+              const val = String(cNom || '').trim();
+              if (ok && val && !/prueba|sector4/i.test(val)) set.add(val);
+            });
+          }
+          if (Array.isArray(fam.clan)) {
+            fam.clan.forEach(m => {
+              if (normH(m?.handle) === target && m?.clanNombre) {
+                const val = String(m.clanNombre).trim();
+                if (val && !/prueba|sector4/i.test(val)) set.add(val);
               }
             });
           }
-          (fam.clan || []).forEach(m => {
-            if (normH(m?.handle) === target && m?.clanNombre && !/prueba|sector4/i.test(String(m.clanNombre))) {
-              set.add(String(m.clanNombre).trim());
-            }
-          });
         } catch {}
-        if (!set.size) {
-          if (Array.isArray(personaje.clanes)) {
-            personaje.clanes.forEach(c => { if (c && !/prueba|sector4/i.test(String(c))) set.add(String(c).trim()); });
-          } else if (personaje.clan && !/prueba|sector4/i.test(String(personaje.clan))) {
-            set.add(String(personaje.clan).trim());
-          }
-        }
+
         return Array.from(set);
       }
 
+      // Devuelve SOLO los universos donde ESTE personaje (@handle) está agregado como miembro
       function obtenerUniversosEnlazados(personaje) {
+        const target = normH(personaje?.handle);
+        if (!target || personaje?.esPlaceholder) return [];
         const set = new Set();
-        const h = normH(personaje.handle);
-        const miembrosUniversos = new Set();
+
         if (window.KIXUZ_UNIVERSOS?.leerUniversos) {
           try {
             window.KIXUZ_UNIVERSOS.leerUniversos().forEach(u => {
               if (!u?.tag || /^#sector4$/i.test(String(u.tag).trim())) return;
-              if (Array.isArray(u.miembros) && u.miembros.some(m => normH(m) === h)) {
-                miembrosUniversos.add(u.tag.toLowerCase());
+              if (Array.isArray(u.miembros) && u.miembros.some(m => normH(m) === target)) {
                 set.add(u.tag);
               }
             });
           } catch {}
         }
-        (personaje.universos || []).forEach(u => {
-          if (!u) return;
-          const tag = String(u).startsWith('#') ? String(u) : '#' + String(u).replace(/^#+/, '');
-          if (/^#sector4$/i.test(tag.trim())) return;
-          if (miembrosUniversos.has(tag.toLowerCase()) || !window.KIXUZ_UNIVERSOS?.leerUniversos) {
+
+        // También respetar universos guardados explícitamente en la ficha de este personaje
+        if (Array.isArray(personaje.universos)) {
+          personaje.universos.forEach(u => {
+            if (!u) return;
+            const tag = String(u).startsWith('#') ? String(u).trim() : '#' + String(u).trim().replace(/^#+/, '');
+            if (!tag || /^#sector4$/i.test(tag) || /^#kixuz$/i.test(tag)) return;
             set.add(tag);
-          }
-        });
+          });
+        }
+
         return Array.from(set);
       }
 

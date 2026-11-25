@@ -915,7 +915,10 @@ img, video, svg {
                 const clanFiltroSel = document.getElementById('clanSelectorFiltro');
                 const famHeading = document.getElementById('familiaHeadingTitle');
 
-                if (famHeading) famHeading.textContent = st.familiaEtiqueta || 'Mi Familia';
+                const ownerAct = getDuenoActual();
+                const etqsOwner = Object.keys(st.miembrosFamiliaEtiquetas?.[ownerAct] || {}).filter(k => st.miembrosFamiliaEtiquetas[ownerAct][k]);
+                const tituloFamOwner = etqsOwner[0] || st.familiaEtiqueta || 'Mi Familia';
+                if (famHeading) famHeading.textContent = tituloFamOwner;
 
                 const cTags = st.clanesRegistrados || [];
 
@@ -1156,7 +1159,23 @@ img, video, svg {
                         const id = btn.dataset.delItem;
                         const listaKey = btn.dataset.list === 'clan' ? 'clan' : 'familia';
                         const st = leerEstado();
+                        const eliminado = st[listaKey].find(x => String(x.id) === String(id));
                         st[listaKey] = st[listaKey].filter(x => String(x.id) !== String(id));
+                        if (eliminado?.handle) {
+                            const hElim = normH(eliminado.handle);
+                            if (listaKey === 'familia') {
+                                const sigueEnFam = st.familia.some(m => normH(m.handle) === hElim || normH(m.duenoHandle) === hElim);
+                                if (!sigueEnFam && st.miembrosFamiliaEtiquetas?.[hElim]) {
+                                    delete st.miembrosFamiliaEtiquetas[hElim];
+                                }
+                            } else if (eliminado.clanNombre) {
+                                const cNom = String(eliminado.clanNombre).trim();
+                                const sigueEnClan = st.clan.some(m => normH(m.handle) === hElim && String(m.clanNombre || '').trim() === cNom);
+                                if (!sigueEnClan && st.miembrosClanEtiquetas?.[hElim]) {
+                                    delete st.miembrosClanEtiquetas[hElim][cNom];
+                                }
+                            }
+                        }
                         guardarEstado(st);
                         renderAll();
                     });
