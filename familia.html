@@ -47,6 +47,13 @@
             flex-wrap: wrap;
         }
         .top-header h1 { font-size: 24px; color: var(--acento); }
+        .gen-controls-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
@@ -92,7 +99,9 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            gap: 5px;
         }
+        .btn-ghost:hover { border-color: var(--acento); color: var(--acento); }
         .inline-editor {
             display: none;
             margin-top: 14px;
@@ -106,8 +115,8 @@
         .tree-container {
             display: flex;
             flex-direction: column;
-            gap: 22px;
-            margin-top: 20px;
+            gap: 18px;
+            margin-top: 18px;
         }
         .gen-block {
             background: rgba(21, 10, 36, 0.36);
@@ -125,6 +134,21 @@
             color: var(--acento);
             margin-bottom: 12px;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .gen-remove-btn {
+            background: rgba(224, 60, 108, 0.16);
+            color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.45);
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-size: 10.5px;
+            font-weight: 700;
+            cursor: pointer;
         }
         .generation {
             display: flex;
@@ -236,11 +260,7 @@
                 <input type="text" id="famNombre" placeholder="Nombre del personaje">
                 <input type="text" id="famHandle" placeholder="@Usuario (ej. @JerElyPrince)">
                 <input type="text" id="famRelacion" placeholder="Relación (ej. Padre, Madre, Hija, Hijo, Pareja)">
-                <select id="famGeneracion">
-                    <option value="anterior">Generación Anterior</option>
-                    <option value="actual" selected>Generación Actual</option>
-                    <option value="siguiente">Siguiente Generación</option>
-                </select>
+                <select id="famGeneracion"></select>
                 <button type="button" class="btn-add" id="btnAgregarFam">Agregar Vínculo</button>
             </div>
 
@@ -250,11 +270,7 @@
                     <input type="text" id="editFamNombre" placeholder="Nombre">
                     <input type="text" id="editFamHandle" placeholder="@Usuario">
                     <input type="text" id="editFamRelacion" placeholder="Relación">
-                    <select id="editFamGeneracion">
-                        <option value="anterior">Generación Anterior</option>
-                        <option value="actual">Generación Actual</option>
-                        <option value="siguiente">Siguiente Generación</option>
-                    </select>
+                    <select id="editFamGeneracion"></select>
                 </div>
                 <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
                     <button type="button" class="btn-ghost" id="btnCancelarEdit">Cancelar</button>
@@ -262,20 +278,12 @@
                 </div>
             </div>
 
-            <div class="tree-container">
-                <div class="gen-block">
-                    <div class="rank-label">Generación Anterior</div>
-                    <div class="generation" id="gridAnterior"></div>
-                </div>
-                <div class="gen-block">
-                    <div class="rank-label">Generación Actual</div>
-                    <div class="generation" id="gridActual"></div>
-                </div>
-                <div class="gen-block">
-                    <div class="rank-label">Siguiente Generación</div>
-                    <div class="generation" id="gridSiguiente"></div>
-                </div>
+            <div class="gen-controls-bar" id="genControlsBar">
+                <button type="button" class="btn-ghost" id="btnAddGenUp">↑ Agregar generación arriba</button>
+                <button type="button" class="btn-ghost" id="btnAddGenDown">↓ Agregar generación abajo</button>
             </div>
+
+            <div class="tree-container" id="treeContainer"></div>
         </section>
     </main>
 
@@ -288,7 +296,13 @@
         const STORAGE_KEY = 'kixuz_familia_clan_v1';
         const LEGACY_KEYS = ['kixuz_familia_clan_v5', 'kixuz_familia_clan_v4', 'kixuz_familia_clan_v3', 'kixuz_familia_clan_v2'];
 
-        let dataStore = { familia: [], clan: [] };
+        const BASE_GENERACIONES = [
+            { id: 'anterior', label: 'Generación Anterior', custom: false },
+            { id: 'actual', label: 'Generación Actual', custom: false },
+            { id: 'siguiente', label: 'Siguiente Generación', custom: false }
+        ];
+
+        let dataStore = { familia: [], clan: [], generacionesExtra: [] };
         let focoChar = { nombre: 'Personaje', handle: '@rol', avatar: '' };
         let esFocoPropio = true;
         let avataresMap = new Map();
@@ -307,8 +321,43 @@
             return limp ? '@' + limp : '';
         };
 
+        function obtenerGeneracionesOrdenadas() {
+            const extras = Array.isArray(dataStore.generacionesExtra) ? dataStore.generacionesExtra : [];
+            const arriba = extras.filter(g => g && g.direccion === 'arriba');
+            const abajo = extras.filter(g => g && g.direccion !== 'arriba');
+            return [
+                ...arriba,
+                BASE_GENERACIONES[0],
+                BASE_GENERACIONES[1],
+                BASE_GENERACIONES[2],
+                ...abajo
+            ];
+        }
+
+        function poblarSelectoresGeneracion(valorPreferido = 'actual') {
+            const gens = obtenerGeneracionesOrdenadas();
+            const optsHtml = gens.map(g => `<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');
+            ['famGeneracion', 'editFamGeneracion'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const prev = valorPreferido || sel.value || 'actual';
+                sel.innerHTML = optsHtml;
+                if (gens.some(g => g.id === prev)) sel.value = prev;
+                else sel.value = 'actual';
+            });
+        }
+
         function inferirGeneracion(rel, fallback = 'actual') {
             const r = norm(rel);
+            const gens = obtenerGeneracionesOrdenadas();
+            if (r.includes('tatara') && (r.includes('abuel') || r.includes('ancestr'))) {
+                const matchArriba = gens.find(g => g.direccion === 'arriba');
+                if (matchArriba) return matchArriba.id;
+            }
+            if (r.includes('tatara') && (r.includes('niet') || r.includes('descend'))) {
+                const matchAbajo = gens.find(g => g.direccion !== 'arriba' && g.id.startsWith('gen_'));
+                if (matchAbajo) return matchAbajo.id;
+            }
             if (r.includes('padre') || r.includes('madre') || r.includes('abuel') || r.includes('tío') || r.includes('tio') || r.includes('tía') || r.includes('tia')) return 'anterior';
             if (r.includes('hijo') || r.includes('hija') || r.includes('niet') || r.includes('sobrin')) return 'siguiente';
             if (r.includes('herman') || r.includes('pareja') || r.includes('espos') || r.includes('casad') || r.includes('primo') || r.includes('prima')) return 'actual';
@@ -350,18 +399,23 @@
                 if (raw && typeof raw === 'object') {
                     return {
                         familia: Array.isArray(raw.familia) ? raw.familia : [],
-                        clan: Array.isArray(raw.clan) ? raw.clan : []
+                        clan: Array.isArray(raw.clan) ? raw.clan : [],
+                        generacionesExtra: Array.isArray(raw.generacionesExtra) ? raw.generacionesExtra : []
                     };
                 }
             } catch {}
-            return { familia: [], clan: [] };
+            return { familia: [], clan: [], generacionesExtra: [] };
         }
 
         function cargarDatos() {
             const famMap = new Map();
             const clanMap = new Map();
+            let extras = [];
             [...LEGACY_KEYS.slice().reverse(), STORAGE_KEY].forEach(k => {
                 const d = leerObjetoStorage(k);
+                if (Array.isArray(d.generacionesExtra) && d.generacionesExtra.length) {
+                    extras = d.generacionesExtra;
+                }
                 d.familia.forEach((item, i) => {
                     if (!item) return;
                     const duenoH = normHandle(item.duenoHandle || '');
@@ -381,7 +435,7 @@
                     clanMap.set(key, { ...clanMap.get(key), ...item });
                 });
             });
-            dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()) };
+            dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()), generacionesExtra: extras };
             guardarDatos();
         }
 
@@ -420,54 +474,30 @@
             return `<div class="member-img">${esc((nombre || 'P').charAt(0).toUpperCase())}</div>`;
         }
 
-        // Determina si un registro de dataStore.familia pertenece al árbol de focoH
-        // y qué relación/nombre/generación mostrar para ese otro personaje respecto a focoH
         function resolverEntradaParaFoco(item, focoH) {
             if (!item || !focoH) return null;
             const duenoH = normHandle(item.duenoHandle || '');
             const miembroH = normHandle(item.handle || '');
             if (!miembroH || miembroH === focoH) return null;
 
-            // Caso 1: registro creado en el árbol de focoH (duenoH === focoH)
             if (duenoH === focoH) {
                 const nombreResuelto = nombresMap.get(miembroH) || item.nombre || miembroH.replace(/^@/, '');
                 const etiqueta = item.relacion || 'Vínculo familiar';
-                const generacion = inferirGeneracion(etiqueta, item.generacion || 'actual');
-                return {
-                    nombre: nombreResuelto,
-                    handle: miembroH,
-                    etiqueta,
-                    generacion,
-                    esInverso: false
-                };
+                const generacion = item.generacion || inferirGeneracion(etiqueta, 'actual');
+                return { nombre: nombreResuelto, handle: miembroH, etiqueta, generacion, esInverso: false };
             }
 
-            // Caso 2: registro creado en el árbol de otro personaje (duenoH !== focoH)
-            // donde miembroH es focoH -> el otro personaje es duenoH, con relación inversa
             if (duenoH && duenoH !== focoH && miembroH === focoH) {
                 const invRel = calcularRelacionInversa(item.relacion);
-                const genInv = inferirGeneracion(invRel, item.generacion === 'anterior' ? 'siguiente' : (item.generacion === 'siguiente' ? 'anterior' : 'actual'));
+                const genInv = item.generacion === 'anterior' ? 'siguiente' : (item.generacion === 'siguiente' ? 'anterior' : 'actual');
                 const nombreOtro = nombresMap.get(duenoH) || item.duenoNombre || duenoH.replace(/^@/, '');
-                return {
-                    nombre: nombreOtro,
-                    handle: duenoH,
-                    etiqueta: invRel,
-                    generacion: genInv,
-                    esInverso: true
-                };
+                return { nombre: nombreOtro, handle: duenoH, etiqueta: invRel, generacion: genInv, esInverso: true };
             }
 
-            // Caso 3: registro sin duenoHandle explícito
             if (!duenoH) {
                 const nombreResuelto = nombresMap.get(miembroH) || item.nombre || miembroH.replace(/^@/, '');
                 const etiqueta = item.relacion || 'Vínculo familiar';
-                return {
-                    nombre: nombreResuelto,
-                    handle: miembroH,
-                    etiqueta,
-                    generacion: inferirGeneracion(etiqueta, item.generacion || 'actual'),
-                    esInverso: false
-                };
+                return { nombre: nombreResuelto, handle: miembroH, etiqueta, generacion: item.generacion || inferirGeneracion(etiqueta, 'actual'), esInverso: false };
             }
 
             return null;
@@ -500,11 +530,11 @@
             const item = dataStore.familia[index];
             if (!item) return;
             indiceEditando = index;
+            poblarSelectoresGeneracion(item.generacion || inferirGeneracion(item.relacion, 'actual'));
             document.getElementById('inlineEditorTitle').textContent = `Editando vínculo: ${item.nombre || item.handle}`;
             document.getElementById('editFamNombre').value = item.nombre || '';
             document.getElementById('editFamHandle').value = item.handle || '';
             document.getElementById('editFamRelacion').value = item.relacion || '';
-            document.getElementById('editFamGeneracion').value = inferirGeneracion(item.relacion, item.generacion || 'actual');
             document.getElementById('inlineEditorBox').classList.add('open');
         }
 
@@ -513,18 +543,33 @@
             document.getElementById('inlineEditorBox').classList.remove('open');
         }
 
+        function agregarGeneracion(direccion) {
+            if (!esFocoPropio) return;
+            const extras = Array.isArray(dataStore.generacionesExtra) ? dataStore.generacionesExtra : [];
+            const num = extras.length + 1;
+            const id = `gen_${direccion}_${Date.now()}`;
+            const labelDefault = direccion === 'arriba'
+                ? `Generación Superior ${num}`
+                : `Generación Descendiente ${num}`;
+            extras.push({ id, label: labelDefault, direccion });
+            dataStore.generacionesExtra = extras;
+            guardarDatos();
+            poblarSelectoresGeneracion(id);
+            renderArbol();
+        }
+
         function renderArbol() {
             const focoH = normHandle(focoChar.handle);
             document.getElementById('famTitulo').textContent = `Familia de ${focoChar.nombre}`;
             document.getElementById('focoSubtitle').textContent = `${focoChar.nombre} (${focoChar.handle})${esFocoPropio ? '' : ' · Vista de personaje'}`;
             document.getElementById('btnVerPerfilFoco').href = `perfil.html?char=${encodeURIComponent(focoH)}`;
             document.getElementById('formAgregarFamBox').style.display = esFocoPropio ? 'grid' : 'none';
+            document.getElementById('genControlsBar').style.display = esFocoPropio ? 'flex' : 'none';
             document.getElementById('famAyudaTexto').textContent = esFocoPropio
-                ? 'La generación y la relación inversa se calculan automáticamente al vincular.'
+                ? 'La generación y la relación inversa se calculan automáticamente al vincular. Puedes sumar generaciones arriba o abajo.'
                 : `Viendo el árbol familiar de ${focoChar.nombre} (${focoChar.handle}) en modo consulta.`;
             if (!esFocoPropio) cerrarEditorInline();
 
-            // Evita duplicar el mismo handle relacionado en el mismo árbol priorizando los vínculos directos del foco
             const vistosHandle = new Set();
             const directos = [];
             const inversos = [];
@@ -543,43 +588,43 @@
                 combinados.push(entry);
             });
 
-            document.getElementById('gridAnterior').innerHTML = combinados
-                .filter(({ res }) => res.generacion === 'anterior')
-                .map(({ index, res }) => cardHtml({
-                    nombre: res.nombre,
-                    handle: res.handle,
-                    etiqueta: res.etiqueta,
-                    index,
-                    puedeEditar: esFocoPropio && !res.esInverso
-                }))
-                .join('') || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
-
+            const gens = obtenerGeneracionesOrdenadas();
             const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
-            const actItemsHtml = combinados
-                .filter(({ res }) => res.generacion === 'actual')
-                .map(({ index, res }) => cardHtml({
-                    nombre: res.nombre,
-                    handle: res.handle,
-                    etiqueta: res.etiqueta,
-                    index,
-                    puedeEditar: esFocoPropio && !res.esInverso
-                }))
-                .join('');
-            document.getElementById('gridActual').innerHTML = yoCard + actItemsHtml;
+            const container = document.getElementById('treeContainer');
 
-            document.getElementById('gridSiguiente').innerHTML = combinados
-                .filter(({ res }) => res.generacion === 'siguiente')
-                .map(({ index, res }) => cardHtml({
-                    nombre: res.nombre,
-                    handle: res.handle,
-                    etiqueta: res.etiqueta,
-                    index,
-                    puedeEditar: esFocoPropio && !res.esInverso
-                }))
-                .join('') || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
+            container.innerHTML = gens.map(g => {
+                const itemsGen = combinados
+                    .filter(({ res }) => res.generacion === g.id)
+                    .map(({ index, res }) => cardHtml({
+                        nombre: res.nombre,
+                        handle: res.handle,
+                        etiqueta: res.etiqueta,
+                        index,
+                        puedeEditar: esFocoPropio && !res.esInverso
+                    }))
+                    .join('');
+
+                const contenido = g.id === 'actual'
+                    ? yoCard + itemsGen
+                    : (itemsGen || `<div class="member-user">Sin vínculos en esta generación.</div>`);
+
+                const botonBorrarGen = (esFocoPropio && g.id.startsWith('gen_'))
+                    ? `<button type="button" class="gen-remove-btn" data-del-gen="${esc(g.id)}" title="Quitar generación">✕</button>`
+                    : '';
+
+                return `
+                    <div class="gen-block">
+                        <div class="rank-label">
+                            <span>${esc(g.label)}</span>
+                            ${botonBorrarGen}
+                        </div>
+                        <div class="generation">${contenido}</div>
+                    </div>
+                `;
+            }).join('');
 
             if (esFocoPropio) {
-                document.querySelectorAll('[data-del]').forEach(btn => {
+                container.querySelectorAll('[data-del]').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const i = Number(btn.dataset.del);
                         if (Number.isNaN(i)) return;
@@ -590,23 +635,41 @@
                     });
                 });
 
-                document.querySelectorAll('[data-edit]').forEach(btn => {
+                container.querySelectorAll('[data-edit]').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const i = Number(btn.dataset.edit);
                         if (!Number.isNaN(i)) abrirEditorInline(i);
                     });
                 });
+
+                container.querySelectorAll('[data-del-gen]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const genId = btn.dataset.delGen;
+                        dataStore.generacionesExtra = (dataStore.generacionesExtra || []).filter(x => x.id !== genId);
+                        dataStore.familia = dataStore.familia.map(item =>
+                            item.generacion === genId ? { ...item, generacion: 'actual' } : item
+                        );
+                        guardarDatos();
+                        poblarSelectoresGeneracion('actual');
+                        renderArbol();
+                    });
+                });
             }
         }
 
+        document.getElementById('btnAddGenUp').addEventListener('click', () => agregarGeneracion('arriba'));
+        document.getElementById('btnAddGenDown').addEventListener('click', () => agregarGeneracion('abajo'));
+
         document.getElementById('famRelacion').addEventListener('input', e => {
             const genSel = document.getElementById('famGeneracion');
-            genSel.value = inferirGeneracion(e.target.value, genSel.value || 'actual');
+            const sugerida = inferirGeneracion(e.target.value, genSel.value || 'actual');
+            if (sugerida) genSel.value = sugerida;
         });
 
         document.getElementById('editFamRelacion').addEventListener('input', e => {
             const genSel = document.getElementById('editFamGeneracion');
-            genSel.value = inferirGeneracion(e.target.value, genSel.value || 'actual');
+            const sugerida = inferirGeneracion(e.target.value, genSel.value || 'actual');
+            if (sugerida) genSel.value = sugerida;
         });
 
         document.getElementById('btnCancelarEdit').addEventListener('click', cerrarEditorInline);
@@ -617,7 +680,7 @@
             const nuevoNombre = document.getElementById('editFamNombre').value.trim();
             const nuevoHandle = normHandle(document.getElementById('editFamHandle').value.trim() || nuevoNombre);
             const nuevaRel = document.getElementById('editFamRelacion').value.trim() || item.relacion;
-            const nuevaGen = inferirGeneracion(nuevaRel, document.getElementById('editFamGeneracion').value || 'actual');
+            const nuevaGen = document.getElementById('editFamGeneracion').value || 'actual';
             if (nuevoNombre) item.nombre = nuevoNombre;
             if (nuevoHandle) item.handle = nuevoHandle;
             item.relacion = nuevaRel;
@@ -632,15 +695,13 @@
             const nombreInput = document.getElementById('famNombre').value.trim();
             const handle = normHandle(document.getElementById('famHandle').value.trim() || nombreInput);
             const relacion = document.getElementById('famRelacion').value.trim() || 'Vínculo familiar';
-            const generacion = inferirGeneracion(relacion, document.getElementById('famGeneracion').value || 'actual');
+            const generacion = document.getElementById('famGeneracion').value || 'actual';
             if (!handle) return;
 
             const duenoH = normHandle(focoChar.handle);
             if (handle === duenoH) return;
 
             const nombreFinal = nombreInput || nombresMap.get(handle) || handle.replace(/^@/, '');
-
-            // Evita duplicar al mismo handle en el mismo árbol
             const yaExiste = dataStore.familia.some(x =>
                 normHandle(x.duenoHandle) === duenoH && normHandle(x.handle) === handle
             );
@@ -665,6 +726,7 @@
 
         async function iniciar() {
             cargarDatos();
+            poblarSelectoresGeneracion('actual');
             const params = new URLSearchParams(window.location.search);
             const charParam = params.get('char') || '';
             const activo = obtenerPersonajeActivoExacto();

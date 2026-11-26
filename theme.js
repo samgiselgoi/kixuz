@@ -18,25 +18,19 @@
             if (t === 'light') {
                 btn.innerHTML = `${SVG_MOON}<span>Oscuro</span>`;
                 btn.setAttribute('aria-label', 'Cambiar a modo oscuro');
-                btn.setAttribute('title', 'Cambiar a modo oscuro');
             } else {
                 btn.innerHTML = `${SVG_SUN}<span>Claro</span>`;
                 btn.setAttribute('aria-label', 'Cambiar a modo claro');
-                btn.setAttribute('title', 'Cambiar a modo claro');
             }
         });
     }
 
     function applyTheme(theme) {
         const t = theme === 'light' ? 'light' : 'dark';
-        if (t === 'light') {
-            root.setAttribute('data-theme', 'light');
-        } else {
-            root.removeAttribute('data-theme');
-        }
+        if (t === 'light') root.setAttribute('data-theme', 'light');
+        else root.removeAttribute('data-theme');
         try { localStorage.setItem(STORAGE_KEY, t); } catch {}
         actualizarBotonesTema(t);
-        window.dispatchEvent(new CustomEvent('kixuz:theme-changed', { detail: { theme: t } }));
     }
 
     const style = document.createElement('style');
@@ -85,45 +79,111 @@
             cursor: pointer;
             white-space: nowrap;
             flex-shrink: 0;
-            line-height: 1;
-            transition: background 0.2s, border-color 0.2s, color 0.2s;
-        }
-        .kixuz-theme-toggle-btn:hover {
-            border-color: var(--acento, #2DD4C4);
-            color: var(--acento, #2DD4C4);
         }
         html[data-theme="light"] .kixuz-theme-toggle-btn {
             background: rgba(108, 60, 224, 0.12);
             color: #150A24;
         }
-        @media (max-width: 860px) {
-            .kixuz-theme-toggle-btn span { display: none !important; }
-            .kixuz-theme-toggle-btn { width: 36px !important; padding: 0 !important; }
-        }
 
+        /* === ADAPTACIÓN COMPLETA PARA TABLET Y CELULAR (SIN OCULTAR NADA DE PC) === */
         @media (max-width: 900px) {
             .profile-layout,
             .detail-body {
                 grid-template-columns: 1fr !important;
+                gap: 16px !important;
             }
+            .character-sidebar,
             .side-column {
                 position: static !important;
                 top: auto !important;
+                width: 100% !important;
             }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 680px) {
+            header {
+                height: auto !important;
+                min-height: 54px !important;
+                padding: 8px 10px !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+            }
+            header .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start !important;
+                overflow-x: auto !important;
+                padding-top: 4px !important;
+                border-top: 1px solid rgba(108, 60, 224, 0.22);
+            }
+            header .user-menu {
+                margin-left: auto;
+                gap: 6px !important;
+            }
+            #activeCharSelect,
+            .user-menu select {
+                max-width: 155px !important;
+                font-size: 12px !important;
+                height: 34px !important;
+            }
+            .kixuz-theme-toggle-btn span {
+                display: none !important;
+            }
+            .kixuz-theme-toggle-btn {
+                width: 34px !important;
+                height: 34px !important;
+                padding: 0 !important;
+            }
             .container,
+            .page-wrap,
             .page-wrapper,
             .profile-layout {
-                margin: 16px auto 76px !important;
-                padding: 0 12px !important;
+                margin: 14px auto 84px !important;
+                padding: 0 10px !important;
             }
-            .grid-universos,
-            .universes-grid,
-            .zones-grid,
-            .new-u-grid {
+            .panel,
+            .panel-box,
+            .create-post,
+            .post-card {
+                padding: 14px !important;
+                border-radius: 14px !important;
+            }
+            .form-row,
+            .create-post-controls,
+            .kixuz-modal-grid,
+            .grid-universos {
                 grid-template-columns: 1fr !important;
+            }
+            /* Familia en 2 tarjetas por fila en celular para ver todo el árbol */
+            .generation {
+                gap: 10px !important;
+            }
+            .member-card {
+                width: calc(50% - 6px) !important;
+                min-width: 142px !important;
+                max-width: 190px !important;
+                padding: 12px 8px !important;
+            }
+            .member-img {
+                width: 52px !important;
+                height: 52px !important;
+                font-size: 17px !important;
+            }
+            /* Chat a pantalla completa limpia en celular */
+            .kixuz-chat-sidebar {
+                width: 100vw !important;
+                max-width: 100vw !important;
+                right: -105vw !important;
+                border-left: none !important;
+            }
+            .kixuz-chat-sidebar.active {
+                right: 0 !important;
+            }
+            .kixuz-chat-trigger {
+                width: 50px !important;
+                height: 50px !important;
+                right: 12px !important;
+                bottom: 12px !important;
             }
         }
     `;
@@ -132,20 +192,12 @@
     function mountThemeButton() {
         const header = document.querySelector('header');
         if (!header) return;
-
         let userMenu = header.querySelector('.user-menu');
         if (!userMenu) {
             userMenu = document.createElement('div');
             userMenu.className = 'user-menu';
             header.appendChild(userMenu);
         }
-
-        // Evita duplicados si ya existe
-        const existentes = userMenu.querySelectorAll('.kixuz-theme-toggle-btn');
-        if (existentes.length > 1) {
-            for (let i = 1; i < existentes.length; i++) existentes[i].remove();
-        }
-
         let btn = userMenu.querySelector('.kixuz-theme-toggle-btn');
         if (!btn) {
             btn = document.createElement('button');
@@ -157,22 +209,12 @@
             });
             userMenu.appendChild(btn);
         }
-
         applyTheme(getPreferredTheme());
     }
 
-    window.KIXUZ_THEME = {
-        getTheme: getPreferredTheme,
-        setTheme: applyTheme,
-        mount: mountThemeButton
-    };
-
+    window.KIXUZ_THEME = { getTheme: getPreferredTheme, setTheme: applyTheme, mount: mountThemeButton };
     applyTheme(getPreferredTheme());
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', mountThemeButton);
-    } else {
-        mountThemeButton();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountThemeButton);
+    else mountThemeButton();
     window.addEventListener('load', mountThemeButton);
 })();
