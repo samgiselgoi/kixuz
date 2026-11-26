@@ -519,7 +519,7 @@
             return chatActivoId ? conversaciones.find(c => String(c.id) === String(chatActivoId)) || null : null;
         }
 
-        // Identidad que está hablando en este preciso instante (para alinear derecha/izquierda)
+        // Identidad estricta del personaje activo actual
         function obtenerClavesPersonajeActivo() {
             const set = new Set();
             const add = v => {
@@ -547,47 +547,35 @@
             return set;
         }
 
-        // Todas las identidades de mi cuenta (personaje activo + todos mis sub-personajes + cuenta maestra)
-        function obtenerTodasMisClaves() {
-            const set = obtenerClavesPersonajeActivo();
-            const add = v => {
-                const s = normToken(v);
-                if (!s) return;
-                set.add(s);
-                if (s.startsWith('@')) set.add(s.slice(1));
-                else set.add('@' + s.replace(/\s+/g, '_'));
-            };
-            leerArregloSeguro('kixuz_subpersonajes').forEach(p => {
-                if (p) {
-                    add(p.handle);
-                    add(p.nombre);
-                }
-            });
-            if (window.KIXUZ_DB?.perfilCuenta) {
-                add(window.KIXUZ_DB.perfilCuenta.apodo);
-                add(window.KIXUZ_DB.perfilCuenta.uid);
-            }
-            if (window.KIXUZ_DB?.usuarioActual) {
-                add(window.KIXUZ_DB.usuarioActual.uid);
-            }
-            return set;
+        function coincideConClaves(valor, clavesSet) {
+            const v = normToken(valor);
+            if (!v || !clavesSet.size) return false;
+            return clavesSet.has(v) || clavesSet.has(normHandle(v));
         }
 
+        // Para chats 1x1: solo el personaje implicado (sin filtrar por otros subpersonajes de la cuenta)
+        // Para grupos: los participantes incluidos en el grupo
         function esImplicado(conv) {
             if (!conv || idsEliminadosRecientemente.has(String(conv.id))) return false;
-            const misClaves = obtenerTodasMisClaves();
-            if (!misClaves.size) return false;
+            const pjClaves = obtenerClavesPersonajeActivo();
+            if (!pjClaves.size) return false;
+
             const participantes = [
                 ...(Array.isArray(conv.participantes) ? conv.participantes : []),
-                ...(Array.isArray(conv.miembros) ? conv.miembros : []),
-                conv.creadorHandle,
-                conv.uidMaestro
+                ...(Array.isArray(conv.miembros) ? conv.miembros : [])
             ].map(normToken).filter(x => x && x !== 'todos');
-            if (participantes.length > 0) {
-                return participantes.some(p => misClaves.has(p) || misClaves.has(normHandle(p)));
+
+            if (conv.tipo === 'privado') {
+                if (participantes.length > 0) {
+                    return participantes.some(p => coincideConClaves(p, pjClaves));
+                }
+                return coincideConClaves(conv.usuario, pjClaves) || coincideConClaves(conv.creadorHandle, pjClaves);
             }
-            const dest = normToken(conv.usuario);
-            return Boolean(dest && (misClaves.has(dest) || misClaves.has(normHandle(dest))));
+
+            if (participantes.length > 0) {
+                return participantes.some(p => coincideConClaves(p, pjClaves));
+            }
+            return coincideConClaves(conv.usuario, pjClaves);
         }
 
         function esMensajeMio(msg) {
@@ -635,7 +623,6 @@
             }
         }
 
-        // Paneles integrados dentro del mismo chat (sin prompt() de Chrome)
         function abrirEditorNombreInline(conv) {
             inlineDrawer.innerHTML = `
                 <div class="kixuz-inline-drawer-title">
@@ -772,7 +759,6 @@
                 `
                 : `
                     <button type="button" class="kixuz-more-item" data-act="rename">Editar nombre</button>
-                    <button type="button" class="kixuz-more-item" data-act="add-person">Agregar persona</button>
                     <button type="button" class="kixuz-more-item danger" data-act="delete">Eliminar chat</button>
                 `;
 
@@ -871,7 +857,10 @@
         }
 
         function abrirConversacion(conv) {
-            if (!conv || !esImplicado(conv)) return;
+            if (!conv || !esImplicado(conv)) {
+                volverLista();
+                return;
+            }
             cerrarInlineDrawer();
             chatActivoId = String(conv.id);
             marcarChatComoLeido(conv);
@@ -925,11 +914,12 @@
                 return;
             }
             const tipo = chatTipoSelect.value || 'privado';
-            const primer = miembrosPendientes[0];
+            const destinoElegido = tipo === 'privado' ? [miembrosPendientes[0]] : [...miembrosPendientes];
+            const primer = destinoElegido[0];
             const usuario = normHandle(primer) || primer;
-            const nombreFinal = tipo === 'grupo' ? miembrosPendientes.join(', ') : primer;
+            const nombreFinal = tipo === 'grupo' ? destinoElegido.join(', ') : primer;
             const misPjClaves = Array.from(obtenerClavesPersonajeActivo());
-            const participantes = Array.from(new Set([...misPjClaves, ...miembrosPendientes].filter(Boolean)));
+            const participantes = Array.from(new Set([...misPjClaves, ...destinoElegido].filter(Boolean)));
             const tempId = 'chat_' + Date.now();
             const nueva = {
                 id: tempId,
@@ -1038,8 +1028,12 @@
 
                 const act = obtenerChatActivo();
                 if (act && sidebar.classList.contains('active')) {
-                    marcarChatComoLeido(act);
-                    renderMensajes();
+                    if (esImplicado(act)) {
+                        marcarChatComoLeido(act);
+                        renderMensajes();
+                    } else {
+                        volverLista();
+                    }
                 }
                 renderLista(searchInput.value);
                 actualizarBadge();
