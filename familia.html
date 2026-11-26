@@ -234,7 +234,7 @@
 
             <div class="form-row" id="formAgregarFamBox">
                 <input type="text" id="famNombre" placeholder="Nombre del personaje">
-                <input type="text" id="famHandle" placeholder="@Usuario (ej. @Demian)">
+                <input type="text" id="famHandle" placeholder="@Usuario (ej. @JerElyPrince)">
                 <input type="text" id="famRelacion" placeholder="Relación (ej. Padre, Madre, Hija, Hijo, Pareja)">
                 <select id="famGeneracion">
                     <option value="anterior">Generación Anterior</option>
@@ -286,10 +286,13 @@
     <script src="chat.js"></script>
     <script>
         const STORAGE_KEY = 'kixuz_familia_clan_v1';
+        const LEGACY_KEYS = ['kixuz_familia_clan_v5', 'kixuz_familia_clan_v4', 'kixuz_familia_clan_v3', 'kixuz_familia_clan_v2'];
+
         let dataStore = { familia: [], clan: [] };
         let focoChar = { nombre: 'Personaje', handle: '@rol', avatar: '' };
         let esFocoPropio = true;
         let avataresMap = new Map();
+        let nombresMap = new Map();
         let indiceEditando = null;
 
         const esc = s => String(s || '')
@@ -341,36 +344,74 @@
             return { nombre: 'Personaje', handle: '@rol', avatar: '' };
         }
 
-        function cargarDatos() {
+        function leerObjetoStorage(k) {
             try {
-                const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-                dataStore = {
-                    familia: Array.isArray(raw.familia) ? raw.familia : [],
-                    clan: Array.isArray(raw.clan) ? raw.clan : []
-                };
-            } catch {
-                dataStore = { familia: [], clan: [] };
-            }
+                const raw = JSON.parse(localStorage.getItem(k) || 'null');
+                if (raw && typeof raw === 'object') {
+                    return {
+                        familia: Array.isArray(raw.familia) ? raw.familia : [],
+                        clan: Array.isArray(raw.clan) ? raw.clan : []
+                    };
+                }
+            } catch {}
+            return { familia: [], clan: [] };
+        }
+
+        function cargarDatos() {
+            const famMap = new Map();
+            const clanMap = new Map();
+            [...LEGACY_KEYS.slice().reverse(), STORAGE_KEY].forEach(k => {
+                const d = leerObjetoStorage(k);
+                d.familia.forEach((item, i) => {
+                    if (!item) return;
+                    const duenoH = normHandle(item.duenoHandle || '');
+                    const miembroH = normHandle(item.handle || item.nombre || '');
+                    const relN = norm(item.relacion || '');
+                    const key = String(item.id || `${duenoH}__${miembroH}__${relN}__${i}`);
+                    famMap.set(key, {
+                        ...famMap.get(key),
+                        ...item,
+                        duenoHandle: duenoH,
+                        handle: miembroH
+                    });
+                });
+                d.clan.forEach((item, i) => {
+                    if (!item) return;
+                    const key = String(item.id || `c_${i}`);
+                    clanMap.set(key, { ...clanMap.get(key), ...item });
+                });
+            });
+            dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()) };
+            guardarDatos();
         }
 
         function guardarDatos() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStore)); } catch {}
         }
 
-        async function cargarAvatares() {
-            const m = new Map();
-            if (focoChar?.handle && focoChar?.avatar) m.set(normHandle(focoChar.handle), focoChar.avatar);
+        async function cargarDirectorioPersonajes() {
+            const mAv = new Map();
+            const mNom = new Map();
+            const registrar = p => {
+                if (!p) return;
+                const h = normHandle(p.handle);
+                if (!h) return;
+                if (p.avatar) mAv.set(h, p.avatar);
+                if (p.nombre) mNom.set(h, p.nombre);
+            };
+            registrar(focoChar);
             try {
                 const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                subs.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
+                if (Array.isArray(subs)) subs.forEach(registrar);
             } catch {}
             if (window.KIXUZ_DB?.listarPersonajesPublicos) {
                 try {
                     const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
-                    pub.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
+                    if (Array.isArray(pub)) pub.forEach(registrar);
                 } catch {}
             }
-            avataresMap = m;
+            avataresMap = mAv;
+            nombresMap = mNom;
         }
 
         function renderAvatar(nombre, handle) {
@@ -379,32 +420,57 @@
             return `<div class="member-img">${esc((nombre || 'P').charAt(0).toUpperCase())}</div>`;
         }
 
-        function esVinculoDeEsteArbol(item, focoH) {
-            if (!item) return false;
-            const dueno = normHandle(item.duenoHandle || '');
-            const miembro = normHandle(item.handle || '');
-            if (!dueno) return miembro !== focoH;
-            return (dueno === focoH && miembro !== focoH) || (miembro === focoH && dueno !== focoH);
-        }
+        // Determina si un registro de dataStore.familia pertenece al árbol de focoH
+        // y qué relación/nombre/generación mostrar para ese otro personaje respecto a focoH
+        function resolverEntradaParaFoco(item, focoH) {
+            if (!item || !focoH) return null;
+            const duenoH = normHandle(item.duenoHandle || '');
+            const miembroH = normHandle(item.handle || '');
+            if (!miembroH || miembroH === focoH) return null;
 
-        function datosMostrarParaFoco(item, focoH) {
-            const dueno = normHandle(item.duenoHandle || '');
-            if (dueno && dueno !== focoH && normHandle(item.handle) === focoH) {
-                const invRel = calcularRelacionInversa(item.relacion);
-                const genInv = item.generacion === 'anterior' ? 'siguiente' : (item.generacion === 'siguiente' ? 'anterior' : 'actual');
+            // Caso 1: registro creado en el árbol de focoH (duenoH === focoH)
+            if (duenoH === focoH) {
+                const nombreResuelto = nombresMap.get(miembroH) || item.nombre || miembroH.replace(/^@/, '');
+                const etiqueta = item.relacion || 'Vínculo familiar';
+                const generacion = inferirGeneracion(etiqueta, item.generacion || 'actual');
                 return {
-                    nombre: item.duenoNombre || dueno.replace(/^@/, ''),
-                    handle: dueno,
-                    etiqueta: invRel,
-                    generacion: inferirGeneracion(invRel, genInv)
+                    nombre: nombreResuelto,
+                    handle: miembroH,
+                    etiqueta,
+                    generacion,
+                    esInverso: false
                 };
             }
-            return {
-                nombre: item.nombre,
-                handle: item.handle,
-                etiqueta: item.relacion,
-                generacion: inferirGeneracion(item.relacion, item.generacion || 'actual')
-            };
+
+            // Caso 2: registro creado en el árbol de otro personaje (duenoH !== focoH)
+            // donde miembroH es focoH -> el otro personaje es duenoH, con relación inversa
+            if (duenoH && duenoH !== focoH && miembroH === focoH) {
+                const invRel = calcularRelacionInversa(item.relacion);
+                const genInv = inferirGeneracion(invRel, item.generacion === 'anterior' ? 'siguiente' : (item.generacion === 'siguiente' ? 'anterior' : 'actual'));
+                const nombreOtro = nombresMap.get(duenoH) || item.duenoNombre || duenoH.replace(/^@/, '');
+                return {
+                    nombre: nombreOtro,
+                    handle: duenoH,
+                    etiqueta: invRel,
+                    generacion: genInv,
+                    esInverso: true
+                };
+            }
+
+            // Caso 3: registro sin duenoHandle explícito
+            if (!duenoH) {
+                const nombreResuelto = nombresMap.get(miembroH) || item.nombre || miembroH.replace(/^@/, '');
+                const etiqueta = item.relacion || 'Vínculo familiar';
+                return {
+                    nombre: nombreResuelto,
+                    handle: miembroH,
+                    etiqueta,
+                    generacion: inferirGeneracion(etiqueta, item.generacion || 'actual'),
+                    esInverso: false
+                };
+            }
+
+            return null;
         }
 
         function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1, puedeEditar = false }) {
@@ -434,7 +500,7 @@
             const item = dataStore.familia[index];
             if (!item) return;
             indiceEditando = index;
-            document.getElementById('inlineEditorTitle').textContent = `Editando miembro: ${item.nombre || item.handle}`;
+            document.getElementById('inlineEditorTitle').textContent = `Editando vínculo: ${item.nombre || item.handle}`;
             document.getElementById('editFamNombre').value = item.nombre || '';
             document.getElementById('editFamHandle').value = item.handle || '';
             document.getElementById('editFamRelacion').value = item.relacion || '';
@@ -458,25 +524,58 @@
                 : `Viendo el árbol familiar de ${focoChar.nombre} (${focoChar.handle}) en modo consulta.`;
             if (!esFocoPropio) cerrarEditorInline();
 
-            const famItems = dataStore.familia
-                .map((m, index) => ({ m, index, view: datosMostrarParaFoco(m, focoH) }))
-                .filter(({ m }) => esVinculoDeEsteArbol(m, focoH) && normHandle(m.handle) !== focoH);
+            // Evita duplicar el mismo handle relacionado en el mismo árbol priorizando los vínculos directos del foco
+            const vistosHandle = new Set();
+            const directos = [];
+            const inversos = [];
 
-            document.getElementById('gridAnterior').innerHTML = famItems
-                .filter(({ view }) => view.generacion === 'anterior')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
+            dataStore.familia.forEach((m, index) => {
+                const res = resolverEntradaParaFoco(m, focoH);
+                if (!res || res.handle === focoH) return;
+                if (res.esInverso) inversos.push({ m, index, res });
+                else directos.push({ m, index, res });
+            });
+
+            const combinados = [];
+            [...directos, ...inversos].forEach(entry => {
+                if (vistosHandle.has(entry.res.handle)) return;
+                vistosHandle.add(entry.res.handle);
+                combinados.push(entry);
+            });
+
+            document.getElementById('gridAnterior').innerHTML = combinados
+                .filter(({ res }) => res.generacion === 'anterior')
+                .map(({ index, res }) => cardHtml({
+                    nombre: res.nombre,
+                    handle: res.handle,
+                    etiqueta: res.etiqueta,
+                    index,
+                    puedeEditar: esFocoPropio && !res.esInverso
+                }))
                 .join('') || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
 
             const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
-            const actItemsHtml = famItems
-                .filter(({ view }) => view.generacion === 'actual')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
+            const actItemsHtml = combinados
+                .filter(({ res }) => res.generacion === 'actual')
+                .map(({ index, res }) => cardHtml({
+                    nombre: res.nombre,
+                    handle: res.handle,
+                    etiqueta: res.etiqueta,
+                    index,
+                    puedeEditar: esFocoPropio && !res.esInverso
+                }))
                 .join('');
             document.getElementById('gridActual').innerHTML = yoCard + actItemsHtml;
 
-            document.getElementById('gridSiguiente').innerHTML = famItems
-                .filter(({ view }) => view.generacion === 'siguiente')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
+            document.getElementById('gridSiguiente').innerHTML = combinados
+                .filter(({ res }) => res.generacion === 'siguiente')
+                .map(({ index, res }) => cardHtml({
+                    nombre: res.nombre,
+                    handle: res.handle,
+                    etiqueta: res.etiqueta,
+                    index,
+                    puedeEditar: esFocoPropio && !res.esInverso
+                }))
                 .join('') || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
 
             if (esFocoPropio) {
@@ -530,23 +629,33 @@
 
         document.getElementById('btnAgregarFam').addEventListener('click', () => {
             if (!esFocoPropio) return;
-            const nombre = document.getElementById('famNombre').value.trim();
-            const handle = normHandle(document.getElementById('famHandle').value.trim() || nombre);
+            const nombreInput = document.getElementById('famNombre').value.trim();
+            const handle = normHandle(document.getElementById('famHandle').value.trim() || nombreInput);
             const relacion = document.getElementById('famRelacion').value.trim() || 'Vínculo familiar';
             const generacion = inferirGeneracion(relacion, document.getElementById('famGeneracion').value || 'actual');
-            if (!nombre && !handle) return;
-            const duenoH = normHandle(focoChar.handle);
-            if (handle && handle === duenoH) return;
+            if (!handle) return;
 
-            dataStore.familia.push({
-                id: 'fam_' + Date.now(),
-                duenoNombre: focoChar.nombre,
-                duenoHandle: duenoH,
-                nombre: nombre || handle.replace(/^@/, ''),
-                handle,
-                relacion,
-                generacion
-            });
+            const duenoH = normHandle(focoChar.handle);
+            if (handle === duenoH) return;
+
+            const nombreFinal = nombreInput || nombresMap.get(handle) || handle.replace(/^@/, '');
+
+            // Evita duplicar al mismo handle en el mismo árbol
+            const yaExiste = dataStore.familia.some(x =>
+                normHandle(x.duenoHandle) === duenoH && normHandle(x.handle) === handle
+            );
+            if (!yaExiste) {
+                dataStore.familia.push({
+                    id: 'fam_' + Date.now(),
+                    duenoNombre: focoChar.nombre,
+                    duenoHandle: duenoH,
+                    nombre: nombreFinal,
+                    handle,
+                    relacion,
+                    generacion
+                });
+            }
+
             guardarDatos();
             renderArbol();
             document.getElementById('famNombre').value = '';
@@ -596,7 +705,7 @@
                 esFocoPropio = true;
             }
 
-            await cargarAvatares();
+            await cargarDirectorioPersonajes();
             renderArbol();
         }
 
