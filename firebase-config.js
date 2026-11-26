@@ -11,8 +11,14 @@ import {
     doc,
     getDoc,
     setDoc,
+    addDoc,
+    deleteDoc,
     collection,
-    getDocs
+    getDocs,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -111,17 +117,8 @@ window.KIXUZ_DB = {
             uidMaestro: uid,
             actualizadoEn: Date.now()
         };
-        const publicPayload = {
-            nombre: payload.nombre || h.slice(1),
-            handle: h,
-            avatar: payload.avatar || "",
-            clan: payload.clan || "",
-            universos: Array.isArray(payload.universos) ? payload.universos : [],
-            actualizadoEn: payload.actualizadoEn
-        };
         try {
             await setDoc(doc(db, "personajes", h.slice(1)), payload, { merge: true });
-            await setDoc(doc(db, "personajes_publicos", h.slice(1)), publicPayload, { merge: true });
             if (uid) {
                 await setDoc(doc(db, "cuentas", uid, "personajes", h.slice(1)), payload, { merge: true });
             }
@@ -158,11 +155,14 @@ window.KIXUZ_DB = {
             });
         } catch {}
 
-        // Subir a Firestore cualquier personaje local o de la cuenta para que aparezca en el directorio global
-        for (const p of mapa.values()) {
-            const actualizado = uid && (!p.uidMaestro || p.uidMaestro === uid) ? { ...p, uidMaestro: uid } : p;
-            mapa.set(p.handle, actualizado);
-            await this.guardarSubpersonaje(actualizado);
+        if (uid) {
+            for (const p of mapa.values()) {
+                if (!p.uidMaestro || p.uidMaestro === uid) {
+                    const actualizado = { ...p, uidMaestro: uid };
+                    mapa.set(p.handle, actualizado);
+                    await this.guardarSubpersonaje(actualizado);
+                }
+            }
         }
 
         const fusionados = Array.from(mapa.values());
@@ -227,65 +227,107 @@ window.KIXUZ_DB = {
             if (h) mapa.set(h, { ...p, handle: h });
         });
         try {
-            const postsLocal = JSON.parse(localStorage.getItem("kixuz_posts") || "[]");
-            if (Array.isArray(postsLocal)) {
-                postsLocal.forEach(it => {
-                    const h = normHandle(it?.autorHandle || it?.handle);
-                    if (h && !mapa.has(h)) {
-                        mapa.set(h, { nombre: it.autorNombre || it.author || h.slice(1), handle: h });
-                    }
-                });
-            }
-        } catch {}
-        try {
-            const pubSnap = await getDocs(collection(db, "personajes_publicos"));
-            pubSnap.forEach(d => {
-                const data = d.data() || {};
-                const h = normHandle(data.handle || ("@" + d.id));
-                if (h) {
-                    mapa.set(h, {
-                        ...(mapa.get(h) || {}),
-                        ...data,
-                        nombre: data.nombre || mapa.get(h)?.nombre || h.slice(1),
-                        handle: h
-                    });
-                }
-            });
-        } catch {}
-        try {
             const snap = await getDocs(collection(db, "personajes"));
             snap.forEach(d => {
-                const data = d.data() || {};
-                const h = normHandle(data.handle || ("@" + d.id));
-                if (h) {
-                    mapa.set(h, {
-                        ...(mapa.get(h) || {}),
-                        ...data,
-                        nombre: data.nombre || mapa.get(h)?.nombre || h.slice(1),
-                        handle: h
-                    });
-                }
+                const data = d.data();
+                const h = normHandle(data?.handle);
+                if (h) mapa.set(h, { ...(mapa.get(h) || {}), ...data, handle: h });
             });
         } catch {}
-        return Array.from(mapa.values()).sort((a, b) =>
-            String(a.nombre || a.handle).localeCompare(String(b.nombre || b.handle), "es")
-        );
+        return Array.from(mapa.values());
     },
 
     async buscarPersonajePublico(handle) {
         const h = normHandle(handle);
         if (!h) return null;
-        const idDoc = h.slice(1);
         try {
-            const pubSnap = await getDoc(doc(db, "personajes_publicos", idDoc));
-            if (pubSnap.exists()) return { handle: h, ...pubSnap.data() };
+            const snap = await getDoc(doc(db, "personajes", h.slice(1)));
+            if (snap.exists()) return snap.data();
         } catch {}
+        return null;
+    },
+
+    // --- CHATS EN TIEMPO REAL ENTRE DISPOSITIVOS Y PERSONAJES ---
+    async crearConversacionChat({ nombre, usuario = "", tipo = "privado", participantesExtra = [] }) {
+        let autorHandle = normHandle(window.KIXUZ_ACTIVE_CHAR?.handle || "");
+        if (!autorHandle) {
+            try {
+                const act = JSON.parse(localStorage.getItem(KEY_ACTIVO) || "null");
+                autorHandle = normHandle(act?.handle || "");
+            } catch {}
+        }
+        const destinoH = normHandle(usuario);
+        const extras = (Array.isArray(participantesExtra) ? participantesExtra : [])
+            .map(normHandle)
+            .filter(Boolean);
+
+        const participantes = Array.from(new Set(
+            [autorHandle, destinoH, ...extras].filter(Boolean)
+        ));
+
+        const ahora = Date.now();
+        const payload = {
+            nombre: nombre || destinoH || "Chat",
+            usuario: destinoH,
+            tipo: tipo === "grupo" ? "grupo" : "privado",
+            participantes,
+            creadorHandle: autorHandle,
+            uidMaestro: auth.currentUser?.uid || "",
+            mensajes: [],
+            createdAtMs: ahora,
+            actualizadoEn: ahora,
+            creadoEn: serverTimestamp()
+        };
+
         try {
-            const snap = await getDoc(doc(db, "personajes", idDoc));
-            if (snap.exists()) return { handle: h, ...snap.data() };
+            const ref = await addDoc(collection(db, "chats"), payload);
+            await setDoc(doc(db, "chats", ref.id), { id: ref.id }, { merge: true });
+            return { id: ref.id, ...payload };
+        } catch {
+            return { id: "chat_" + ahora + "_" + Math.random().toString(36).slice(2, 6), ...payload };
+        }
+    },
+
+    async guardarMensajesChat(chatId, mensajes) {
+        if (!chatId) return;
+        const limpio = Array.isArray(mensajes) ? mensajes : [];
+        try {
+            const idStr = String(chatId);
+            if (idStr.startsWith("chat_")) {
+                await setDoc(doc(db, "chats", idStr), {
+                    id: idStr,
+                    mensajes: limpio,
+                    actualizadoEn: Date.now(),
+                    editadoEn: serverTimestamp()
+                }, { merge: true });
+            } else {
+                await setDoc(doc(db, "chats", idStr), {
+                    mensajes: limpio,
+                    actualizadoEn: Date.now(),
+                    editadoEn: serverTimestamp()
+                }, { merge: true });
+            }
         } catch {}
-        const lista = await this.listarPersonajesPublicos();
-        return lista.find(p => normHandle(p.handle) === h) || null;
+    },
+
+    async eliminarConversacionChat(chatId) {
+        if (!chatId) return;
+        try {
+            await deleteDoc(doc(db, "chats", String(chatId)));
+        } catch {}
+    },
+
+    escucharChats(callback) {
+        const q = query(collection(db, "chats"), orderBy("createdAtMs", "desc"));
+        return onSnapshot(q, snap => {
+            const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            callback(lista);
+        }, () => {
+            return onSnapshot(collection(db, "chats"), snap => {
+                const lista = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                callback(lista);
+            });
+        });
     }
 };
 
