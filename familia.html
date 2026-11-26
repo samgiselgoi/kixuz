@@ -39,6 +39,13 @@
             padding: 20px;
             box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
         }
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
         .top-header h1 { font-size: 24px; color: var(--acento); }
         .form-row {
             display: grid;
@@ -82,6 +89,9 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
         .inline-editor {
             display: none;
@@ -210,16 +220,19 @@
     <main class="page-wrap">
         <section class="panel-box top-header">
             <div>
-                <h1>Árbol Familiar</h1>
+                <h1 id="famTitulo">Árbol Familiar</h1>
                 <div style="font-size: 13px; opacity: 0.8;" id="focoSubtitle">Cargando personaje...</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <a href="perfil.html" id="btnVerPerfilFoco" class="btn-ghost">Ver perfil</a>
             </div>
         </section>
 
         <section class="panel-box">
             <h2 style="font-size: 17px; color: var(--acento);">Agregar o Editar Familiar</h2>
-            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">La generación y la relación inversa se calculan automáticamente al vincular.</p>
+            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;" id="famAyudaTexto">La generación y la relación inversa se calculan automáticamente al vincular.</p>
 
-            <div class="form-row">
+            <div class="form-row" id="formAgregarFamBox">
                 <input type="text" id="famNombre" placeholder="Nombre del personaje">
                 <input type="text" id="famHandle" placeholder="@Usuario (ej. @Demian)">
                 <input type="text" id="famRelacion" placeholder="Relación (ej. Padre, Madre, Hija, Hijo, Pareja)">
@@ -266,13 +279,16 @@
         </section>
     </main>
 
+    <script type="module" src="firebase-config.js"></script>
+    <script src="characters.js"></script>
     <script src="theme.js"></script>
     <script src="navbar-ui.js"></script>
     <script src="chat.js"></script>
     <script>
         const STORAGE_KEY = 'kixuz_familia_clan_v1';
         let dataStore = { familia: [], clan: [] };
-        let focoChar = { nombre: 'Personaje', handle: '@rol' };
+        let focoChar = { nombre: 'Personaje', handle: '@rol', avatar: '' };
+        let esFocoPropio = true;
         let avataresMap = new Map();
         let indiceEditando = null;
 
@@ -302,8 +318,12 @@
             if (r.includes('madre') || r.includes('padre')) return 'Hijo/a';
             if (r.includes('abuela') || r.includes('abuelo')) return 'Nieto/a';
             if (r.includes('nieto') || r.includes('nieta')) return 'Abuelo/a';
-            if (r.includes('herman')) return 'Hermano/a';
-            if (r.includes('pareja') || r.includes('espos') || r.includes('casad')) return 'Pareja';
+            if (r.includes('tía') || r.includes('tia') || r.includes('tío') || r.includes('tio')) return 'Sobrino/a';
+            if (r.includes('sobrina') || r.includes('sobrino')) return 'Tío/a';
+            if (r.includes('hermana') || r.includes('hermano')) return 'Hermano/a';
+            if (r.includes('esposa')) return 'Esposo/a';
+            if (r.includes('esposo')) return 'Esposa/o';
+            if (r.includes('pareja')) return 'Pareja';
             return 'Vínculo familiar';
         }
 
@@ -337,13 +357,19 @@
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStore)); } catch {}
         }
 
-        function cargarAvatares() {
+        async function cargarAvatares() {
             const m = new Map();
             if (focoChar?.handle && focoChar?.avatar) m.set(normHandle(focoChar.handle), focoChar.avatar);
             try {
                 const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
                 subs.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
             } catch {}
+            if (window.KIXUZ_DB?.listarPersonajesPublicos) {
+                try {
+                    const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
+                    pub.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
+                } catch {}
+            }
             avataresMap = m;
         }
 
@@ -381,7 +407,10 @@
             };
         }
 
-        function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1 }) {
+        function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1, puedeEditar = false }) {
+            const hNorm = normHandle(handle || '');
+            const perfilHref = hNorm ? `perfil.html?char=${encodeURIComponent(hNorm)}` : 'perfil.html';
+            const famHref = hNorm ? `familia.html?char=${encodeURIComponent(hNorm)}` : 'familia.html';
             return `
                 <div class="member-card ${esYo ? 'self-card' : ''}">
                     ${renderAvatar(nombre, handle)}
@@ -389,8 +418,9 @@
                     <div class="member-user">${esc(handle || '@rol')}</div>
                     <div class="member-relation">${esc(etiqueta)}</div>
                     <div class="card-actions">
-                        <a href="perfil.html?char=${encodeURIComponent(handle || '')}" class="mini-btn">Perfil</a>
-                        ${index >= 0 ? `
+                        <a href="${esc(perfilHref)}" class="mini-btn">Perfil</a>
+                        ${!esYo && hNorm ? `<a href="${esc(famHref)}" class="mini-btn">Familia</a>` : ''}
+                        ${index >= 0 && puedeEditar ? `
                             <button type="button" class="mini-btn" data-edit="${index}" title="Editar">✏️</button>
                             <button type="button" class="mini-btn del" data-del="${index}" title="Eliminar">✖</button>
                         ` : ''}
@@ -400,6 +430,7 @@
         }
 
         function abrirEditorInline(index) {
+            if (!esFocoPropio) return;
             const item = dataStore.familia[index];
             if (!item) return;
             indiceEditando = index;
@@ -418,44 +449,55 @@
 
         function renderArbol() {
             const focoH = normHandle(focoChar.handle);
+            document.getElementById('famTitulo').textContent = `Familia de ${focoChar.nombre}`;
+            document.getElementById('focoSubtitle').textContent = `${focoChar.nombre} (${focoChar.handle})${esFocoPropio ? '' : ' · Vista de personaje'}`;
+            document.getElementById('btnVerPerfilFoco').href = `perfil.html?char=${encodeURIComponent(focoH)}`;
+            document.getElementById('formAgregarFamBox').style.display = esFocoPropio ? 'grid' : 'none';
+            document.getElementById('famAyudaTexto').textContent = esFocoPropio
+                ? 'La generación y la relación inversa se calculan automáticamente al vincular.'
+                : `Viendo el árbol familiar de ${focoChar.nombre} (${focoChar.handle}) en modo consulta.`;
+            if (!esFocoPropio) cerrarEditorInline();
+
             const famItems = dataStore.familia
                 .map((m, index) => ({ m, index, view: datosMostrarParaFoco(m, focoH) }))
-                .filter(({ m }) => esVinculoDeEsteArbol(m, focoH));
+                .filter(({ m }) => esVinculoDeEsteArbol(m, focoH) && normHandle(m.handle) !== focoH);
 
             document.getElementById('gridAnterior').innerHTML = famItems
                 .filter(({ view }) => view.generacion === 'anterior')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
                 .join('') || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
 
             const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
             const actItemsHtml = famItems
                 .filter(({ view }) => view.generacion === 'actual')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
                 .join('');
             document.getElementById('gridActual').innerHTML = yoCard + actItemsHtml;
 
             document.getElementById('gridSiguiente').innerHTML = famItems
                 .filter(({ view }) => view.generacion === 'siguiente')
-                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index, puedeEditar: esFocoPropio }))
                 .join('') || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
 
-            document.querySelectorAll('[data-del]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const i = Number(btn.dataset.del);
-                    if (Number.isNaN(i)) return;
-                    dataStore.familia.splice(i, 1);
-                    if (indiceEditando === i) cerrarEditorInline();
-                    guardarDatos();
-                    renderArbol();
+            if (esFocoPropio) {
+                document.querySelectorAll('[data-del]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const i = Number(btn.dataset.del);
+                        if (Number.isNaN(i)) return;
+                        dataStore.familia.splice(i, 1);
+                        if (indiceEditando === i) cerrarEditorInline();
+                        guardarDatos();
+                        renderArbol();
+                    });
                 });
-            });
 
-            document.querySelectorAll('[data-edit]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const i = Number(btn.dataset.edit);
-                    if (!Number.isNaN(i)) abrirEditorInline(i);
+                document.querySelectorAll('[data-edit]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const i = Number(btn.dataset.edit);
+                        if (!Number.isNaN(i)) abrirEditorInline(i);
+                    });
                 });
-            });
+            }
         }
 
         document.getElementById('famRelacion').addEventListener('input', e => {
@@ -471,7 +513,7 @@
         document.getElementById('btnCancelarEdit').addEventListener('click', cerrarEditorInline);
 
         document.getElementById('btnGuardarEdit').addEventListener('click', () => {
-            if (indiceEditando === null || !dataStore.familia[indiceEditando]) return;
+            if (!esFocoPropio || indiceEditando === null || !dataStore.familia[indiceEditando]) return;
             const item = dataStore.familia[indiceEditando];
             const nuevoNombre = document.getElementById('editFamNombre').value.trim();
             const nuevoHandle = normHandle(document.getElementById('editFamHandle').value.trim() || nuevoNombre);
@@ -487,6 +529,7 @@
         });
 
         document.getElementById('btnAgregarFam').addEventListener('click', () => {
+            if (!esFocoPropio) return;
             const nombre = document.getElementById('famNombre').value.trim();
             const handle = normHandle(document.getElementById('famHandle').value.trim() || nombre);
             const relacion = document.getElementById('famRelacion').value.trim() || 'Vínculo familiar';
@@ -511,12 +554,49 @@
             document.getElementById('famRelacion').value = '';
         });
 
-        function iniciar() {
+        async function iniciar() {
             cargarDatos();
-            const act = obtenerPersonajeActivoExacto();
-            if (act && act.handle !== '@rol') focoChar = act;
-            cargarAvatares();
-            document.getElementById('focoSubtitle').textContent = `${focoChar.nombre} (${focoChar.handle})`;
+            const params = new URLSearchParams(window.location.search);
+            const charParam = params.get('char') || '';
+            const activo = obtenerPersonajeActivoExacto();
+
+            if (charParam) {
+                const limpio = normHandle(charParam);
+                if (limpio === normHandle(activo.handle)) {
+                    focoChar = activo;
+                    esFocoPropio = true;
+                } else {
+                    let hallado = null;
+                    try {
+                        const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                        if (Array.isArray(subs)) {
+                            hallado = subs.find(p => normHandle(p?.handle) === limpio) || null;
+                        }
+                    } catch {}
+                    if (!hallado && window.KIXUZ_DB?.buscarPersonajePublico) {
+                        try { hallado = await window.KIXUZ_DB.buscarPersonajePublico(limpio); } catch {}
+                    }
+                    if (hallado) {
+                        focoChar = {
+                            nombre: hallado.nombre || limpio.replace(/^@/, ''),
+                            handle: normHandle(hallado.handle || limpio),
+                            avatar: hallado.avatar || ''
+                        };
+                    } else {
+                        focoChar = {
+                            nombre: limpio.replace(/^@/, '') || 'Personaje',
+                            handle: limpio || '@rol',
+                            avatar: ''
+                        };
+                    }
+                    esFocoPropio = window.KIXUZ_CHARS?.esPropietario ? window.KIXUZ_CHARS.esPropietario(hallado || focoChar) : false;
+                }
+            } else {
+                focoChar = activo;
+                esFocoPropio = true;
+            }
+
+            await cargarAvatares();
             renderArbol();
         }
 
