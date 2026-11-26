@@ -1,127 +1,198 @@
 (() => {
     const STORAGE_KEY = 'kixuz_theme';
+    const root = document.documentElement;
+
+    function getPreferredTheme() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved === 'light' || saved === 'dark') return saved;
+        } catch {}
+        return 'dark';
+    }
+
+    function applyTheme(theme) {
+        const t = theme === 'light' ? 'light' : 'dark';
+        if (t === 'light') {
+            root.setAttribute('data-theme', 'light');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+        try { localStorage.setItem(STORAGE_KEY, t); } catch {}
+        document.querySelectorAll('.kixuz-theme-toggle-btn').forEach(btn => {
+            btn.textContent = t === 'light' ? '🌙 Oscuro' : '☀️ Claro';
+            btn.setAttribute('aria-label', t === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+        });
+    }
 
     const style = document.createElement('style');
-    style.id = 'kixuz-theme-styles';
+    style.id = 'kixuz-global-responsive-theme';
     style.textContent = `
-        .theme-icon, .theme-label, #themeIcon, #kixuzThemeToggleBtn, .kixuz-theme-btn {
-            display: none !important;
+        html, body {
+            max-width: 100% !important;
+            overflow-x: hidden !important;
         }
-        .kixuz-theme-switch {
-            position: relative;
-            width: 52px;
-            height: 28px;
-            border-radius: 999px;
-            background: #2A164B;
-            border: 1px solid rgba(108, 60, 224, 0.7);
+        img, video, svg {
+            max-width: 100%;
+        }
+
+        /* --- MODO CLARO --- */
+        html[data-theme="light"] {
+            --bg-principal: #F4F1FA;
+            --bg-secundario: #6C3CE0;
+            --acento: #0F9D8E;
+            --texto: #150A24;
+            --bg-tarjeta: rgba(255, 255, 255, 0.9);
+            --tarjeta: rgba(255, 255, 255, 0.9);
+            --borde: rgba(108, 60, 224, 0.25);
+        }
+        html[data-theme="light"] body {
+            background-color: var(--bg-principal) !important;
+            color: var(--texto) !important;
+        }
+        html[data-theme="light"] header {
+            background: rgba(244, 241, 250, 0.96) !important;
+            border-bottom-color: rgba(108, 60, 224, 0.25) !important;
+        }
+
+        /* --- BOTÓN DE TEMA --- */
+        .kixuz-theme-toggle-btn {
+            background: rgba(108, 60, 224, 0.22);
+            color: var(--texto, #EDE7E0);
+            border: 1px solid rgba(108, 60, 224, 0.48);
+            border-radius: 9px;
+            padding: 6px 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
-            padding: 0 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: space-between;
+            white-space: nowrap;
             flex-shrink: 0;
-            transition: background 0.25s, border-color 0.25s;
+            line-height: 1.2;
         }
-        .kixuz-theme-switch svg {
-            width: 13px;
-            height: 13px;
-            z-index: 1;
-            pointer-events: none;
-            transition: opacity 0.25s, color 0.25s;
+        html[data-theme="light"] .kixuz-theme-toggle-btn {
+            background: rgba(108, 60, 224, 0.12);
+            color: #150A24;
         }
-        .kixuz-theme-switch .icon-sun {
-            color: #FBBF24;
-            opacity: 0.4;
+
+        /* --- CABECERA FLUIDA SIN SUPERPOSICIÓN NI BLOQUEO AL SCROLLEAR --- */
+        header {
+            position: static !important;
+            top: auto !important;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+            padding: 10px 16px !important;
+            overflow: visible !important;
         }
-        .kixuz-theme-switch .icon-moon {
-            color: #2DD4C4;
-            opacity: 0.95;
+        header > * {
+            min-width: 0;
+            box-sizing: border-box;
         }
-        .kixuz-theme-thumb {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #EDE7E0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s;
-            z-index: 2;
+        header .logo,
+        header .logo-placeholder {
+            display: inline-flex !important;
+            align-items: center !important;
+            flex-shrink: 0 !important;
         }
-        html[data-theme="light"] .kixuz-theme-switch {
-            background: #E9E2F8;
-            border-color: rgba(108, 60, 224, 0.5);
+        header .nav-links {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            max-width: 100% !important;
         }
-        html[data-theme="light"] .kixuz-theme-switch .icon-sun {
-            opacity: 1;
-            color: #D97706;
+        header .nav-links::-webkit-scrollbar {
+            display: none;
         }
-        html[data-theme="light"] .kixuz-theme-switch .icon-moon {
-            opacity: 0.35;
-            color: #6C3CE0;
+        header .nav-links a {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            margin-left: 0 !important;
+            padding: 5px 9px !important;
+            font-size: 13px !important;
         }
-        html[data-theme="light"] .kixuz-theme-thumb {
-            transform: translateX(24px);
-            background: #6C3CE0;
+        header .user-menu {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            max-width: 100% !important;
+        }
+
+        /* --- ADAPTACIÓN TABLET Y CELULAR --- */
+        @media (max-width: 900px) {
+            .profile-layout,
+            .detail-body {
+                grid-template-columns: 1fr !important;
+            }
+            .side-column {
+                position: static !important;
+                top: auto !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 9px 12px !important;
+                gap: 8px !important;
+            }
+            header .nav-links {
+                order: 3;
+                width: 100%;
+                border-top: 1px solid rgba(108, 60, 224, 0.22);
+                padding-top: 6px !important;
+            }
+            .container,
+            .page-wrapper,
+            .profile-layout {
+                margin: 16px auto 76px !important;
+                padding: 0 12px !important;
+            }
+            .grid-universos,
+            .universes-grid,
+            .zones-grid,
+            .new-u-grid {
+                grid-template-columns: 1fr !important;
+            }
         }
     `;
-    if (!document.getElementById('kixuz-theme-styles')) {
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
 
-    function aplicarTema(tema) {
-        const finalTheme = tema === 'light' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', finalTheme);
-        try { localStorage.setItem(STORAGE_KEY, finalTheme); } catch {}
-        const btn = document.getElementById('kixuzThemeSwitch');
-        if (btn) {
-            btn.setAttribute('aria-label', finalTheme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
-            btn.setAttribute('title', finalTheme === 'light' ? 'Modo claro activo' : 'Modo oscuro activo');
-        }
-    }
-
-    function montarSwitch() {
+    function mountThemeButton() {
         const header = document.querySelector('header');
-        if (!header) return;
+        if (!header || header.querySelector('.kixuz-theme-toggle-btn')) return;
 
-        let btn = document.getElementById('kixuzThemeSwitch');
-        if (!btn) {
-            btn = document.createElement('button');
-            btn.type = 'button';
-            btn.id = 'kixuzThemeSwitch';
-            btn.className = 'kixuz-theme-switch';
-            btn.innerHTML = `
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-                    <circle cx="12" cy="12" r="4"/>
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-                </svg>
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-                <span class="kixuz-theme-thumb"></span>
-            `;
-            btn.addEventListener('click', () => {
-                const actual = document.documentElement.getAttribute('data-theme') || 'dark';
-                aplicarTema(actual === 'light' ? 'dark' : 'light');
-            });
-        }
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'kixuz-theme-toggle-btn';
+        btn.addEventListener('click', () => {
+            const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+            applyTheme(current === 'light' ? 'dark' : 'light');
+        });
 
         const userMenu = header.querySelector('.user-menu');
-        if (userMenu && btn.parentElement !== userMenu) {
-            userMenu.insertBefore(btn, userMenu.firstChild);
-        } else if (!userMenu && !btn.parentElement) {
+        if (userMenu) {
+            userMenu.appendChild(btn);
+        } else {
             header.appendChild(btn);
         }
 
-        aplicarTema(localStorage.getItem(STORAGE_KEY) || 'dark');
+        applyTheme(getPreferredTheme());
     }
 
-    aplicarTema(localStorage.getItem(STORAGE_KEY) || 'dark');
+    applyTheme(getPreferredTheme());
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', montarSwitch);
+        document.addEventListener('DOMContentLoaded', mountThemeButton);
     } else {
-        montarSwitch();
+        mountThemeButton();
     }
-    window.addEventListener('load', montarSwitch);
 })();
