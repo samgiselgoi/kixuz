@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +14,7 @@
             --tarjeta: rgba(108, 60, 224, 0.14);
             --borde: rgba(108, 60, 224, 0.45);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             background-color: var(--bg-principal);
             color: var(--texto);
@@ -25,67 +23,19 @@
             line-height: 1.55;
             overflow-x: hidden;
         }
-
         h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
-
         header {
-            background: rgba(0, 0, 0, 0.55);
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--acento);
-            gap: 12px;
-            flex-wrap: wrap;
+            background: rgba(21, 10, 36, 0.92);
+            border-bottom: 1px solid var(--borde);
         }
-
         .logo {
             font-family: 'Unbounded', cursive;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--bg-secundario);
             text-decoration: none;
         }
         .logo span { color: var(--acento); }
-
-        .nav-links {
-            display: flex;
-            gap: 14px;
-            align-items: center;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            flex-wrap: wrap;
-        }
-        .nav-links a {
-            color: var(--texto);
-            text-decoration: none;
-            font-size: 13.5px;
-            padding: 5px 9px;
-            border-radius: 8px;
-        }
-        .nav-links a.active, .nav-links a:hover {
-            color: var(--acento);
-            background: rgba(108, 60, 224, 0.22);
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        #activeCharSelect {
-            background: rgba(0, 0, 0, 0.35);
-            color: var(--texto);
-            border: 1px solid var(--borde);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 12.5px;
-            max-width: 210px;
-        }
-
         .page-wrap {
             max-width: 1020px;
             margin: 24px auto 80px;
@@ -94,7 +44,6 @@
             flex-direction: column;
             gap: 18px;
         }
-
         .panel-box {
             background-color: var(--tarjeta);
             border: 1px solid var(--borde);
@@ -102,23 +51,13 @@
             padding: 20px;
             box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
         }
-
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
         .top-header h1 { font-size: 24px; color: var(--acento); }
-
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
             gap: 10px;
             margin-top: 14px;
         }
-
         input, select {
             width: 100%;
             background: rgba(0, 0, 0, 0.35);
@@ -132,7 +71,6 @@
         }
         html[data-theme="light"] input,
         html[data-theme="light"] select { background: #fff; color: #150A24; }
-
         .btn-add {
             background: var(--acento);
             color: #150A24;
@@ -143,10 +81,7 @@
             font-weight: 700;
             font-size: 13.5px;
             cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s ease;
         }
-        .btn-add:hover { transform: translateY(-2px); filter: brightness(1.05); }
-
         .btn-ghost {
             background: transparent;
             color: var(--texto);
@@ -158,7 +93,6 @@
             font-weight: 700;
             cursor: pointer;
         }
-
         .inline-editor {
             display: none;
             margin-top: 14px;
@@ -169,14 +103,12 @@
         }
         html[data-theme="light"] .inline-editor { background: rgba(255, 255, 255, 0.96); }
         .inline-editor.open { display: block; }
-
         .tree-container {
             display: flex;
             flex-direction: column;
             gap: 22px;
             margin-top: 20px;
         }
-
         .gen-block {
             background: rgba(21, 10, 36, 0.36);
             border: 1px solid rgba(108, 60, 224, 0.28);
@@ -184,7 +116,6 @@
             padding: 14px 12px;
         }
         html[data-theme="light"] .gen-block { background: rgba(108, 60, 224, 0.04); }
-
         .rank-label {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 12px;
@@ -195,24 +126,12 @@
             margin-bottom: 12px;
             text-align: center;
         }
-
         .generation {
-            position: relative;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 16px;
         }
-        .generation.multiple::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 20%;
-            right: 20%;
-            height: 2px;
-            background: rgba(45, 212, 196, 0.32);
-        }
-
         .member-card {
             width: 196px;
             background: rgba(21, 10, 36, 0.78);
@@ -224,21 +143,12 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
         }
         html[data-theme="light"] .member-card { background: rgba(108, 60, 224, 0.07); }
-
-        .member-card:hover {
-            transform: translateY(-7px) scale(1.02);
-            border-color: var(--acento);
-            box-shadow: 0 14px 24px rgba(45, 212, 196, 0.22);
-        }
-
         .member-card.self-card {
             border: 2px solid var(--acento);
             box-shadow: 0 0 16px rgba(45, 212, 196, 0.2);
         }
-
         .member-img {
             width: 64px;
             height: 64px;
@@ -254,10 +164,7 @@
             font-weight: 700;
             font-size: 20px;
             color: var(--acento);
-            transition: transform 0.25s ease;
         }
-        .member-card:hover .member-img { transform: scale(1.08); }
-
         .member-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14.5px; color: var(--acento); }
         .member-user { font-size: 12px; opacity: 0.78; }
         .member-relation {
@@ -269,9 +176,7 @@
             font-size: 11px;
             font-weight: 700;
         }
-
         .card-actions { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; justify-content: center; }
-
         .mini-btn {
             background: rgba(108, 60, 224, 0.24);
             color: var(--texto);
@@ -283,25 +188,13 @@
             cursor: pointer;
             text-decoration: none;
         }
-        .mini-btn:hover { border-color: var(--acento); color: var(--acento); }
         .mini-btn.del { border-color: rgba(224, 60, 108, 0.55); color: #ff9bb4; }
-
-        .req-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding: 9px 0;
-            border-bottom: 1px solid rgba(108, 60, 224, 0.22);
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
     <header>
         <a href="index.html" class="logo">KI<span>X</span>UZ</a>
-        <nav class="nav-links">
+        <nav class="nav-links" aria-label="Navegación principal">
             <a href="index.html">Inicio</a>
             <a href="perfil.html">Mi Perfil</a>
             <a href="universo.html">Universos</a>
@@ -309,6 +202,7 @@
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <a href="registro.html">Entrar</a>
         </div>
     </header>
 
@@ -320,14 +214,9 @@
             </div>
         </section>
 
-        <section class="panel-box" id="solicitudesBox" style="display:none;">
-            <h2 style="font-size: 16px; color: var(--acento); margin-bottom: 8px;">Solicitudes de Vínculo Recibidas</h2>
-            <div id="solicitudesList"></div>
-        </section>
-
         <section class="panel-box">
             <h2 style="font-size: 17px; color: var(--acento);">Agregar o Editar Familiar</h2>
-            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">Puedes editar o quitar cualquier miembro del árbol (útil para limpiar duplicados o ajustar relaciones).</p>
+            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">La generación y la relación recíproca se calculan automáticamente según el vínculo.</p>
 
             <div class="form-row">
                 <input type="text" id="famNombre" placeholder="Nombre del personaje">
@@ -364,12 +253,10 @@
                     <div class="rank-label">Generación Anterior</div>
                     <div class="generation" id="gridAnterior"></div>
                 </div>
-
                 <div class="gen-block">
                     <div class="rank-label">Generación Actual</div>
                     <div class="generation" id="gridActual"></div>
                 </div>
-
                 <div class="gen-block">
                     <div class="rank-label">Siguiente Generación</div>
                     <div class="generation" id="gridSiguiente"></div>
@@ -378,14 +265,13 @@
         </section>
     </main>
 
+    <script src="theme.js"></script>
+    <script src="navbar-ui.js"></script>
+    <script src="chat.js"></script>
     <script>
         const STORAGE_KEY = 'kixuz_familia_clan_v1';
-        const LEGACY_KEYS = ['kixuz_familia_clan_v5', 'kixuz_familia_clan_v4', 'kixuz_familia_clan_v3', 'kixuz_familia_clan_v2'];
-
         let dataStore = { familia: [], clan: [] };
-        let pendientes = [];
         let focoChar = { nombre: 'Personaje', handle: '@rol' };
-        let avataresMap = new Map();
         let indiceEditando = null;
 
         const esc = s => String(s || '')
@@ -402,15 +288,9 @@
 
         function inferirGeneracion(rel, fallback = 'actual') {
             const r = norm(rel);
-            if (r.includes('padre') || r.includes('madre') || r.includes('abuel') || r.includes('tío') || r.includes('tio') || r.includes('tía') || r.includes('tia')) {
-                return 'anterior';
-            }
-            if (r.includes('hijo') || r.includes('hija') || r.includes('niet') || r.includes('sobrin')) {
-                return 'siguiente';
-            }
-            if (r.includes('herman') || r.includes('pareja') || r.includes('espos') || r.includes('casad') || r.includes('primo') || r.includes('prima')) {
-                return 'actual';
-            }
+            if (r.includes('padre') || r.includes('madre') || r.includes('abuel') || r.includes('tío') || r.includes('tio') || r.includes('tía') || r.includes('tia')) return 'anterior';
+            if (r.includes('hijo') || r.includes('hija') || r.includes('niet') || r.includes('sobrin')) return 'siguiente';
+            if (r.includes('herman') || r.includes('pareja') || r.includes('espos') || r.includes('casad') || r.includes('primo') || r.includes('prima')) return 'actual';
             return fallback;
         }
 
@@ -432,81 +312,27 @@
             }
             try {
                 const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                if (act?.handle) {
-                    return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normHandle(act.handle) };
-                }
-            } catch {}
-            try {
+                if (act?.handle) return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normHandle(act.handle) };
                 const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                if (Array.isArray(subs) && subs.length > 0 && subs[0]?.handle) {
-                    return { nombre: subs[0].nombre || subs[0].handle.replace(/^@/, ''), handle: normHandle(subs[0].handle) };
-                }
+                if (Array.isArray(subs) && subs[0]?.handle) return { nombre: subs[0].nombre || subs[0].handle.replace(/^@/, ''), handle: normHandle(subs[0].handle) };
             } catch {}
             return { nombre: 'Personaje', handle: '@rol' };
         }
 
-        function leerStorage(key) {
-            try {
-                const raw = JSON.parse(localStorage.getItem(key) || 'null');
-                if (raw && typeof raw === 'object') {
-                    return {
-                        familia: Array.isArray(raw.familia) ? raw.familia : [],
-                        clan: Array.isArray(raw.clan) ? raw.clan : []
-                    };
-                }
-            } catch {}
-            return { familia: [], clan: [] };
-        }
-
         function cargarDatos() {
-            const famMap = new Map();
-            const clanMap = new Map();
-            [...LEGACY_KEYS.slice().reverse(), STORAGE_KEY].forEach(k => {
-                const d = leerStorage(k);
-                d.familia.forEach((item, i) => {
-                    if (!item) return;
-                    const id = String(item.id || `f_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.relacion)}_${i}`);
-                    famMap.set(id, { ...famMap.get(id), ...item, id });
-                });
-                d.clan.forEach((item, i) => {
-                    if (!item) return;
-                    const id = String(item.id || `c_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.clanNombre)}_${i}`);
-                    clanMap.set(id, { ...clanMap.get(id), ...item, id });
-                });
-            });
-            dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()) };
-            guardarDatos();
+            try {
+                const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                dataStore = {
+                    familia: Array.isArray(raw.familia) ? raw.familia : [],
+                    clan: Array.isArray(raw.clan) ? raw.clan : []
+                };
+            } catch {
+                dataStore = { familia: [], clan: [] };
+            }
         }
 
         function guardarDatos() {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStore)); } catch {}
-        }
-
-        async function cargarAvatares() {
-            const m = new Map();
-            if (focoChar?.handle && focoChar?.avatar) m.set(normHandle(focoChar.handle), focoChar.avatar);
-            try {
-                const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                subs.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
-            } catch {}
-            if (window.KIXUZ_DB?.listarPersonajesPublicos) {
-                try {
-                    const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
-                    pub.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
-                } catch {}
-            }
-            avataresMap = m;
-        }
-
-        function renderAvatar(nombre, handle) {
-            const img = avataresMap.get(normHandle(handle)) || '';
-            if (img) return `<div class="member-img" style="background-image:url('${esc(img)}');"></div>`;
-            return `<div class="member-img">${esc((nombre || 'P').charAt(0).toUpperCase())}</div>`;
-        }
-
-        function syncLine(el) {
-            if (!el) return;
-            el.classList.toggle('multiple', el.querySelectorAll('.member-card').length > 1);
         }
 
         function esVinculoDeEsteArbol(item, focoH) {
@@ -514,9 +340,7 @@
             const dueno = normHandle(item.duenoHandle || '');
             const miembro = normHandle(item.handle || '');
             if (!dueno) return miembro !== focoH;
-            if (dueno === focoH && miembro !== focoH) return true;
-            if (miembro === focoH && dueno !== focoH) return true;
-            return false;
+            return (dueno === focoH && miembro !== focoH) || (miembro === focoH && dueno !== focoH);
         }
 
         function datosMostrarParaFoco(item, focoH) {
@@ -539,16 +363,16 @@
             };
         }
 
-        function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1, puedeEditar = false }) {
+        function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1 }) {
             return `
                 <div class="member-card ${esYo ? 'self-card' : ''}">
-                    ${renderAvatar(nombre, handle)}
+                    <div class="member-img">${esc((nombre || 'P').charAt(0).toUpperCase())}</div>
                     <div class="member-name">${esYo ? '✨ ' : ''}${esc(nombre)}${esYo ? ' · Yo' : ''}</div>
                     <div class="member-user">${esc(handle || '@rol')}</div>
                     <div class="member-relation">${esc(etiqueta)}</div>
                     <div class="card-actions">
                         <a href="perfil.html?char=${encodeURIComponent(handle || '')}" class="mini-btn">Perfil</a>
-                        ${index >= 0 && puedeEditar ? `
+                        ${index >= 0 ? `
                             <button type="button" class="mini-btn" data-edit="${index}" title="Editar">✏️</button>
                             <button type="button" class="mini-btn del" data-del="${index}" title="Eliminar">✖</button>
                         ` : ''}
@@ -567,7 +391,6 @@
             document.getElementById('editFamRelacion').value = item.relacion || '';
             document.getElementById('editFamGeneracion').value = inferirGeneracion(item.relacion, item.generacion || 'actual');
             document.getElementById('inlineEditorBox').classList.add('open');
-            document.getElementById('editFamNombre').focus();
         }
 
         function cerrarEditorInline() {
@@ -577,53 +400,26 @@
 
         function renderArbol() {
             const focoH = normHandle(focoChar.handle);
-
             const famItems = dataStore.familia
                 .map((m, index) => ({ m, index, view: datosMostrarParaFoco(m, focoH) }))
                 .filter(({ m }) => esVinculoDeEsteArbol(m, focoH));
 
-            const antHtml = famItems
+            document.getElementById('gridAnterior').innerHTML = famItems
                 .filter(({ view }) => view.generacion === 'anterior')
-                .map(({ index, view }) => cardHtml({
-                    nombre: view.nombre,
-                    handle: view.handle,
-                    etiqueta: view.etiqueta,
-                    index,
-                    puedeEditar: true
-                })).join('');
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .join('') || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
 
             const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
             const actItemsHtml = famItems
                 .filter(({ view }) => view.generacion === 'actual')
-                .map(({ index, view }) => cardHtml({
-                    nombre: view.nombre,
-                    handle: view.handle,
-                    etiqueta: view.etiqueta,
-                    index,
-                    puedeEditar: true
-                })).join('');
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .join('');
+            document.getElementById('gridActual').innerHTML = yoCard + actItemsHtml;
 
-            const sigHtml = famItems
+            document.getElementById('gridSiguiente').innerHTML = famItems
                 .filter(({ view }) => view.generacion === 'siguiente')
-                .map(({ index, view }) => cardHtml({
-                    nombre: view.nombre,
-                    handle: view.handle,
-                    etiqueta: view.etiqueta,
-                    index,
-                    puedeEditar: true
-                })).join('');
-
-            const gAnt = document.getElementById('gridAnterior');
-            const gAct = document.getElementById('gridActual');
-            const gSig = document.getElementById('gridSiguiente');
-
-            gAnt.innerHTML = antHtml || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
-            gAct.innerHTML = yoCard + actItemsHtml;
-            gSig.innerHTML = sigHtml || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
-
-            syncLine(gAnt);
-            syncLine(gAct);
-            syncLine(gSig);
+                .map(({ index, view }) => cardHtml({ nombre: view.nombre, handle: view.handle, etiqueta: view.etiqueta, index }))
+                .join('') || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
 
             document.querySelectorAll('[data-del]').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -644,71 +440,6 @@
             });
         }
 
-        function renderSolicitudes() {
-            const box = document.getElementById('solicitudesBox');
-            const list = document.getElementById('solicitudesList');
-            const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
-
-            if (!activoH || activoH === '@rol') {
-                box.style.display = 'none';
-                return;
-            }
-
-            const mias = pendientes.filter(s => normHandle(s.paraHandle) === activoH);
-            if (!mias.length) {
-                box.style.display = 'none';
-                return;
-            }
-
-            box.style.display = 'block';
-            list.innerHTML = '';
-            mias.forEach(s => {
-                const inversa = s.relacionInversa || calcularRelacionInversa(s.relacion);
-                const genInv = inferirGeneracion(inversa, s.generacion === 'anterior' ? 'siguiente' : (s.generacion === 'siguiente' ? 'anterior' : 'actual'));
-                const row = document.createElement('div');
-                row.className = 'req-row';
-                row.innerHTML = `
-                    <div>
-                        <strong>${esc(s.deNombre || s.deHandle)}</strong> (${esc(s.deHandle || '')}) te vinculó como <strong>${esc(s.relacion)}</strong> · Tu relación recíproca: <strong>${esc(inversa)}</strong>
-                    </div>
-                    <div style="display:flex; gap:6px; align-items:center;">
-                        <button type="button" class="mini-btn btn-accept" style="background:var(--acento);color:#150A24;">Aceptar</button>
-                        <button type="button" class="mini-btn del btn-reject">Rechazar</button>
-                    </div>
-                `;
-
-                row.querySelector('.btn-accept').addEventListener('click', async () => {
-                    if (window.KIXUZ_DB?.aceptarSolicitudVinculo) {
-                        try { await window.KIXUZ_DB.aceptarSolicitudVinculo(s); } catch {}
-                    }
-                    const destinoH = normHandle(s.paraHandle || activoH);
-                    const origenH = normHandle(s.deHandle);
-                    dataStore.familia.push({
-                        id: 'fam_' + Date.now() + '_inv',
-                        duenoHandle: destinoH,
-                        nombre: s.deNombre || origenH.replace(/^@/, ''),
-                        handle: origenH,
-                        relacion: inversa,
-                        generacion: genInv
-                    });
-                    guardarDatos();
-                    pendientes = pendientes.filter(x => x.id !== s.id);
-                    renderSolicitudes();
-                    renderArbol();
-                });
-
-                row.querySelector('.btn-reject').addEventListener('click', async () => {
-                    if (window.KIXUZ_DB?.rechazarSolicitudVinculo && s.id) {
-                        try { await window.KIXUZ_DB.rechazarSolicitudVinculo(s.id); } catch {}
-                    }
-                    pendientes = pendientes.filter(x => x.id !== s.id);
-                    renderSolicitudes();
-                });
-
-                list.appendChild(row);
-            });
-        }
-
         document.getElementById('famRelacion').addEventListener('input', e => {
             const genSel = document.getElementById('famGeneracion');
             genSel.value = inferirGeneracion(e.target.value, genSel.value || 'actual');
@@ -724,108 +455,55 @@
         document.getElementById('btnGuardarEdit').addEventListener('click', () => {
             if (indiceEditando === null || !dataStore.familia[indiceEditando]) return;
             const item = dataStore.familia[indiceEditando];
-            const focoH = normHandle(focoChar.handle);
             const nuevoNombre = document.getElementById('editFamNombre').value.trim();
             const nuevoHandle = normHandle(document.getElementById('editFamHandle').value.trim() || nuevoNombre);
             const nuevaRel = document.getElementById('editFamRelacion').value.trim() || item.relacion;
             const nuevaGen = inferirGeneracion(nuevaRel, document.getElementById('editFamGeneracion').value || 'actual');
-
-            if (normHandle(item.duenoHandle) !== focoH && normHandle(item.handle) === focoH) {
-                if (nuevoNombre) item.duenoNombre = nuevoNombre;
-                if (nuevoHandle) item.duenoHandle = nuevoHandle;
-                item.relacion = calcularRelacionInversa(nuevaRel);
-                item.generacion = nuevaGen === 'anterior' ? 'siguiente' : (nuevaGen === 'siguiente' ? 'anterior' : 'actual');
-            } else {
-                if (nuevoNombre) item.nombre = nuevoNombre;
-                if (nuevoHandle) item.handle = nuevoHandle;
-                item.relacion = nuevaRel;
-                item.generacion = nuevaGen;
-            }
-
+            if (nuevoNombre) item.nombre = nuevoNombre;
+            if (nuevoHandle) item.handle = nuevoHandle;
+            item.relacion = nuevaRel;
+            item.generacion = nuevaGen;
             guardarDatos();
             cerrarEditorInline();
             renderArbol();
         });
 
-        document.getElementById('btnAgregarFam').addEventListener('click', async () => {
+        document.getElementById('btnAgregarFam').addEventListener('click', () => {
             const nombre = document.getElementById('famNombre').value.trim();
             const handle = normHandle(document.getElementById('famHandle').value.trim() || nombre);
             const relacion = document.getElementById('famRelacion').value.trim() || 'Vínculo familiar';
             const generacion = inferirGeneracion(relacion, document.getElementById('famGeneracion').value || 'actual');
             if (!nombre && !handle) return;
-
             const duenoH = normHandle(focoChar.handle);
-            const nombreLimpio = nombre || handle.replace(/^@/, '');
             if (handle && handle === duenoH) return;
 
             dataStore.familia.push({
                 id: 'fam_' + Date.now(),
                 duenoNombre: focoChar.nombre,
                 duenoHandle: duenoH,
-                nombre: nombreLimpio,
+                nombre: nombre || handle.replace(/^@/, ''),
                 handle,
                 relacion,
                 generacion
             });
-
             guardarDatos();
             renderArbol();
-
             document.getElementById('famNombre').value = '';
             document.getElementById('famHandle').value = '';
             document.getElementById('famRelacion').value = '';
-
-            if (window.KIXUZ_DB?.enviarSolicitudVinculo && handle && handle !== duenoH) {
-                try {
-                    await window.KIXUZ_DB.enviarSolicitudVinculo({
-                        tipo: 'familiar',
-                        destinoNombre: nombreLimpio,
-                        destinoHandle: handle,
-                        destinoUid: '',
-                        relacion,
-                        relacionInversa: calcularRelacionInversa(relacion),
-                        generacion
-                    });
-                } catch {}
-            }
         });
 
-        async function iniciar() {
+        function iniciar() {
             cargarDatos();
-            const params = new URLSearchParams(window.location.search);
-            const charParam = params.get('char') || '';
-
-            if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista && charParam) {
-                const res = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(charParam);
-                if (res && res.nombre) focoChar = res;
-            } else {
-                const act = obtenerPersonajeActivoExacto();
-                if (act && act.handle !== '@rol') focoChar = act;
-            }
-
-            await cargarAvatares();
+            const act = obtenerPersonajeActivoExacto();
+            if (act && act.handle !== '@rol') focoChar = act;
             document.getElementById('focoSubtitle').textContent = `${focoChar.nombre} (${focoChar.handle})`;
-            renderSolicitudes();
             renderArbol();
         }
 
         window.addEventListener('DOMContentLoaded', iniciar);
-        window.addEventListener('kixuz:personaje-cambiado', iniciar);
         window.addEventListener('kixuz:personajes-actualizados', iniciar);
-        window.addEventListener('load', () => {
-            iniciar();
-            if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharSolicitudesVinculo) {
-                window.KIXUZ_DB.escucharSolicitudesVinculo(sols => {
-                    pendientes = Array.isArray(sols) ? sols : [];
-                    renderSolicitudes();
-                });
-            }
-        });
+        if (document.readyState !== 'loading') iniciar();
     </script>
-
-    <script type="module" src="firebase-config.js"></script>
-    <script src="characters.js"></script>
-    <script src="theme.js"></script>
-    <script src="chat.js"></script>
 </body>
 </html>
