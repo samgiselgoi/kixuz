@@ -3,128 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Familia y Clanes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <title>Familia - KIXUZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-principal: #150A24;
             --bg-secundario: #6C3CE0;
             --acento: #2DD4C4;
             --texto: #EDE7E0;
-            --tarjeta: rgba(34, 17, 61, 0.88);
+            --tarjeta: rgba(108, 60, 224, 0.14);
             --borde: rgba(108, 60, 224, 0.45);
         }
-        html[data-theme="light"] {
-            --bg-principal: #F4F1FA;
-            --bg-secundario: #6C3CE0;
-            --acento: #0F9D8E;
-            --texto: #150A24;
-            --tarjeta: rgba(255, 255, 255, 0.94);
-            --borde: rgba(108, 60, 224, 0.25);
-        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             background-color: var(--bg-principal);
             color: var(--texto);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            line-height: 1.5;
-        }
-        header {
-            background: rgba(21, 10, 36, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--borde);
-        }
-        html[data-theme="light"] header { background: rgba(244, 241, 250, 0.92); }
-        .logo { display: inline-flex; align-items: center; text-decoration: none; }
-        .nav-links { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-        .nav-links a {
-            color: var(--texto); text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px;
-            padding: 6px 10px; border-radius: 8px;
-        }
-        .user-menu { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .user-menu select {
-            background: rgba(0, 0, 0, 0.35); color: var(--texto);
-            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 10px; font-size: 13px;
-        }
-        .btn-auth-link {
-            background: var(--acento); color: #150A24 !important;
-            padding: 6px 12px; border-radius: 8px; font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px; font-weight: 700; text-decoration: none;
+            line-height: 1.55;
+            overflow-x: hidden;
         }
 
-        main {
-            max-width: 1080px;
-            margin: 28px auto 90px;
-            padding: 0 18px;
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+
+        header {
+            background: rgba(0, 0, 0, 0.55);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--acento);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-family: 'Unbounded', cursive;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--bg-secundario);
+            text-decoration: none;
+        }
+        .logo span { color: var(--acento); }
+
+        .nav-links {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--texto);
+            text-decoration: none;
+            font-size: 13.5px;
+            padding: 5px 9px;
+            border-radius: 8px;
+        }
+        .nav-links a.active, .nav-links a:hover {
+            color: var(--acento);
+            background: rgba(108, 60, 224, 0.22);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        #activeCharSelect {
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            max-width: 210px;
+        }
+
+        .page-wrap {
+            max-width: 1020px;
+            margin: 24px auto 80px;
+            padding: 0 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
         }
-        .panel {
-            background: var(--tarjeta);
+
+        .panel-box {
+            background-color: var(--tarjeta);
             border: 1px solid var(--borde);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
         }
-        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; color: var(--acento); }
 
-        details.tag-dropdown-box {
-            margin-top: 12px;
-            border: 1px solid var(--borde);
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.22);
-            padding: 10px 14px;
-        }
-        details.tag-dropdown-box > summary {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--acento);
-            cursor: pointer;
-            list-style: none;
+        .top-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
+        .top-header h1 { font-size: 24px; color: var(--acento); }
 
-        .tabs-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
-        .tab-btn {
-            background: rgba(108, 60, 224, 0.2); border: 1px solid var(--borde);
-            color: var(--texto); padding: 8px 16px; border-radius: 10px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
-        }
-        .tab-btn.active { background: var(--acento); color: #150A24; border-color: var(--acento); }
-
-        .tags-manager-row {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center;
-        }
-        .tag-badge-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700;
-            background: rgba(45, 212, 196, 0.14); border: 1px solid var(--acento); color: var(--acento);
-            cursor: pointer;
-        }
-        .tag-badge-chip.fam {
-            background: rgba(108, 60, 224, 0.24); border-color: #b794ff; color: #e2d4ff;
-        }
-        .tag-badge-chip button {
-            background: none; border: none; color: inherit; font-weight: 700; cursor: pointer; font-size: 12px;
-        }
-
-        .form-grid {
+        .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
             gap: 10px;
-            margin-top: 12px;
+            margin-top: 14px;
         }
+
         input, select {
             width: 100%;
-            background: rgba(0, 0, 0, 0.34);
+            background: rgba(0, 0, 0, 0.35);
             color: var(--texto);
             border: 1px solid var(--borde);
             border-radius: 10px;
@@ -133,1505 +130,701 @@
             font-size: 13.5px;
             outline: none;
         }
-        html[data-theme="light"] input, html[data-theme="light"] select { background: #fff; color: #150A24; }
+        html[data-theme="light"] input,
+        html[data-theme="light"] select { background: #fff; color: #150A24; }
 
-        .search-picker-wrap { position: relative; }
-        .search-picker-dropdown {
-            position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-            background: var(--bg-principal); border: 1px solid var(--acento);
-            border-radius: 12px; max-height: 230px; overflow-y: auto;
-            z-index: 999; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
-            display: none;
+        .btn-add {
+            background: var(--acento);
+            color: #150A24;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
         }
-        .search-picker-dropdown.open { display: block; }
-        .picker-option {
-            display: flex; align-items: center; gap: 9px; padding: 8px 11px;
-            cursor: pointer; border-bottom: 1px solid rgba(108, 60, 224, 0.22); font-size: 12.5px;
-        }
-        .picker-option:last-child { border-bottom: none; }
-        .picker-option:hover { background: rgba(45, 212, 196, 0.16); }
-        .picker-mini-av {
-            width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--acento);
-            background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 11px; color: #150A24; flex-shrink: 0;
-        }
+        .btn-add:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-        .btn-accent {
-            background: var(--acento); color: #150A24; border: none;
-            border-radius: 10px; padding: 9px 15px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer;
-        }
         .btn-ghost {
-            background: rgba(108, 60, 224, 0.22); color: var(--texto);
-            border: 1px solid var(--borde); border-radius: 8px; padding: 6px 11px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12px; cursor: pointer;
-        }
-        .btn-danger {
-            background: rgba(224, 60, 108, 0.18); color: #ff9bb4;
-            border: 1px solid rgba(224, 60, 108, 0.5); border-radius: 8px; padding: 6px 11px;
-            font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+            background: transparent;
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 9px;
+            padding: 7px 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        @keyframes kixuzCardFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+        .inline-editor {
+            display: none;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--acento);
+            background: rgba(21, 10, 36, 0.65);
+        }
+        html[data-theme="light"] .inline-editor { background: rgba(255, 255, 255, 0.95); }
+        .inline-editor.open { display: block; }
+
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            margin-top: 20px;
         }
 
         .gen-block {
-            margin-top: 14px; padding: 16px; border-radius: 16px;
-            background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(108, 60, 224, 0.3);
+            background: rgba(21, 10, 36, 0.36);
+            border: 1px solid rgba(108, 60, 224, 0.28);
+            border-radius: 14px;
+            padding: 14px 12px;
         }
-        .gen-head {
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 14px; gap: 10px; flex-wrap: wrap; text-align: center;
+        html[data-theme="light"] .gen-block { background: rgba(108, 60, 224, 0.04); }
+
+        .rank-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            color: var(--acento);
+            margin-bottom: 12px;
+            text-align: center;
         }
-        .tier-block {
-            margin-top: 14px; padding: 14px; border-radius: 14px;
-            background: rgba(21, 10, 36, 0.45); border: 1px solid rgba(108, 60, 224, 0.32);
-        }
-        .tier-title {
-            text-align: center; font-size: 13.5px; font-weight: 700; color: var(--acento);
-            margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .branches-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-            margin-top: 14px;
-        }
-        .branch-column {
-            background: rgba(21, 10, 36, 0.52);
-            border: 1px solid var(--acento);
-            border-radius: 16px;
-            padding: 14px;
+
+        .generation {
+            position: relative;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
-        .branch-subtier {
-            border-top: 1px dashed rgba(108, 60, 224, 0.4);
-            padding-top: 10px;
+        .generation.multiple::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: rgba(45, 212, 196, 0.32);
         }
-        .branch-subtier-label {
-            text-align: center; font-size: 11.5px; font-weight: 700;
-            color: var(--acento); margin-bottom: 8px;
-        }
-        .cards-grid {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
-        }
+
         .member-card {
-            width: 230px;
-            background: rgba(21, 10, 36, 0.82);
+            width: 196px;
+            background: rgba(21, 10, 36, 0.78);
             border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 15px;
+            border-radius: 14px;
+            padding: 15px 12px;
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
-            gap: 7px;
-            animation: kixuzCardFloat 4.2s ease-in-out infinite;
-            transition: border-color 0.22s ease, box-shadow 0.22s ease;
+            gap: 6px;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
         }
-        .member-card:nth-child(2n) { animation-delay: 0.9s; }
-        .member-card:nth-child(3n) { animation-delay: 1.8s; }
-        html[data-theme="light"] .member-card { background: #FFFFFF; }
+        html[data-theme="light"] .member-card { background: rgba(108, 60, 224, 0.07); }
+
         .member-card:hover {
-            animation-play-state: paused;
+            transform: translateY(-7px) scale(1.02);
             border-color: var(--acento);
-            box-shadow: 0 12px 26px rgba(45, 212, 196, 0.16);
-        }
-        .member-avatar {
-            width: 60px; height: 60px; border-radius: 50%;
-            border: 2.5px solid var(--acento);
-            background: linear-gradient(135deg, #6C3CE0, #2DD4C4);
-            background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; color: #150A24;
-            flex-shrink: 0;
-        }
-        .member-link {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--acento);
-            text-decoration: none;
-        }
-        .member-link:hover { text-decoration: underline; }
-        .pill-rol {
-            display: inline-block; font-size: 11px; font-weight: 700;
-            padding: 3px 10px; border-radius: 999px;
-            background: rgba(108, 60, 224, 0.28); color: var(--texto);
-        }
-        .card-actions-row {
-            display: flex; justify-content: center; gap: 6px; margin-top: 5px; flex-wrap: wrap;
-        }
-        .req-card {
-            display: flex; justify-content: space-between; align-items: center; gap: 10px;
-            flex-wrap: wrap; padding: 12px 14px; border-radius: 12px;
-            background: rgba(45, 212, 196, 0.1); border: 1px solid var(--acento); margin-top: 10px;
+            box-shadow: 0 14px 24px rgba(45, 212, 196, 0.22);
         }
 
-/* === KIXUZ UNIFIED MOBILE & TABLET ADAPTATION === */
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-img, video, svg {
-  max-width: 100%;
-}
-@media (max-width: 768px) {
-  header {
-    padding: 10px 12px !important;
-    gap: 8px !important;
-  }
-  .nav-links {
-    width: 100%;
-    order: 3;
-    gap: 6px !important;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-  .nav-links a {
-    font-size: 12.5px !important;
-    padding: 5px 8px !important;
-    white-space: nowrap;
-  }
-  .user-menu {
-    gap: 6px !important;
-    flex-wrap: wrap;
-    max-width: 100%;
-  }
-  .user-menu select,
-  .dropdown {
-    max-width: 185px;
-    font-size: 12px !important;
-    height: 34px !important;
-    padding: 0 8px !important;
-  }
-  main,
-  .profile-layout {
-    margin: 14px auto 80px !important;
-    padding: 0 10px !important;
-    gap: 14px !important;
-  }
-  .panel,
-  .create-post,
-  .post-card {
-    padding: 14px !important;
-    border-radius: 14px !important;
-  }
-  .form-grid,
-  .create-post-controls,
-  .kixuz-modal-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .member-card {
-    width: 100% !important;
-    max-width: 340px;
-  }
-  .group-banner {
-    height: 130px !important;
-  }
-  .group-avatar {
-    width: 68px !important;
-    height: 68px !important;
-    font-size: 22px !important;
-  }
-}
+        .member-card.self-card {
+            border: 2px solid var(--acento);
+            box-shadow: 0 0 16px rgba(45, 212, 196, 0.2);
+        }
+
+        .member-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid var(--acento);
+            background: #281445;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--acento);
+            transition: transform 0.25s ease;
+        }
+        .member-card:hover .member-img { transform: scale(1.08); }
+
+        .member-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14.5px; color: var(--acento); }
+        .member-user { font-size: 12px; opacity: 0.78; }
+        .member-relation {
+            margin-top: 2px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(108, 60, 224, 0.28);
+            border: 1px solid rgba(45, 212, 196, 0.38);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .card-actions { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; justify-content: center; }
+
+        .mini-btn {
+            background: rgba(108, 60, 224, 0.24);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 7px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .mini-btn:hover { border-color: var(--acento); color: var(--acento); }
+        .mini-btn.del { border-color: rgba(224, 60, 108, 0.55); color: #ff9bb4; }
+
+        .req-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(108, 60, 224, 0.22);
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
     <header>
-        <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px;">
-        </a>
+        <a href="index.html" class="logo">KI<span>X</span>UZ</a>
         <nav class="nav-links">
             <a href="index.html">Inicio</a>
             <a href="perfil.html">Mi Perfil</a>
             <a href="universo.html">Universos</a>
-            <a href="familia.html" class="active">Familia / Clan</a>
-            <a href="crear-personaje.html">+ Personaje</a>
+            <a href="familia.html" class="active">Familia</a>
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" aria-label="Personaje activo"></select>
-            <a href="registro.html" class="btn-auth-link">Entrar / Registro</a>
         </div>
     </header>
 
-    <main>
-        <section class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-                <div>
-                    <h1 style="font-size:22px;">Familia y Clanes</h1>
-                    <p style="font-size:13.5px;opacity:0.78;margin-top:4px;">Creá etiquetas para tu perfil y su estructura jerárquica sin ocupar lugar extra.</p>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <button type="button" class="btn-ghost" id="addGenBtn">+ Nueva Generación</button>
-                </div>
-            </div>
-
-            <!-- Desplegable compacto para crear etiqueta de Familia o Clan -->
-            <details class="tag-dropdown-box" id="tagCreatorDropdown">
-                <summary>
-                    <span>+ Crear / gestionar etiqueta de Familia o Clan</span>
-                    <span style="font-size:12px;opacity:0.75;">Desplegar</span>
-                </summary>
-                <form id="createTagForm" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
-                    <select id="newTagKindSelect" style="max-width:170px;">
-                        <option value="familia">Familia (Única)</option>
-                        <option value="clan">Clan (Jerarquía)</option>
-                    </select>
-                    <input type="text" id="newTagNameInput" placeholder="Nombre (ej. Mi Familia o Clan Lobo)" style="max-width:300px;" required>
-                    <button type="submit" class="btn-accent">Crear etiqueta y estructura</button>
-                </form>
-                <div class="tags-manager-row" id="createdTagsList"></div>
-            </details>
-
-            <div class="tabs-row">
-                <button type="button" class="tab-btn active" id="tabFamilia">Familia</button>
-                <button type="button" class="tab-btn" id="tabClanes">Clanes</button>
-                <select id="clanSelectorFiltro" aria-label="Elegir clan" style="max-width:240px;display:none;"></select>
+    <main class="page-wrap">
+        <section class="panel-box top-header">
+            <div>
+                <h1>Árbol Familiar</h1>
+                <div style="font-size: 13px; opacity: 0.8;" id="focoSubtitle">Cargando personaje...</div>
             </div>
         </section>
 
-        <section class="panel" id="inboxRequestsPanel" style="display:none;">
-            <h2 style="font-size:16px;">Solicitudes recibidas</h2>
-            <div id="inboxRequestsList"></div>
+        <section class="panel-box" id="solicitudesBox" style="display:none;">
+            <h2 style="font-size: 16px; color: var(--acento); margin-bottom: 8px;">Solicitudes de Vínculo Recibidas</h2>
+            <div id="solicitudesList"></div>
         </section>
 
-        <!-- Vista Familia -->
-        <section id="viewFamilia">
-            <div class="panel">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <h2 style="font-size:17px;" id="familiaHeadingTitle">Mi Familia</h2>
-                    <button type="button" class="btn-ghost" id="btnAddSelfFamily">Agregarme a mí en la generación elegida</button>
-                </div>
-                <form id="addFamilyForm" class="form-grid">
-                    <div class="search-picker-wrap">
-                        <input type="text" id="famSearchInput" placeholder="Buscar personaje por nombre o @usuario..." autocomplete="off">
-                        <div class="search-picker-dropdown" id="famSearchDropdown"></div>
-                    </div>
-                    <input type="text" id="famNombre" placeholder="Nombre del miembro" required>
-                    <input type="text" id="famHandle" placeholder="@usuario (ej. @liam_miller)" required>
-                    <input type="text" id="famRelacion" list="relacionesSugeridas" placeholder="Relación (ej. Casado con:, Hijo/a)" required>
-                    <datalist id="relacionesSugeridas">
-                        <option value="Casado con:">
-                        <option value="En pareja con:">
-                        <option value="Madre">
-                        <option value="Padre">
-                        <option value="Hijo/a">
-                        <option value="Hermano/a">
-                        <option value="Abuelo/a">
-                        <option value="Nieto/a">
-                        <option value="Tío/a">
-                        <option value="Sobrino/a">
-                        <option value="Primo/a">
-                    </datalist>
-                    <select id="famGenSelect" aria-label="Generación"></select>
-                    <select id="famEnvioModo" aria-label="Agregar directo o enviar solicitud">
-                        <option value="directo">Agregar directo</option>
-                        <option value="solicitud">Enviar solicitud al @usuario</option>
-                    </select>
-                    <button type="submit" class="btn-accent">Guardar en Familia</button>
-                </form>
+        <section class="panel-box">
+            <h2 style="font-size: 17px; color: var(--acento);">Agregar Familiar</h2>
+            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">La generación y la relación recíproca se calculan automáticamente según el lazo.</p>
+
+            <div class="form-row">
+                <input type="text" id="famNombre" placeholder="Nombre del personaje">
+                <input type="text" id="famHandle" placeholder="@Usuario (ej. @Demian)">
+                <input type="text" id="famRelacion" placeholder="Relación (ej. Padre, Madre, Hija, Hijo, Pareja)">
+                <select id="famGeneracion">
+                    <option value="anterior">Generación Anterior</option>
+                    <option value="actual" selected>Generación Actual</option>
+                    <option value="siguiente">Siguiente Generación</option>
+                </select>
+                <button type="button" class="btn-add" id="btnAgregarFam">Agregar Vínculo</button>
             </div>
 
-            <div id="familiaGenerationsContainer"></div>
-        </section>
-
-        <!-- Vista Clanes (jerarquía militar con mando central y ramas desde Capitán) -->
-        <section id="viewClanes" style="display:none;">
-            <div class="panel">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <h2 style="font-size:17px;">Agregar miembro a un Clan</h2>
-                    <button type="button" class="btn-ghost" id="btnAddSelfClan">Agregarme a mí a este Clan</button>
+            <div class="inline-editor" id="inlineEditorBox">
+                <div style="font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--acento); margin-bottom:8px;" id="inlineEditorTitle">Editar vínculo</div>
+                <div class="form-row" style="margin-top:0;">
+                    <input type="text" id="editFamNombre" placeholder="Nombre">
+                    <input type="text" id="editFamHandle" placeholder="@Usuario">
+                    <input type="text" id="editFamRelacion" placeholder="Relación">
+                    <select id="editFamGeneracion">
+                        <option value="anterior">Generación Anterior</option>
+                        <option value="actual">Generación Actual</option>
+                        <option value="siguiente">Siguiente Generación</option>
+                    </select>
                 </div>
-                <form id="addClanForm" class="form-grid">
-                    <select id="clanEtiquetaSelect" aria-label="Escoger clan creado"></select>
-                    <input type="text" id="clanNombreClan" placeholder="Nombre del Clan" required>
-                    <div class="search-picker-wrap">
-                        <input type="text" id="clanSearchInput" placeholder="Buscar personaje por nombre o @usuario..." autocomplete="off">
-                        <div class="search-picker-dropdown" id="clanSearchDropdown"></div>
-                    </div>
-                    <input type="text" id="clanMiembroNombre" placeholder="Nombre del personaje" required>
-                    <input type="text" id="clanMiembroHandle" placeholder="@usuario" required>
-                    <select id="clanRangoSelect" aria-label="Rango militar jerárquico">
-                        <option value="Líder">1. Líder (Mando Superior)</option>
-                        <option value="Sublíder / Segundo al Mando">2. Sublíder / Segundo al Mando</option>
-                        <option value="Comandante">3. Comandante</option>
-                        <option value="Capitán">4. Capitán (Abre Unidad / Rama)</option>
-                        <option value="Teniente">5. Teniente (En Unidad)</option>
-                        <option value="Sargento">6. Sargento (En Unidad)</option>
-                        <option value="Cabo">7. Cabo (En Unidad)</option>
-                        <option value="Soldado / Miembro">8. Soldado / Miembro (En Unidad)</option>
-                        <option value="Recluta">9. Recluta (En Unidad)</option>
-                    </select>
-                    <select id="clanCapitanRamaSelect" aria-label="Capitán / Unidad asignada" style="display:none;">
-                        <option value="">Unidad general (sin capitán asignado)</option>
-                    </select>
-                    <select id="clanEnvioModo" aria-label="Agregar directo o enviar solicitud">
-                        <option value="directo">Agregar directo al Clan</option>
-                        <option value="solicitud">Enviar solicitud al @usuario</option>
-                    </select>
-                    <button type="submit" class="btn-accent">Guardar en Clan</button>
-                </form>
+                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                    <button type="button" class="btn-ghost" id="btnCancelarEdit">Cancelar</button>
+                    <button type="button" class="btn-add" id="btnGuardarEdit">Guardar cambios</button>
+                </div>
             </div>
 
-            <div id="clanesCardsContainer"></div>
+            <div class="tree-container">
+                <div class="gen-block">
+                    <div class="rank-label">Generación Anterior</div>
+                    <div class="generation" id="gridAnterior"></div>
+                </div>
+
+                <div class="gen-block">
+                    <div class="rank-label">Generación Actual</div>
+                    <div class="generation" id="gridActual"></div>
+                </div>
+
+                <div class="gen-block">
+                    <div class="rank-label">Siguiente Generación</div>
+                    <div class="generation" id="gridSiguiente"></div>
+                </div>
+            </div>
         </section>
     </main>
 
     <script>
-        (() => {
-            const KEY_FAM_CLAN = 'kixuz_familia_clan_v1';
-            const KEY_SOLICITUDES = 'kixuz_solicitudes_vinculo_v1';
-            const KEY_FOTOS = 'kixuz_perfil_fotos_v1';
+        const STORAGE_KEY = 'kixuz_familia_clan_v1';
+        const LEGACY_KEYS = ['kixuz_familia_clan_v5', 'kixuz_familia_clan_v4', 'kixuz_familia_clan_v3', 'kixuz_familia_clan_v2'];
 
-            const RANGOS_CENTRALES = [
-                { key: 'Líder', label: '1. Líderes (Mando Central)' },
-                { key: 'Sublíder / Segundo al Mando', label: '2. Sublíder / Segundo al Mando' },
-                { key: 'Comandante', label: '3. Comandante' }
-            ];
+        let dataStore = { familia: [], clan: [] };
+        let pendientes = [];
+        let focoChar = { nombre: 'Personaje', handle: '@rol' };
+        let avataresMap = new Map();
+        let indiceEditando = null;
 
-            const RANGOS_UNIDAD = [
-                { key: 'Teniente', label: '5. Teniente' },
-                { key: 'Sargento', label: '6. Sargento' },
-                { key: 'Cabo', label: '7. Cabo' },
-                { key: 'Soldado / Miembro', label: '8. Soldado / Miembro' },
-                { key: 'Recluta', label: '9. Recluta' }
-            ];
+        const esc = s => String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
 
-            function getPesoRango(rango) {
-                const limpio = String(rango || '').trim().toLowerCase();
-                if (!limpio) return 8;
-                if (limpio.includes('líder') || limpio.includes('lider')) return 1;
-                if (limpio.includes('sublíder') || limpio.includes('sublider') || limpio.includes('segundo')) return 2;
-                if (limpio.includes('comandante') || limpio.includes('general') || limpio.includes('coronel')) return 3;
-                if (limpio.includes('capitán') || limpio.includes('capitan')) return 4;
-                if (limpio.includes('teniente')) return 5;
-                if (limpio.includes('sargento')) return 6;
-                if (limpio.includes('cabo')) return 7;
-                if (limpio.includes('recluta') || limpio.includes('cadete')) return 9;
-                return 8;
+        const norm = v => String(v || '').trim().toLowerCase();
+        const normHandle = v => {
+            const limp = norm(v).replace(/^@+/, '').replace(/\s+/g, '_');
+            return limp ? '@' + limp : '';
+        };
+
+        function inferirGeneracion(rel, fallback = 'actual') {
+            const r = norm(rel);
+            if (r.includes('padre') || r.includes('madre') || r.includes('abuel') || r.includes('tío') || r.includes('tio') || r.includes('tía') || r.includes('tia')) {
+                return 'anterior';
             }
-
-            const esc = s => String(s || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-
-            const normH = h => {
-                const s = String(h || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
-                return s ? '@' + s : '';
-            };
-
-            const RELACION_RECIPROCA = {
-                'madre': 'Hijo/a',
-                'padre': 'Hijo/a',
-                'hijo/a': 'Madre / Padre',
-                'hijo': 'Madre / Padre',
-                'hija': 'Madre / Padre',
-                'hermano/a': 'Hermano/a',
-                'hermano': 'Hermano/a',
-                'hermana': 'Hermana / Hermano',
-                'abuelo/a': 'Nieto/a',
-                'nieto/a': 'Abuelo/a',
-                'tío/a': 'Sobrino/a',
-                'tio/a': 'Sobrino/a',
-                'tío': 'Sobrino/a',
-                'tía': 'Sobrino/a',
-                'sobrino/a': 'Tío/a',
-                'sobrino': 'Tío/a',
-                'sobrina': 'Tío/a',
-                'primo/a': 'Primo/a',
-                'pareja': 'En pareja con:',
-                'en pareja con:': 'En pareja con:',
-                'casado con:': 'Casado con:'
-            };
-
-            function getRelacionReciproca(rel) {
-                return RELACION_RECIPROCA[String(rel || '').trim().toLowerCase()] || (rel || 'Vínculo');
+            if (r.includes('hijo') || r.includes('hija') || r.includes('niet') || r.includes('sobrin')) {
+                return 'siguiente';
             }
+            if (r.includes('herman') || r.includes('pareja') || r.includes('espos') || r.includes('casad') || r.includes('primo') || r.includes('prima')) {
+                return 'actual';
+            }
+            return fallback;
+        }
 
-            let directorioPersonajes = [];
+        function calcularRelacionInversa(rel) {
+            const r = norm(rel);
+            if (r.includes('hija') || r.includes('hijo')) return 'Padre/Madre';
+            if (r.includes('madre') || r.includes('padre')) return 'Hijo/a';
+            if (r.includes('abuela') || r.includes('abuelo')) return 'Nieto/a';
+            if (r.includes('nieto') || r.includes('nieta')) return 'Abuelo/a';
+            if (r.includes('herman')) return 'Hermano/a';
+            if (r.includes('pareja') || r.includes('espos') || r.includes('casad')) return 'Pareja';
+            return 'Vínculo familiar';
+        }
 
-            async function cargarDirectorioPersonajes() {
-                const mapa = new Map();
-                try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    if (Array.isArray(subs)) subs.forEach(p => {
-                        const h = normH(p?.handle);
-                        if (h) mapa.set(h, { nombre: p.nombre || h.slice(1), handle: h, avatar: p.avatar || '' });
-                    });
-                } catch {}
-                if (window.KIXUZ_DB?.listarPersonajesPublicos) {
-                    try {
-                        const pubs = await window.KIXUZ_DB.listarPersonajesPublicos();
-                        pubs.forEach(p => {
-                            const h = normH(p?.handle);
-                            if (h) mapa.set(h, { ...(mapa.get(h) || {}), nombre: p.nombre || h.slice(1), handle: h, avatar: p.avatar || '' });
-                        });
-                    } catch {}
+        function obtenerPersonajeActivoExacto() {
+            const ac = window.KIXUZ_ACTIVE_CHAR;
+            if (ac && !ac.esPlaceholder && ac.handle) {
+                return { nombre: ac.nombre || ac.handle.replace(/^@/, ''), handle: normHandle(ac.handle) };
+            }
+            try {
+                const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+                if (act?.handle) {
+                    return { nombre: act.nombre || act.handle.replace(/^@/, ''), handle: normHandle(act.handle) };
                 }
-                directorioPersonajes = Array.from(mapa.values());
-            }
+            } catch {}
+            try {
+                const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                if (Array.isArray(subs) && subs.length > 0 && subs[0]?.handle) {
+                    return { nombre: subs[0].nombre || subs[0].handle.replace(/^@/, ''), handle: normHandle(subs[0].handle) };
+                }
+            } catch {}
+            return { nombre: 'Personaje', handle: '@rol' };
+        }
 
-            function vincularBuscadorDesplegable(inputId, dropdownId, onSelect) {
-                const inp = document.getElementById(inputId);
-                const drop = document.getElementById(dropdownId);
-                if (!inp || !drop) return;
+        function esMiPropioPersonaje(personaje) {
+            const targetH = normHandle(personaje?.handle);
+            const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
+            if (!targetH || !activoH || activoH === '@rol') return false;
+            return targetH === activoH;
+        }
 
-                const renderOpciones = () => {
-                    const q = (inp.value || '').trim().toLowerCase();
-                    const filtrados = directorioPersonajes.filter(p =>
-                        !q || p.nombre.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q)
-                    ).slice(0, 30);
+        function leerStorage(key) {
+            try {
+                const raw = JSON.parse(localStorage.getItem(key) || 'null');
+                if (raw && typeof raw === 'object') {
+                    return {
+                        familia: Array.isArray(raw.familia) ? raw.familia : [],
+                        clan: Array.isArray(raw.clan) ? raw.clan : []
+                    };
+                }
+            } catch {}
+            return { familia: [], clan: [] };
+        }
 
-                    if (!filtrados.length) {
-                        drop.innerHTML = `<div style="padding:9px 12px;font-size:12px;opacity:0.7;">Sin coincidencias. Podés escribir el nombre y @usuario manualmente.</div>`;
-                    } else {
-                        drop.innerHTML = filtrados.map(p => {
-                            const avStyle = p.avatar ? `style="background-image:url('${esc(p.avatar)}');"` : '';
-                            const ini = p.avatar ? '' : p.nombre.charAt(0).toUpperCase();
-                            return `
-                                <div class="picker-option" data-pick-handle="${esc(p.handle)}" data-pick-nombre="${esc(p.nombre)}">
-                                    <div class="picker-mini-av" ${avStyle}>${esc(ini)}</div>
-                                    <div>
-                                        <strong style="color:var(--acento);">${esc(p.nombre)}</strong>
-                                        <div style="font-size:11px;opacity:0.78;">${esc(p.handle)}</div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-
-                        drop.querySelectorAll('.picker-option').forEach(opt => {
-                            opt.addEventListener('click', () => {
-                                onSelect({ nombre: opt.dataset.pickNombre, handle: opt.dataset.pickHandle });
-                                inp.value = `${opt.dataset.pickNombre} (${opt.dataset.pickHandle})`;
-                                drop.classList.remove('open');
-                            });
-                        });
-                    }
-                    drop.classList.add('open');
-                };
-
-                inp.addEventListener('focus', renderOpciones);
-                inp.addEventListener('input', renderOpciones);
-                document.addEventListener('click', ev => {
-                    if (!inp.contains(ev.target) && !drop.contains(ev.target)) {
-                        drop.classList.remove('open');
-                    }
+        function cargarDatos() {
+            const famMap = new Map();
+            const clanMap = new Map();
+            [...LEGACY_KEYS.slice().reverse(), STORAGE_KEY].forEach(k => {
+                const d = leerStorage(k);
+                d.familia.forEach((item, i) => {
+                    if (!item) return;
+                    const id = String(item.id || `f_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.relacion)}_${i}`);
+                    famMap.set(id, { ...famMap.get(id), ...item });
                 });
-            }
+                d.clan.forEach((item, i) => {
+                    if (!item) return;
+                    const id = String(item.id || `c_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.clanNombre)}_${i}`);
+                    clanMap.set(id, { ...clanMap.get(id), ...item });
+                });
+            });
+            dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()) };
+            guardarDatos();
+        }
 
-            function obtenerAvatarPorHandle(handle) {
-                const h = normH(handle);
-                const delDir = directorioPersonajes.find(p => normH(p.handle) === h && p.avatar);
-                if (delDir) return delDir.avatar;
+        function guardarDatos() {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(dataStore)); } catch {}
+        }
+
+        async function cargarAvatares() {
+            const m = new Map();
+            if (focoChar?.handle && focoChar?.avatar) m.set(normHandle(focoChar.handle), focoChar.avatar);
+            try {
+                const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
+                subs.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
+            } catch {}
+            if (window.KIXUZ_DB?.listarPersonajesPublicos) {
                 try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    if (Array.isArray(subs)) {
-                        const found = subs.find(p => normH(p?.handle) === h && p?.avatar);
-                        if (found) return found.avatar;
-                    }
+                    const pub = await window.KIXUZ_DB.listarPersonajesPublicos();
+                    pub.forEach(p => { if (p?.handle && p?.avatar) m.set(normHandle(p.handle), p.avatar); });
                 } catch {}
-                try {
-                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act && normH(act.handle) === h && act.avatar) return act.avatar;
-                } catch {}
-                try {
-                    const fotos = JSON.parse(localStorage.getItem(KEY_FOTOS) || '{}');
-                    if (fotos && fotos[h]?.avatar) return fotos[h].avatar;
-                } catch {}
-                return '';
+            }
+            avataresMap = m;
+        }
+
+        function renderAvatar(nombre, handle) {
+            const img = avataresMap.get(normHandle(handle)) || '';
+            if (img) return `<div class="member-img" style="background-image:url('${esc(img)}');"></div>`;
+            return `<div class="member-img">${esc((nombre || 'P').charAt(0).toUpperCase())}</div>`;
+        }
+
+        function syncLine(el) {
+            if (!el) return;
+            el.classList.toggle('multiple', el.querySelectorAll('.member-card').length > 1);
+        }
+
+        function esVinculoDeEsteArbol(item, focoH) {
+            if (!item) return false;
+            const dueno = normHandle(item.duenoHandle || '');
+            const miembro = normHandle(item.handle || '');
+            if (!dueno) return miembro !== focoH;
+            if (dueno === focoH && miembro !== focoH) return true;
+            if (miembro === focoH && dueno !== focoH) return true;
+            return false;
+        }
+
+        function datosMostrarParaFoco(item, focoH) {
+            const dueno = normHandle(item.duenoHandle || '');
+            if (dueno && dueno !== focoH && normHandle(item.handle) === focoH) {
+                const invRel = calcularRelacionInversa(item.relacion);
+                const genInv = item.generacion === 'anterior' ? 'siguiente' : (item.generacion === 'siguiente' ? 'anterior' : 'actual');
+                return {
+                    nombre: item.duenoNombre || dueno.replace(/^@/, ''),
+                    handle: dueno,
+                    etiqueta: invRel,
+                    generacion: inferirGeneracion(invRel, genInv)
+                };
+            }
+            return {
+                nombre: item.nombre,
+                handle: item.handle,
+                etiqueta: item.relacion,
+                generacion: inferirGeneracion(item.relacion, item.generacion || 'actual')
+            };
+        }
+
+        function cardHtml({ nombre, handle, etiqueta, esYo = false, index = -1, puedeEditar = false }) {
+            return `
+                <div class="member-card ${esYo ? 'self-card' : ''}">
+                    ${renderAvatar(nombre, handle)}
+                    <div class="member-name">${esYo ? '✨ ' : ''}${esc(nombre)}${esYo ? ' · Yo' : ''}</div>
+                    <div class="member-user">${esc(handle || '@rol')}</div>
+                    <div class="member-relation">${esc(etiqueta)}</div>
+                    <div class="card-actions">
+                        <a href="perfil.html?char=${encodeURIComponent(handle || '')}" class="mini-btn">Perfil</a>
+                        ${index >= 0 && puedeEditar ? `
+                            <button type="button" class="mini-btn" data-edit="${index}" title="Editar">✏️</button>
+                            <button type="button" class="mini-btn del" data-del="${index}" title="Eliminar">✖</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function abrirEditorInline(index) {
+            const item = dataStore.familia[index];
+            if (!item) return;
+            indiceEditando = index;
+            document.getElementById('inlineEditorTitle').textContent = `Editando vínculo: ${item.nombre || item.handle}`;
+            document.getElementById('editFamNombre').value = item.nombre || '';
+            document.getElementById('editFamHandle').value = item.handle || '';
+            document.getElementById('editFamRelacion').value = item.relacion || '';
+            document.getElementById('editFamGeneracion').value = inferirGeneracion(item.relacion, item.generacion || 'actual');
+            document.getElementById('inlineEditorBox').classList.add('open');
+        }
+
+        function cerrarEditorInline() {
+            indiceEditando = null;
+            document.getElementById('inlineEditorBox').classList.remove('open');
+        }
+
+        function renderArbol() {
+            const focoH = normHandle(focoChar.handle);
+            const puedeEditar = esMiPropioPersonaje(focoChar);
+
+            const famItems = dataStore.familia
+                .map((m, index) => ({ m, index, view: datosMostrarParaFoco(m, focoH) }))
+                .filter(({ m }) => esVinculoDeEsteArbol(m, focoH));
+
+            const antHtml = famItems
+                .filter(({ view }) => view.generacion === 'anterior')
+                .map(({ m, index, view }) => cardHtml({
+                    nombre: view.nombre,
+                    handle: view.handle,
+                    etiqueta: view.etiqueta,
+                    index,
+                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                })).join('');
+
+            const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
+            const actItemsHtml = famItems
+                .filter(({ view }) => view.generacion === 'actual')
+                .map(({ m, index, view }) => cardHtml({
+                    nombre: view.nombre,
+                    handle: view.handle,
+                    etiqueta: view.etiqueta,
+                    index,
+                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                })).join('');
+
+            const sigHtml = famItems
+                .filter(({ view }) => view.generacion === 'siguiente')
+                .map(({ m, index, view }) => cardHtml({
+                    nombre: view.nombre,
+                    handle: view.handle,
+                    etiqueta: view.etiqueta,
+                    index,
+                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                })).join('');
+
+            const gAnt = document.getElementById('gridAnterior');
+            const gAct = document.getElementById('gridActual');
+            const gSig = document.getElementById('gridSiguiente');
+
+            gAnt.innerHTML = antHtml || `<div class="member-user">Sin vínculos en generación anterior.</div>`;
+            gAct.innerHTML = yoCard + actItemsHtml;
+            gSig.innerHTML = sigHtml || `<div class="member-user">Sin vínculos en siguiente generación.</div>`;
+
+            syncLine(gAnt);
+            syncLine(gAct);
+            syncLine(gSig);
+
+            document.querySelectorAll('[data-del]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const i = Number(btn.dataset.del);
+                    if (Number.isNaN(i)) return;
+                    dataStore.familia.splice(i, 1);
+                    if (indiceEditando === i) cerrarEditorInline();
+                    guardarDatos();
+                    renderArbol();
+                });
+            });
+
+            document.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const i = Number(btn.dataset.edit);
+                    if (!Number.isNaN(i)) abrirEditorInline(i);
+                });
+            });
+        }
+
+        function renderSolicitudes() {
+            const box = document.getElementById('solicitudesBox');
+            const list = document.getElementById('solicitudesList');
+            const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
+
+            if (!activoH || activoH === '@rol' || !esMiPropioPersonaje(focoChar)) {
+                box.style.display = 'none';
+                return;
             }
 
-            function getPersonajeActivoObj() {
-                const ac = window.KIXUZ_ACTIVE_CHAR;
-                if (ac && !ac.esPlaceholder && ac.handle) {
-                    return { ...ac, nombre: ac.nombre || ac.handle.slice(1), handle: normH(ac.handle) };
-                }
-                try {
-                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act?.handle) return { ...act, nombre: act.nombre || act.handle.slice(1), handle: normH(act.handle) };
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    if (Array.isArray(subs) && subs[0]?.handle) {
-                        return { ...subs[0], nombre: subs[0].nombre || subs[0].handle.slice(1), handle: normH(subs[0].handle) };
-                    }
-                } catch {}
-                return { nombre: 'Personaje', handle: '@rol' };
+            const mias = pendientes.filter(s => normHandle(s.paraHandle) === activoH);
+            if (!mias.length) {
+                box.style.display = 'none';
+                return;
             }
 
-            function getDuenoActual() {
-                const params = new URLSearchParams(window.location.search);
-                if (params.get('char')) return normH(params.get('char'));
-                return getPersonajeActivoObj().handle;
-            }
-
-            function leerEstado() {
-                try {
-                    const raw = JSON.parse(localStorage.getItem(KEY_FAM_CLAN) || '{}');
-                    const gens = Array.isArray(raw.generaciones) && raw.generaciones.length
-                        ? raw.generaciones
-                        : [
-                            { id: 'gen_1', titulo: '1.ª Generación (Ancestros / Abuelos)' },
-                            { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
-                            { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
-                        ];
-                    const ownerActual = getDuenoActual();
-                    const familiaLimpia = (Array.isArray(raw.familia) ? raw.familia : []).filter(m => {
-                        const n = String(m?.nombre || '').toLowerCase();
-                        const h = String(m?.handle || '').toLowerCase();
-                        return !n.includes('prueba') && !h.includes('sector4');
-                    });
-                    const clanLimpio = (Array.isArray(raw.clan) ? raw.clan : []).filter(m => {
-                        const c = String(m?.clanNombre || '').toLowerCase();
-                        const n = String(m?.nombre || '').toLowerCase();
-                        return !c.includes('prueba') && !c.includes('sector4') && !n.includes('prueba');
-                    });
-                    const clanesDelOwner = Array.from(new Set(
-                        clanLimpio
-                            .filter(m => normH(m.duenoHandle) === ownerActual || normH(m.handle) === ownerActual)
-                            .map(m => String(m.clanNombre || '').trim())
-                            .filter(Boolean)
-                    ));
-                    const registradosRaw = Array.isArray(raw.clanesRegistrados) ? raw.clanesRegistrados : [];
-                    const clanesRegistradosFinal = Array.from(new Set([
-                        ...registradosRaw.filter(t => !/prueba|sector4/i.test(String(t || ''))),
-                        ...clanesDelOwner
-                    ]));
-                    const famEtqBase = String(raw.familiaEtiqueta || 'Mi Familia').trim();
-                    const famEtiquetasLista = Array.isArray(raw.familiaEtiquetas)
-                        ? Array.from(new Set(raw.familiaEtiquetas.map(x => String(x || '').trim()).filter(Boolean)))
-                        : (famEtqBase ? [famEtqBase] : []);
-
-                    const mapaFamMiembros = {};
-                    if (raw.miembrosFamiliaEtiquetas && typeof raw.miembrosFamiliaEtiquetas === 'object') {
-                        Object.entries(raw.miembrosFamiliaEtiquetas).forEach(([hKey, objE]) => {
-                            const nh = normH(hKey);
-                            if (!nh) return;
-                            mapaFamMiembros[nh] = {};
-                            if (Array.isArray(objE)) {
-                                objE.forEach(e => { if (String(e || '').trim()) mapaFamMiembros[nh][String(e).trim()] = true; });
-                            } else if (objE && typeof objE === 'object') {
-                                Object.entries(objE).forEach(([e, v]) => { if (v && String(e || '').trim()) mapaFamMiembros[nh][String(e).trim()] = true; });
-                            }
-                        });
-                    }
-                    // Derivar pertenencia familiar desde los registros de familia existentes si no estaba mapeada
-                    familiaLimpia.forEach(m => {
-                        const etqM = String(m.etiquetaFamilia || famEtqBase || 'Mi Familia').trim();
-                        if (!etqM) return;
-                        const hDest = normH(m.handle);
-                        const hDueno = normH(m.duenoHandle);
-                        if (hDest) {
-                            mapaFamMiembros[hDest] = mapaFamMiembros[hDest] || {};
-                            mapaFamMiembros[hDest][etqM] = true;
-                        }
-                        if (hDueno) {
-                            mapaFamMiembros[hDueno] = mapaFamMiembros[hDueno] || {};
-                            mapaFamMiembros[hDueno][etqM] = true;
-                        }
-                    });
-
-                    const mapaClanMiembros = {};
-                    if (raw.miembrosClanEtiquetas && typeof raw.miembrosClanEtiquetas === 'object') {
-                        Object.entries(raw.miembrosClanEtiquetas).forEach(([hKey, objC]) => {
-                            const nh = normH(hKey);
-                            if (!nh) return;
-                            mapaClanMiembros[nh] = {};
-                            if (Array.isArray(objC)) {
-                                objC.forEach(c => { if (String(c || '').trim()) mapaClanMiembros[nh][String(c).trim()] = true; });
-                            } else if (objC && typeof objC === 'object') {
-                                Object.entries(objC).forEach(([c, v]) => { if (v && String(c || '').trim()) mapaClanMiembros[nh][String(c).trim()] = true; });
-                            }
-                        });
-                    }
-                    clanLimpio.forEach(m => {
-                        const cNom = String(m.clanNombre || '').trim();
-                        if (!cNom || /prueba|sector4/i.test(cNom)) return;
-                        const hDest = normH(m.handle);
-                        const hDueno = normH(m.duenoHandle);
-                        if (hDest) {
-                            mapaClanMiembros[hDest] = mapaClanMiembros[hDest] || {};
-                            mapaClanMiembros[hDest][cNom] = true;
-                        }
-                        if (hDueno) {
-                            mapaClanMiembros[hDueno] = mapaClanMiembros[hDueno] || {};
-                            mapaClanMiembros[hDueno][cNom] = true;
-                        }
-                    });
-
-                    return {
-                        generaciones: gens,
-                        familiaEtiqueta: famEtqBase,
-                        familiaEtiquetas: famEtiquetasLista,
-                        clanesRegistrados: clanesRegistradosFinal,
-                        miembrosFamiliaEtiquetas: mapaFamMiembros,
-                        miembrosClanEtiquetas: mapaClanMiembros,
-                        familia: familiaLimpia,
-                        clan: clanLimpio
-                    };
-                } catch {
-                    return {
-                        generaciones: [
-                            { id: 'gen_1', titulo: '1.ª Generación (Ancestros / Abuelos)' },
-                            { id: 'gen_2', titulo: '2.ª Generación (Padres / Generación principal)' },
-                            { id: 'gen_3', titulo: '3.ª Generación (Hijos / Descendientes)' }
-                        ],
-                        familiaEtiqueta: 'Mi Familia',
-                        clanesRegistrados: [],
-                        familia: [],
-                        clan: []
-                    };
-                }
-            }
-
-            function guardarEstado(st) {
-                try { localStorage.setItem(KEY_FAM_CLAN, JSON.stringify(st)); } catch {}
-            }
-
-            function leerSolicitudes() {
-                try {
-                    const arr = JSON.parse(localStorage.getItem(KEY_SOLICITUDES) || '[]');
-                    return Array.isArray(arr) ? arr : [];
-                } catch { return []; }
-            }
-
-            function guardarSolicitudes(arr) {
-                try { localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(arr)); } catch {}
-            }
-
-            function asignarEtiquetaAlPerfil(handle, tipo, etiquetaTexto) {
-                const h = normH(handle);
-                const tagClean = String(etiquetaTexto || '').trim();
-                if (!h || !tagClean) return;
-
-                try {
-                    const st = leerEstado();
-                    if (tipo === 'familia') {
-                        st.miembrosFamiliaEtiquetas[h] = st.miembrosFamiliaEtiquetas[h] || {};
-                        st.miembrosFamiliaEtiquetas[h][tagClean] = true;
-                    } else if (tipo === 'clan') {
-                        st.miembrosClanEtiquetas[h] = st.miembrosClanEtiquetas[h] || {};
-                        st.miembrosClanEtiquetas[h][tagClean] = true;
-                    }
-                    guardarEstado(st);
-                } catch {}
-
-                try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    if (Array.isArray(subs)) {
-                        const nextSubs = subs.map(p => {
-                            if (normH(p?.handle) !== h) return p;
-                            if (tipo === 'familia') {
-                                const prevF = Array.isArray(p.familias) ? p.familias : (p.familiaNombre ? [p.familiaNombre] : []);
-                                const setF = new Set(prevF.map(x => String(x).trim()).filter(Boolean));
-                                setF.add(tagClean);
-                                return { ...p, familiaNombre: tagClean, familias: Array.from(setF) };
-                            }
-                            const prevClanes = Array.isArray(p.clanes) ? p.clanes : (p.clan ? [p.clan] : []);
-                            const setC = new Set(prevClanes.map(x => String(x).trim()).filter(Boolean));
-                            setC.add(tagClean);
-                            return { ...p, clan: tagClean, clanes: Array.from(setC) };
-                        });
-                        localStorage.setItem('kixuz_subpersonajes', JSON.stringify(nextSubs));
-                    }
-                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act && normH(act.handle) === h) {
-                        const prevClanes = Array.isArray(act.clanes) ? act.clanes : (act.clan ? [act.clan] : []);
-                        const setC = new Set(prevClanes.map(x => String(x).trim()).filter(Boolean));
-                        const prevF = Array.isArray(act.familias) ? act.familias : (act.familiaNombre ? [act.familiaNombre] : []);
-                        const setF = new Set(prevF.map(x => String(x).trim()).filter(Boolean));
-                        if (tipo === 'clan') setC.add(tagClean);
-                        if (tipo === 'familia') setF.add(tagClean);
-                        const nextAct = tipo === 'familia'
-                            ? { ...act, familiaNombre: tagClean, familias: Array.from(setF) }
-                            : { ...act, clan: tagClean, clanes: Array.from(setC) };
-                        localStorage.setItem('kixuz_personaje_activo', JSON.stringify(nextAct));
-                        window.KIXUZ_ACTIVE_CHAR = nextAct;
-                    }
-                } catch {}
-                window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
-            }
-
-            function actualizarParejaEnPerfil(handleDueno, handlePareja, relacion) {
-                if (!/casad|pareja|espos|marido|compromet/i.test(String(relacion || ''))) return;
-                const hD = normH(handleDueno);
-                const hP = normH(handlePareja);
-                if (!hD || !hP || hD === hP) return;
-
-                const label = /^casad/i.test(relacion.trim()) ? 'Casado con:' : (relacion.trim().endsWith(':') ? relacion.trim() : relacion.trim() + ':');
-
-                try {
-                    const subs = JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]');
-                    if (Array.isArray(subs)) {
-                        const nextSubs = subs.map(p => normH(p?.handle) === hD
-                            ? { ...p, estadoSentimentalTipo: label, estadoSentimentalHandle: hP }
-                            : p);
-                        localStorage.setItem('kixuz_subpersonajes', JSON.stringify(nextSubs));
-                    }
-                    const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
-                    if (act && normH(act.handle) === hD) {
-                        const nextAct = { ...act, estadoSentimentalTipo: label, estadoSentimentalHandle: hP };
-                        localStorage.setItem('kixuz_personaje_activo', JSON.stringify(nextAct));
-                        window.KIXUZ_ACTIVE_CHAR = nextAct;
-                    }
-                } catch {}
-                window.dispatchEvent(new Event('kixuz:personajes-actualizados'));
-            }
-
-            function actualizarSelectorCapitanesRama() {
-                const selCap = document.getElementById('clanCapitanRamaSelect');
-                const rangoSel = document.getElementById('clanRangoSelect');
-                const clanInput = document.getElementById('clanNombreClan');
-                if (!selCap || !rangoSel) return;
-
-                const peso = getPesoRango(rangoSel.value);
-                selCap.style.display = peso >= 5 ? 'block' : 'none';
-
-                const st = leerEstado();
-                const owner = getDuenoActual();
-                const clanNom = (clanInput?.value || '').trim().toLowerCase();
-                const capitanes = st.clan.filter(m =>
-                    normH(m.duenoHandle) === owner &&
-                    getPesoRango(m.rango) === 4 &&
-                    (!clanNom || String(m.clanNombre || '').trim().toLowerCase() === clanNom)
-                );
-
-                selCap.innerHTML = `<option value="">Unidad general (sin capitán asignado)</option>` +
-                    capitanes.map(c => `<option value="${esc(normH(c.handle))}">Unidad de ${esc(c.nombre)} (${esc(normH(c.handle))})</option>`).join('');
-            }
-
-            function renderEtiquetasYSelectores() {
-                const st = leerEstado();
-                const listEl = document.getElementById('createdTagsList');
-                const clanTagSel = document.getElementById('clanEtiquetaSelect');
-                const clanFiltroSel = document.getElementById('clanSelectorFiltro');
-                const famHeading = document.getElementById('familiaHeadingTitle');
-
-                const ownerAct = getDuenoActual();
-                const etqsOwner = Object.keys(st.miembrosFamiliaEtiquetas?.[ownerAct] || {}).filter(k => st.miembrosFamiliaEtiquetas[ownerAct][k]);
-                const tituloFamOwner = etqsOwner[0] || st.familiaEtiqueta || 'Mi Familia';
-                if (famHeading) famHeading.textContent = tituloFamOwner;
-
-                const cTags = st.clanesRegistrados || [];
-
-                if (listEl) {
-                    const famChip = `
-                        <span class="tag-badge-chip fam" data-jump-tab="familia">
-                            <span>Familia: ${esc(st.familiaEtiqueta || 'Mi Familia')}</span>
-                        </span>
-                    `;
-                    const clanChips = cTags.map((t, idx) => `
-                        <span class="tag-badge-chip" data-jump-clan="${esc(t)}">
-                            <span>Clan: ${esc(t)}</span>
-                            <button type="button" data-del-clan-tag="${idx}" title="Quitar">✕</button>
-                        </span>
-                    `).join('');
-
-                    listEl.innerHTML = famChip + clanChips;
-
-                    listEl.querySelector('[data-jump-tab="familia"]')?.addEventListener('click', () => {
-                        window.location.hash = '#familia';
-                        aplicarPestanaPorHash();
-                    });
-
-                    listEl.querySelectorAll('[data-jump-clan]').forEach(chip => {
-                        chip.addEventListener('click', ev => {
-                            if (ev.target.closest('button')) return;
-                            const nombreClan = chip.dataset.jumpClan;
-                            window.location.hash = `#clan:${encodeURIComponent(nombreClan)}`;
-                            aplicarPestanaPorHash();
-                        });
-                    });
-
-                    listEl.querySelectorAll('[data-del-clan-tag]').forEach(btn => {
-                        btn.addEventListener('click', ev => {
-                            ev.stopPropagation();
-                            const next = leerEstado();
-                            next.clanesRegistrados.splice(Number(btn.dataset.delClanTag), 1);
-                            guardarEstado(next);
-                            renderAll();
-                        });
-                    });
-                }
-
-                if (clanTagSel) {
-                    const actualVal = clanTagSel.value;
-                    clanTagSel.innerHTML = `<option value="">Elegir Clan creado...</option>` +
-                        cTags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
-                    if (actualVal && cTags.includes(actualVal)) clanTagSel.value = actualVal;
-                    else if (cTags.length && !document.getElementById('clanNombreClan')?.value) {
-                        clanTagSel.value = cTags[0];
-                        document.getElementById('clanNombreClan').value = cTags[0];
-                    }
-                    clanTagSel.onchange = () => {
-                        if (clanTagSel.value) {
-                            document.getElementById('clanNombreClan').value = clanTagSel.value;
-                            if (clanFiltroSel) clanFiltroSel.value = clanTagSel.value;
-                            actualizarSelectorCapitanesRama();
-                            renderClanes();
-                        }
-                    };
-                }
-
-                if (clanFiltroSel) {
-                    const prevFiltro = clanFiltroSel.value;
-                    clanFiltroSel.innerHTML = `<option value="__todos__">Todos mis clanes (${cTags.length})</option>` +
-                        cTags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
-                    if (prevFiltro && (prevFiltro === '__todos__' || cTags.includes(prevFiltro))) {
-                        clanFiltroSel.value = prevFiltro;
-                    }
-                    clanFiltroSel.onchange = () => {
-                        if (clanFiltroSel.value !== '__todos__' && clanTagSel) {
-                            clanTagSel.value = clanFiltroSel.value;
-                            document.getElementById('clanNombreClan').value = clanFiltroSel.value;
-                        }
-                        actualizarSelectorCapitanesRama();
-                        renderClanes();
-                    };
-                }
-            }
-
-            function agregarVinculo(st, { categoria, duenoHandle, destinoNombre, destinoHandle, relacion, clanNombre, capitanHandle, genId }) {
-                const owner = normH(duenoHandle);
-                const target = normH(destinoHandle);
-                if (!owner || !target) return;
-
-                if (categoria === 'familia') {
-                    const gId = genId || st.generaciones[1]?.id || st.generaciones[0]?.id || 'gen_2';
-                    const etqFamActiva = String(st.familiaEtiqueta || 'Mi Familia').trim();
-                    st.familia.push({
-                        id: 'fam_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                        duenoHandle: owner,
-                        nombre: destinoNombre || target.slice(1),
-                        handle: target,
-                        relacion: relacion || 'Familiar',
-                        etiquetaFamilia: etqFamActiva,
-                        genId: gId
-                    });
-
-                    if (etqFamActiva) {
-                        asignarEtiquetaAlPerfil(owner, 'familia', etqFamActiva);
-                        asignarEtiquetaAlPerfil(target, 'familia', etqFamActiva);
-                    }
-
-                    if (target !== owner) {
-                        actualizarParejaEnPerfil(owner, target, relacion);
-                        const genInversa = gId === 'gen_1' ? 'gen_3' : (gId === 'gen_3' ? 'gen_1' : gId);
-                        st.familia.push({
-                            id: 'fam_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                            duenoHandle: target,
-                            nombre: owner.slice(1),
-                            handle: owner,
-                            relacion: getRelacionReciproca(relacion),
-                            etiquetaFamilia: etqFamActiva,
-                            genId: genInversa
-                        });
-                    }
-                } else {
-                    const cNom = (clanNombre || 'Clan').trim();
-                    if (!st.clanesRegistrados.some(x => x.toLowerCase() === cNom.toLowerCase())) {
-                        st.clanesRegistrados.push(cNom);
-                    }
-                    const rangoLimpio = (relacion || 'Soldado / Miembro').trim();
-                    const capH = normH(capitanHandle || '');
-                    st.clan.push({
-                        id: 'clan_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                        duenoHandle: owner,
-                        clanNombre: cNom,
-                        nombre: destinoNombre || target.slice(1),
-                        handle: target,
-                        rango: rangoLimpio,
-                        capitanHandle: capH
-                    });
-                    asignarEtiquetaAlPerfil(target, 'clan', cNom);
-
-                    if (target !== owner) {
-                        st.clan.push({
-                            id: 'clan_rec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                            duenoHandle: target,
-                            clanNombre: cNom,
-                            nombre: owner.slice(1),
-                            handle: owner,
-                            rango: rangoLimpio,
-                            capitanHandle: capH
-                        });
-                    }
-                }
-            }
-
-            function tarjetaHtml({ id, nombre, handle, subEtiqueta, tipoLista }) {
-                const h = normH(handle);
-                const avatarUrl = obtenerAvatarPorHandle(h);
-                const inicial = (nombre || h.replace(/^@/, '') || 'K').charAt(0).toUpperCase();
-                const avatarStyle = avatarUrl ? `style="background-image:url('${esc(avatarUrl)}');"` : '';
-                return `
-                    <div class="member-card" data-card-id="${esc(id)}">
-                        <div class="member-avatar" ${avatarStyle}>${avatarUrl ? '' : esc(inicial)}</div>
-                        <a href="perfil.html?char=${encodeURIComponent(h)}" class="member-link">${esc(nombre || h)}</a>
-                        <a href="perfil.html?char=${encodeURIComponent(h)}" style="font-size:12px;opacity:0.85;text-decoration:none;color:inherit;">${esc(h)}</a>
-                        <span class="pill-rol">${esc(subEtiqueta)}</span>
-                        <div class="card-actions-row">
-                            <a href="perfil.html?char=${encodeURIComponent(h)}" class="btn-ghost" style="text-decoration:none;">Perfil</a>
-                            <button type="button" class="btn-ghost" data-edit-item="${esc(id)}" data-list="${esc(tipoLista)}">Editar</button>
-                            <button type="button" class="btn-danger" data-del-item="${esc(id)}" data-list="${esc(tipoLista)}">Eliminar</button>
-                        </div>
+            box.style.display = 'block';
+            list.innerHTML = '';
+            mias.forEach(s => {
+                const inversa = s.relacionInversa || calcularRelacionInversa(s.relacion);
+                const genInv = inferirGeneracion(inversa, s.generacion === 'anterior' ? 'siguiente' : (s.generacion === 'siguiente' ? 'anterior' : 'actual'));
+                const row = document.createElement('div');
+                row.className = 'req-row';
+                row.innerHTML = `
+                    <div>
+                        <strong>${esc(s.deNombre || s.deHandle)}</strong> (${esc(s.deHandle || '')}) te vinculó como <strong>${esc(s.relacion)}</strong> · Tu relación recíproca: <strong>${esc(inversa)}</strong>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button type="button" class="mini-btn btn-accept" style="background:var(--acento);color:#150A24;">Aceptar</button>
+                        <button type="button" class="mini-btn del btn-reject">Rechazar</button>
                     </div>
                 `;
-            }
 
-            function poblarSelectorGeneraciones() {
-                const sel = document.getElementById('famGenSelect');
-                if (!sel) return;
-                const st = leerEstado();
-                sel.innerHTML = st.generaciones.map((g, idx) =>
-                    `<option value="${esc(g.id)}" ${idx === 1 ? 'selected' : ''}>${esc(g.titulo)}</option>`
-                ).join('');
-            }
-
-            function renderSolicitudes() {
-                const panel = document.getElementById('inboxRequestsPanel');
-                const listEl = document.getElementById('inboxRequestsList');
-                if (!panel || !listEl) return;
-
-                const actual = getDuenoActual();
-                const mias = leerSolicitudes().filter(s => s.estado === 'pendiente' && normH(s.paraHandle) === actual);
-                if (!mias.length) { panel.style.display = 'none'; return; }
-
-                panel.style.display = 'block';
-                listEl.innerHTML = mias.map(s => `
-                    <div class="req-card">
-                        <div>
-                            <strong style="color:var(--acento);">${esc(s.deHandle)}</strong> te envió solicitud para <strong>${s.categoria === 'clan' ? 'Clan (' + esc(s.clanNombre || '') + ')' : 'Familia'}</strong> como <strong>${esc(s.relacion || 'Vínculo')}</strong>.
-                        </div>
-                        <div style="display:flex;gap:6px;">
-                            <button type="button" class="btn-accent" data-accept-req="${esc(s.id)}">Aceptar</button>
-                            <button type="button" class="btn-danger" data-reject-req="${esc(s.id)}">Rechazar</button>
-                        </div>
-                    </div>
-                `).join('');
-
-                listEl.querySelectorAll('[data-accept-req]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const reqId = btn.dataset.acceptReq;
-                        const all = leerSolicitudes();
-                        const req = all.find(x => String(x.id) === String(reqId));
-                        if (!req) return;
-                        req.estado = 'aceptada';
-                        guardarSolicitudes(all);
-
-                        const st = leerEstado();
-                        agregarVinculo(st, {
-                            categoria: req.categoria,
-                            duenoHandle: req.deHandle,
-                            destinoNombre: req.paraHandle.slice(1),
-                            destinoHandle: req.paraHandle,
-                            relacion: req.relacion,
-                            clanNombre: req.clanNombre,
-                            capitanHandle: req.capitanHandle,
-                            genId: req.genId
-                        });
-                        guardarEstado(st);
-                        renderAll();
-                    });
-                });
-
-                listEl.querySelectorAll('[data-reject-req]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const reqId = btn.dataset.rejectReq;
-                        const all = leerSolicitudes().map(x => String(x.id) === String(reqId) ? { ...x, estado: 'rechazada' } : x);
-                        guardarSolicitudes(all);
-                        renderSolicitudes();
-                    });
-                });
-            }
-
-            function bindCardActions(container) {
-                container.querySelectorAll('[data-del-item]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const id = btn.dataset.delItem;
-                        const listaKey = btn.dataset.list === 'clan' ? 'clan' : 'familia';
-                        const st = leerEstado();
-                        const eliminado = st[listaKey].find(x => String(x.id) === String(id));
-                        st[listaKey] = st[listaKey].filter(x => String(x.id) !== String(id));
-                        if (eliminado?.handle) {
-                            const hElim = normH(eliminado.handle);
-                            if (listaKey === 'familia') {
-                                const sigueEnFam = st.familia.some(m => normH(m.handle) === hElim || normH(m.duenoHandle) === hElim);
-                                if (!sigueEnFam && st.miembrosFamiliaEtiquetas?.[hElim]) {
-                                    delete st.miembrosFamiliaEtiquetas[hElim];
-                                }
-                            } else if (eliminado.clanNombre) {
-                                const cNom = String(eliminado.clanNombre).trim();
-                                const sigueEnClan = st.clan.some(m => normH(m.handle) === hElim && String(m.clanNombre || '').trim() === cNom);
-                                if (!sigueEnClan && st.miembrosClanEtiquetas?.[hElim]) {
-                                    delete st.miembrosClanEtiquetas[hElim][cNom];
-                                }
-                            }
-                        }
-                        guardarEstado(st);
-                        renderAll();
-                    });
-                });
-
-                container.querySelectorAll('[data-edit-item]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const id = btn.dataset.editItem;
-                        const listaKey = btn.dataset.list === 'clan' ? 'clan' : 'familia';
-                        const st = leerEstado();
-                        const item = st[listaKey].find(x => String(x.id) === String(id));
-                        if (!item) return;
-
-                        if (listaKey === 'familia') {
-                            const nuevaRel = prompt('Nueva relación familiar:', item.relacion || '');
-                            if (nuevaRel !== null && nuevaRel.trim()) item.relacion = nuevaRel.trim();
-                        } else {
-                            const nuevoRango = prompt('Nuevo rango militar (Líder, Sublíder / Segundo al Mando, Comandante, Capitán, Teniente, Sargento, Cabo, Soldado / Miembro, Recluta):', item.rango || '');
-                            if (nuevoRango !== null && nuevoRango.trim()) {
-                                item.rango = nuevoRango.trim();
-                                if (getPesoRango(item.rango) >= 5) {
-                                    const cap = prompt('Opcional: @usuario del Capitán de su unidad (dejar vacío para unidad general):', item.capitanHandle || '');
-                                    if (cap !== null) item.capitanHandle = normH(cap);
-                                } else {
-                                    item.capitanHandle = '';
-                                }
-                            }
-                        }
-                        guardarEstado(st);
-                        renderAll();
-                    });
-                });
-            }
-
-            function renderFamilia() {
-                const container = document.getElementById('familiaGenerationsContainer');
-                if (!container) return;
-                const st = leerEstado();
-                const owner = getDuenoActual();
-                const miembrosOwner = st.familia.filter(m => normH(m.duenoHandle) === owner);
-
-                container.innerHTML = st.generaciones.map(gen => {
-                    const enGen = miembrosOwner.filter(m => (m.genId || 'gen_2') === gen.id);
-                    return `
-                        <div class="panel gen-block">
-                            <div class="gen-head">
-                                <h3 style="font-size:15.5px;">${esc(gen.titulo)}</h3>
-                                <span style="font-size:12px;opacity:0.72;">${enGen.length} ${enGen.length === 1 ? 'miembro' : 'miembros'}</span>
-                            </div>
-                            <div class="cards-grid">
-                                ${enGen.length
-                                    ? enGen.map(m => tarjetaHtml({
-                                        id: m.id,
-                                        nombre: m.nombre,
-                                        handle: m.handle,
-                                        subEtiqueta: m.relacion,
-                                        tipoLista: 'familia'
-                                    })).join('')
-                                    : `<p style="font-size:13px;opacity:0.68;">Sin integrantes en esta generación todavía.</p>`}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                bindCardActions(container);
-            }
-
-            function renderClanes() {
-                const container = document.getElementById('clanesCardsContainer');
-                if (!container) return;
-                const st = leerEstado();
-                const owner = getDuenoActual();
-                const misClanes = st.clan.filter(m => normH(m.duenoHandle) === owner);
-                const filtroVal = document.getElementById('clanSelectorFiltro')?.value || '__todos__';
-
-                const agrupados = new Map();
-                (st.clanesRegistrados || []).forEach(nom => {
-                    if (!agrupados.has(nom)) agrupados.set(nom, []);
-                });
-                misClanes.forEach(m => {
-                    const nombreClan = m.clanNombre || 'Clan';
-                    if (!agrupados.has(nombreClan)) agrupados.set(nombreClan, []);
-                    agrupados.get(nombreClan).push(m);
-                });
-
-                const entradas = Array.from(agrupados.entries()).filter(([nom]) =>
-                    filtroVal === '__todos__' || nom.toLowerCase() === filtroVal.toLowerCase()
-                );
-
-                if (!entradas.length) {
-                    container.innerHTML = `<div class="panel" style="opacity:0.75;font-size:13.5px;text-align:center;">Creá un clan en el desplegable superior o agregá un integrante para ver su estructura jerárquica.</div>`;
-                    return;
-                }
-
-                container.innerHTML = entradas.map(([nombreClan, lista]) => {
-                    const bloquesCentrales = RANGOS_CENTRALES.map((tier, idx) => {
-                        const pesoObj = idx + 1;
-                        const enNivel = lista.filter(m => getPesoRango(m.rango) === pesoObj);
-                        if (!enNivel.length) return '';
-                        return `
-                            <div class="tier-block">
-                                <div class="tier-title">${esc(tier.label)}</div>
-                                <div class="cards-grid">
-                                    ${enNivel.map(m => tarjetaHtml({
-                                        id: m.id,
-                                        nombre: m.nombre,
-                                        handle: m.handle,
-                                        subEtiqueta: m.rango,
-                                        tipoLista: 'clan'
-                                    })).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    const capitanes = lista.filter(m => getPesoRango(m.rango) === 4);
-                    const tropas = lista.filter(m => getPesoRango(m.rango) >= 5);
-
-                    const renderSubrangosDeRama = miembrosRama => {
-                        if (!miembrosRama.length) {
-                            return `<p style="font-size:12px;opacity:0.68;text-align:center;">Sin integrantes asignados aún en esta unidad.</p>`;
-                        }
-                        return RANGOS_UNIDAD.map((sub, idx) => {
-                            const pesoSub = idx + 5;
-                            const enSub = miembrosRama.filter(x => getPesoRango(x.rango) === pesoSub);
-                            if (!enSub.length) return '';
-                            return `
-                                <div class="branch-subtier">
-                                    <div class="branch-subtier-label">${esc(sub.label)}</div>
-                                    <div class="cards-grid">
-                                        ${enSub.map(x => tarjetaHtml({
-                                            id: x.id,
-                                            nombre: x.nombre,
-                                            handle: x.handle,
-                                            subEtiqueta: x.rango,
-                                            tipoLista: 'clan'
-                                        })).join('')}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-                    };
-
-                    const capHandlesSet = new Set(capitanes.map(c => normH(c.handle)));
-                    const columnasRamas = capitanes.map((cap, idx) => {
-                        const capH = normH(cap.handle);
-                        const deEstaUnidad = tropas.filter(t => normH(t.capitanHandle) === capH);
-                        return `
-                            <div class="branch-column">
-                                <div class="tier-title" style="margin-bottom:4px;">4. Capitán ${idx + 1} · Unidad</div>
-                                <div class="cards-grid">
-                                    ${tarjetaHtml({
-                                        id: cap.id,
-                                        nombre: cap.nombre,
-                                        handle: cap.handle,
-                                        subEtiqueta: 'Capitán',
-                                        tipoLista: 'clan'
-                                    })}
-                                </div>
-                                ${renderSubrangosDeRama(deEstaUnidad)}
-                            </div>
-                        `;
-                    });
-
-                    const sinCapitan = tropas.filter(t => !t.capitanHandle || !capHandlesSet.has(normH(t.capitanHandle)));
-                    if (sinCapitan.length) {
-                        columnasRamas.push(`
-                            <div class="branch-column">
-                                <div class="tier-title" style="margin-bottom:4px;">Unidad General</div>
-                                ${renderSubrangosDeRama(sinCapitan)}
-                            </div>
-                        `);
+                row.querySelector('.btn-accept').addEventListener('click', async () => {
+                    if (window.KIXUZ_DB?.aceptarSolicitudVinculo) {
+                        try { await window.KIXUZ_DB.aceptarSolicitudVinculo(s); } catch {}
                     }
-
-                    const seccionRamasHtml = columnasRamas.length
-                        ? `<div class="branches-grid">${columnasRamas.join('')}</div>`
-                        : '';
-
-                    return `
-                        <div class="panel gen-block">
-                            <div class="gen-head">
-                                <h3 style="font-size:16.5px;">${esc(nombreClan)}</h3>
-                                <span style="font-size:12px;opacity:0.72;">${lista.length} ${lista.length === 1 ? 'miembro' : 'miembros'} · Cadena de mando</span>
-                            </div>
-                            ${bloquesCentrales}
-                            ${seccionRamasHtml}
-                        </div>
-                    `;
-                }).join('');
-
-                bindCardActions(container);
-            }
-
-            function renderAll() {
-                renderEtiquetasYSelectores();
-                poblarSelectorGeneraciones();
-                actualizarSelectorCapitanesRama();
-                renderSolicitudes();
-                renderFamilia();
-                renderClanes();
-            }
-
-            function aplicarPestanaPorHash() {
-                const h = decodeURIComponent(window.location.hash || '');
-                const clanFiltroSel = document.getElementById('clanSelectorFiltro');
-                if (h.startsWith('#clan')) {
-                    document.getElementById('tabClanes')?.classList.add('active');
-                    document.getElementById('tabFamilia')?.classList.remove('active');
-                    document.getElementById('viewClanes').style.display = 'block';
-                    document.getElementById('viewFamilia').style.display = 'none';
-                    if (clanFiltroSel) {
-                        clanFiltroSel.style.display = 'inline-block';
-                        const idxColon = h.indexOf(':');
-                        if (idxColon > -1) {
-                            const clanElegido = h.slice(idxColon + 1).trim();
-                            if (clanElegido) {
-                                clanFiltroSel.value = clanElegido;
-                                const clanTagSel = document.getElementById('clanEtiquetaSelect');
-                                if (clanTagSel) clanTagSel.value = clanElegido;
-                                const clanInp = document.getElementById('clanNombreClan');
-                                if (clanInp) clanInp.value = clanElegido;
-                            }
-                        }
-                    }
-                    renderClanes();
-                } else {
-                    document.getElementById('tabFamilia')?.classList.add('active');
-                    document.getElementById('tabClanes')?.classList.remove('active');
-                    document.getElementById('viewFamilia').style.display = 'block';
-                    document.getElementById('viewClanes').style.display = 'none';
-                    if (clanFiltroSel) clanFiltroSel.style.display = 'none';
-                }
-            }
-
-            document.getElementById('createTagForm')?.addEventListener('submit', e => {
-                e.preventDefault();
-                const kind = document.getElementById('newTagKindSelect')?.value || 'familia';
-                const inp = document.getElementById('newTagNameInput');
-                const tagVal = (inp?.value || '').trim();
-                if (!tagVal) return;
-
-                const st = leerEstado();
-                const yo = getPersonajeActivoObj();
-
-                if (kind === 'familia') {
-                    st.familiaEtiqueta = tagVal;
-                    guardarEstado(st);
-                    asignarEtiquetaAlPerfil(yo.handle, 'familia', tagVal);
-                    window.location.hash = '#familia';
-                } else {
-                    st.clanesRegistrados = Array.isArray(st.clanesRegistrados) ? st.clanesRegistrados : [];
-                    if (!st.clanesRegistrados.some(t => t.toLowerCase() === tagVal.toLowerCase())) {
-                        st.clanesRegistrados.push(tagVal);
-                    }
-                    guardarEstado(st);
-                    asignarEtiquetaAlPerfil(yo.handle, 'clan', tagVal);
-                    window.location.hash = `#clan:${encodeURIComponent(tagVal)}`;
-                }
-
-                inp.value = '';
-                document.getElementById('tagCreatorDropdown')?.removeAttribute('open');
-                renderAll();
-                aplicarPestanaPorHash();
-            });
-
-            document.getElementById('tabFamilia').addEventListener('click', () => {
-                window.location.hash = '#familia';
-                aplicarPestanaPorHash();
-            });
-
-            document.getElementById('tabClanes').addEventListener('click', () => {
-                window.location.hash = '#clan';
-                aplicarPestanaPorHash();
-            });
-
-            document.getElementById('clanRangoSelect')?.addEventListener('change', actualizarSelectorCapitanesRama);
-            document.getElementById('clanNombreClan')?.addEventListener('input', actualizarSelectorCapitanesRama);
-
-            document.getElementById('addGenBtn').addEventListener('click', () => {
-                const titulo = prompt('Nombre de la nueva generación (ej. 4.ª Generación):');
-                if (!titulo || !titulo.trim()) return;
-                const st = leerEstado();
-                st.generaciones.push({ id: 'gen_' + Date.now(), titulo: titulo.trim() });
-                guardarEstado(st);
-                renderAll();
-            });
-
-            document.getElementById('btnAddSelfFamily').addEventListener('click', () => {
-                const yo = getPersonajeActivoObj();
-                const owner = getDuenoActual();
-                const rel = prompt('Tu relación / rol en la familia:', 'Miembro');
-                if (!rel || !rel.trim()) return;
-                const genId = document.getElementById('famGenSelect')?.value || 'gen_2';
-                const st = leerEstado();
-                agregarVinculo(st, {
-                    categoria: 'familia',
-                    duenoHandle: owner,
-                    destinoNombre: yo.nombre,
-                    destinoHandle: yo.handle,
-                    relacion: rel.trim(),
-                    genId
+                    const destinoH = normHandle(s.paraHandle || activoH);
+                    const origenH = normHandle(s.deHandle);
+                    dataStore.familia.push({
+                        id: 'fam_' + Date.now() + '_inv',
+                        duenoHandle: destinoH,
+                        nombre: s.deNombre || origenH.replace(/^@/, ''),
+                        handle: origenH,
+                        relacion: inversa,
+                        generacion: genInv
+                    });
+                    guardarDatos();
+                    pendientes = pendientes.filter(x => x.id !== s.id);
+                    renderSolicitudes();
+                    renderArbol();
                 });
-                guardarEstado(st);
-                renderAll();
-            });
 
-            document.getElementById('btnAddSelfClan').addEventListener('click', () => {
-                const yo = getPersonajeActivoObj();
-                const owner = getDuenoActual();
-                const clanNom = document.getElementById('clanNombreClan')?.value.trim() || document.getElementById('clanEtiquetaSelect')?.value.trim() || prompt('Nombre del Clan:');
-                if (!clanNom || !clanNom.trim()) return;
-                const rango = document.getElementById('clanRangoSelect')?.value || 'Soldado / Miembro';
-                const capitanHandle = document.getElementById('clanCapitanRamaSelect')?.value || '';
-                const st = leerEstado();
-                agregarVinculo(st, {
-                    categoria: 'clan',
-                    duenoHandle: owner,
-                    destinoNombre: yo.nombre,
-                    destinoHandle: yo.handle,
-                    relacion: rango,
-                    clanNombre: clanNom.trim(),
-                    capitanHandle
+                row.querySelector('.btn-reject').addEventListener('click', async () => {
+                    if (window.KIXUZ_DB?.rechazarSolicitudVinculo && s.id) {
+                        try { await window.KIXUZ_DB.rechazarSolicitudVinculo(s.id); } catch {}
+                    }
+                    pendientes = pendientes.filter(x => x.id !== s.id);
+                    renderSolicitudes();
                 });
-                guardarEstado(st);
-                renderAll();
+
+                list.appendChild(row);
+            });
+        }
+
+        document.getElementById('famRelacion').addEventListener('input', e => {
+            const genSel = document.getElementById('famGeneracion');
+            genSel.value = inferirGeneracion(e.target.value, genSel.value || 'actual');
+        });
+
+        document.getElementById('editFamRelacion').addEventListener('input', e => {
+            const genSel = document.getElementById('editFamGeneracion');
+            genSel.value = inferirGeneracion(e.target.value, genSel.value || 'actual');
+        });
+
+        document.getElementById('btnCancelarEdit').addEventListener('click', cerrarEditorInline);
+
+        document.getElementById('btnGuardarEdit').addEventListener('click', () => {
+            if (indiceEditando === null || !dataStore.familia[indiceEditando]) return;
+            const item = dataStore.familia[indiceEditando];
+            const nuevoNombre = document.getElementById('editFamNombre').value.trim();
+            const nuevoHandle = normHandle(document.getElementById('editFamHandle').value.trim() || nuevoNombre);
+            const nuevaRel = document.getElementById('editFamRelacion').value.trim() || item.relacion;
+            const nuevaGen = inferirGeneracion(nuevaRel, document.getElementById('editFamGeneracion').value || 'actual');
+
+            if (nuevoNombre) item.nombre = nuevoNombre;
+            if (nuevoHandle) item.handle = nuevoHandle;
+            item.relacion = nuevaRel;
+            item.generacion = nuevaGen;
+
+            guardarDatos();
+            cerrarEditorInline();
+            renderArbol();
+        });
+
+        document.getElementById('btnAgregarFam').addEventListener('click', async () => {
+            const nombre = document.getElementById('famNombre').value.trim();
+            const handle = normHandle(document.getElementById('famHandle').value.trim() || nombre);
+            const relacion = document.getElementById('famRelacion').value.trim() || 'Vínculo familiar';
+            const generacion = inferirGeneracion(relacion, document.getElementById('famGeneracion').value || 'actual');
+            if (!nombre && !handle) return;
+
+            const duenoH = normHandle(focoChar.handle);
+            const nombreLimpio = nombre || handle.replace(/^@/, '');
+            if (handle && handle === duenoH) return;
+
+            dataStore.familia.push({
+                id: 'fam_' + Date.now(),
+                duenoNombre: focoChar.nombre,
+                duenoHandle: duenoH,
+                nombre: nombreLimpio,
+                handle,
+                relacion,
+                generacion
             });
 
-            document.getElementById('addFamilyForm').addEventListener('submit', e => {
-                e.preventDefault();
-                const nombre = document.getElementById('famNombre').value.trim();
-                const handle = normH(document.getElementById('famHandle').value);
-                const relacion = document.getElementById('famRelacion').value.trim();
-                const genId = document.getElementById('famGenSelect').value;
-                const modoEnvio = document.getElementById('famEnvioModo').value;
-                const owner = getDuenoActual();
-                if (!nombre || !handle || !relacion) return;
+            guardarDatos();
+            renderArbol();
 
-                if (modoEnvio === 'solicitud' && handle !== owner) {
-                    const reqs = leerSolicitudes();
-                    reqs.unshift({
-                        id: 'req_' + Date.now(),
-                        categoria: 'familia',
-                        deHandle: owner,
-                        paraHandle: handle,
+            document.getElementById('famNombre').value = '';
+            document.getElementById('famHandle').value = '';
+            document.getElementById('famRelacion').value = '';
+
+            if (window.KIXUZ_DB?.enviarSolicitudVinculo && handle && handle !== duenoH) {
+                try {
+                    await window.KIXUZ_DB.enviarSolicitudVinculo({
+                        tipo: 'familiar',
+                        destinoNombre: nombreLimpio,
+                        destinoHandle: handle,
+                        destinoUid: '',
                         relacion,
-                        genId,
-                        estado: 'pendiente'
+                        relacionInversa: calcularRelacionInversa(relacion),
+                        generacion
                     });
-                    guardarSolicitudes(reqs);
-                    window.KIXUZ_NOTIF?.registrar?.({
-                        destinoHandle: handle,
-                        actorNombre: owner.slice(1),
-                        actorHandle: owner,
-                        texto: `te envió una solicitud de Familia (${relacion}).`,
-                        enlace: `familia.html?char=${encodeURIComponent(handle)}#familia`,
-                        tipo: 'familia'
-                    });
-                    alert(`Solicitud enviada a ${handle}.`);
-                } else {
-                    const st = leerEstado();
-                    agregarVinculo(st, {
-                        categoria: 'familia',
-                        duenoHandle: owner,
-                        destinoNombre: nombre,
-                        destinoHandle: handle,
-                        relacion,
-                        genId
-                    });
-                    guardarEstado(st);
-                }
+                } catch {}
+            }
+        });
 
-                e.target.reset();
-                renderAll();
-            });
+        async function iniciar() {
+            cargarDatos();
+            const params = new URLSearchParams(window.location.search);
+            const charParam = params.get('char') || '';
 
-            document.getElementById('addClanForm').addEventListener('submit', e => {
-                e.preventDefault();
-                const clanNombre = document.getElementById('clanNombreClan').value.trim() || document.getElementById('clanEtiquetaSelect').value.trim();
-                const nombre = document.getElementById('clanMiembroNombre').value.trim();
-                const handle = normH(document.getElementById('clanMiembroHandle').value);
-                const rango = document.getElementById('clanRangoSelect').value || 'Soldado / Miembro';
-                const capitanHandle = document.getElementById('clanCapitanRamaSelect').value || '';
-                const modoEnvio = document.getElementById('clanEnvioModo').value;
-                const owner = getDuenoActual();
-                if (!clanNombre || !nombre || !handle) return;
-
-                if (modoEnvio === 'solicitud' && handle !== owner) {
-                    const reqs = leerSolicitudes();
-                    reqs.unshift({
-                        id: 'req_' + Date.now(),
-                        categoria: 'clan',
-                        deHandle: owner,
-                        paraHandle: handle,
-                        clanNombre,
-                        relacion: rango,
-                        capitanHandle,
-                        estado: 'pendiente'
-                    });
-                    guardarSolicitudes(reqs);
-                    window.KIXUZ_NOTIF?.registrar?.({
-                        destinoHandle: handle,
-                        actorNombre: owner.slice(1),
-                        actorHandle: owner,
-                        texto: `te envió una solicitud para el Clan ${clanNombre} (${rango}).`,
-                        enlace: `familia.html?char=${encodeURIComponent(handle)}#clan:${encodeURIComponent(clanNombre)}`,
-                        tipo: 'clan'
-                    });
-                    alert(`Solicitud para ${clanNombre} enviada a ${handle}.`);
-                } else {
-                    const st = leerEstado();
-                    agregarVinculo(st, {
-                        categoria: 'clan',
-                        duenoHandle: owner,
-                        destinoNombre: nombre,
-                        destinoHandle: handle,
-                        relacion: rango,
-                        clanNombre,
-                        capitanHandle
-                    });
-                    guardarEstado(st);
-                }
-
-                e.target.reset();
-                renderAll();
-            });
-
-            async function init() {
-                await cargarDirectorioPersonajes();
-                vincularBuscadorDesplegable('famSearchInput', 'famSearchDropdown', p => {
-                    document.getElementById('famNombre').value = p.nombre;
-                    document.getElementById('famHandle').value = p.handle;
-                });
-                vincularBuscadorDesplegable('clanSearchInput', 'clanSearchDropdown', p => {
-                    document.getElementById('clanMiembroNombre').value = p.nombre;
-                    document.getElementById('clanMiembroHandle').value = p.handle;
-                });
-                renderAll();
-                aplicarPestanaPorHash();
+            if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista && charParam) {
+                const res = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(charParam);
+                if (res && res.nombre) focoChar = res;
+            } else {
+                const act = obtenerPersonajeActivoExacto();
+                if (act && act.handle !== '@rol') focoChar = act;
             }
 
-            window.addEventListener('hashchange', aplicarPestanaPorHash);
-            window.addEventListener('DOMContentLoaded', init);
-            window.addEventListener('kixuz:personajes-actualizados', async () => {
-                await cargarDirectorioPersonajes();
-                renderAll();
-            });
-        })();
+            await cargarAvatares();
+            document.getElementById('focoSubtitle').textContent = `${focoChar.nombre} (${focoChar.handle})`;
+            renderSolicitudes();
+            renderArbol();
+        }
+
+        window.addEventListener('DOMContentLoaded', iniciar);
+        window.addEventListener('kixuz:personaje-cambiado', iniciar);
+        window.addEventListener('kixuz:personajes-actualizados', iniciar);
+        window.addEventListener('load', () => {
+            iniciar();
+            if (window.KIXUZ_DB?.activo && window.KIXUZ_DB?.escucharSolicitudesVinculo) {
+                window.KIXUZ_DB.escucharSolicitudesVinculo(sols => {
+                    pendientes = Array.isArray(sols) ? sols : [];
+                    renderSolicitudes();
+                });
+            }
+        });
     </script>
 
-    <script src="chat.js"></script>
-    <script src="theme.js"></script>
-    <script src="characters.js"></script>
-    <script src="buscador-global.js"></script>
-    <script src="navbar-ui.js"></script>
-    <script src="notificaciones.js"></script>
-    <script src="amigos.js"></script>
     <script type="module" src="firebase-config.js"></script>
+    <script src="characters.js"></script>
+    <script src="theme.js"></script>
+    <script src="chat.js"></script>
 </body>
 </html>
