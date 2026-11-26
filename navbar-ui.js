@@ -30,6 +30,11 @@
             flex-shrink: 0 !important;
             text-decoration: none !important;
         }
+        .brand img, .logo img {
+            height: 36px !important;
+            width: auto !important;
+            display: block !important;
+        }
         .nav-links {
             display: flex !important;
             align-items: center !important;
@@ -192,8 +197,8 @@
         if (!header) return;
 
         const brand = header.querySelector('.brand, .logo');
-        if (brand && !brand.querySelector('svg')) {
-            brand.innerHTML = `<svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="KIXUZ"><path d="M5 22c2-7 7-9 11-6-3 1-5 3-5 6-2 0-4 0-6 0z" fill="#6C3CE0"/><path d="M13 22c1-9 7-13 14-12 0 5-3 9-8 10 2-2 3-4 2-5-3 1-6 4-8 7z" fill="#2DD4C4"/></svg>`;
+        if (brand) {
+            brand.innerHTML = `<img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 36px; width: auto; display: block;">`;
         }
 
         const paginaActual = window.location.pathname.split('/').pop() || 'index.html';
