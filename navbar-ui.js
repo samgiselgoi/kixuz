@@ -11,8 +11,8 @@
             justify-content: space-between !important;
             flex-wrap: nowrap !important;
             gap: 10px !important;
-            padding: 10px 22px !important;
-            height: 60px !important;
+            padding: 10px 20px !important;
+            min-height: 60px !important;
             background: rgba(21, 10, 36, 0.92) !important;
             backdrop-filter: blur(12px) !important;
             border-bottom: 1px solid var(--borde, rgba(108, 60, 224, 0.45)) !important;
@@ -70,7 +70,7 @@
         }
         .user-menu select, .user-menu .dropdown, #activeCharSelect {
             height: 36px !important;
-            max-width: 210px !important;
+            max-width: 215px !important;
             padding: 0 10px !important;
             border-radius: 10px !important;
             border: 1px solid var(--borde, rgba(108, 60, 224, 0.45)) !important;
@@ -92,7 +92,7 @@
             align-items: center !important;
             justify-content: center !important;
             height: 36px !important;
-            padding: 0 12px !important;
+            padding: 0 13px !important;
             border-radius: 10px !important;
             background: var(--acento, #2DD4C4) !important;
             color: #150A24 !important;
@@ -115,10 +115,10 @@
     }
 
     const SVGS = {
-        inicio: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>`,
-        personaje: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>`,
-        universos: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-25 12 12)"/></svg>`,
-        familia: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 5-3.5 7.8-8 9-4.5-1.2-8-4-8-9V7l8-4z"/></svg>`
+        inicio: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>`,
+        personaje: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>`,
+        universos: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-25 12 12)"/></svg>`,
+        familia: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 5-3.5 7.8-8 9-4.5-1.2-8-4-8-9V7l8-4z"/></svg>`
     };
 
     function asegurarSelectorEnHeader(header) {
@@ -181,6 +181,10 @@
         }
         authLink.className = 'kixuz-auth-btn';
         authLink.textContent = 'Entrar';
+
+        if (window.KIXUZ_THEME?.mount) {
+            window.KIXUZ_THEME.mount();
+        }
     }
 
     function initNavbar() {
@@ -188,8 +192,8 @@
         if (!header) return;
 
         const brand = header.querySelector('.brand, .logo');
-        if (brand) {
-            brand.innerHTML = `<img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px; width: auto; display: block;">`;
+        if (brand && !brand.querySelector('svg')) {
+            brand.innerHTML = `<svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="KIXUZ"><path d="M5 22c2-7 7-9 11-6-3 1-5 3-5 6-2 0-4 0-6 0z" fill="#6C3CE0"/><path d="M13 22c1-9 7-13 14-12 0 5-3 9-8 10 2-2 3-4 2-5-3 1-6 4-8 7z" fill="#2DD4C4"/></svg>`;
         }
 
         const paginaActual = window.location.pathname.split('/').pop() || 'index.html';

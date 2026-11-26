@@ -2,12 +2,29 @@
     const STORAGE_KEY = 'kixuz_theme';
     const root = document.documentElement;
 
+    const SVG_SUN = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"/></svg>`;
+    const SVG_MOON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
     function getPreferredTheme() {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved === 'light' || saved === 'dark') return saved;
         } catch {}
         return 'dark';
+    }
+
+    function actualizarBotonesTema(t) {
+        document.querySelectorAll('.kixuz-theme-toggle-btn').forEach(btn => {
+            if (t === 'light') {
+                btn.innerHTML = `${SVG_MOON}<span>Oscuro</span>`;
+                btn.setAttribute('aria-label', 'Cambiar a modo oscuro');
+                btn.setAttribute('title', 'Cambiar a modo oscuro');
+            } else {
+                btn.innerHTML = `${SVG_SUN}<span>Claro</span>`;
+                btn.setAttribute('aria-label', 'Cambiar a modo claro');
+                btn.setAttribute('title', 'Cambiar a modo claro');
+            }
+        });
     }
 
     function applyTheme(theme) {
@@ -18,10 +35,8 @@
             root.removeAttribute('data-theme');
         }
         try { localStorage.setItem(STORAGE_KEY, t); } catch {}
-        document.querySelectorAll('.kixuz-theme-toggle-btn').forEach(btn => {
-            btn.textContent = t === 'light' ? '🌙 Oscuro' : '☀️ Claro';
-            btn.setAttribute('aria-label', t === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
-        });
+        actualizarBotonesTema(t);
+        window.dispatchEvent(new CustomEvent('kixuz:theme-changed', { detail: { theme: t } }));
     }
 
     const style = document.createElement('style');
@@ -35,7 +50,6 @@
             max-width: 100%;
         }
 
-        /* --- MODO CLARO --- */
         html[data-theme="light"] {
             --bg-principal: #F4F1FA;
             --bg-secundario: #6C3CE0;
@@ -54,80 +68,39 @@
             border-bottom-color: rgba(108, 60, 224, 0.25) !important;
         }
 
-        /* --- BOTÓN DE TEMA --- */
         .kixuz-theme-toggle-btn {
-            background: rgba(108, 60, 224, 0.22);
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            height: 36px !important;
+            padding: 0 11px !important;
+            border-radius: 10px !important;
+            background: rgba(108, 60, 224, 0.24);
             color: var(--texto, #EDE7E0);
             border: 1px solid rgba(108, 60, 224, 0.48);
-            border-radius: 9px;
-            padding: 6px 10px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
             flex-shrink: 0;
-            line-height: 1.2;
+            line-height: 1;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+        .kixuz-theme-toggle-btn:hover {
+            border-color: var(--acento, #2DD4C4);
+            color: var(--acento, #2DD4C4);
         }
         html[data-theme="light"] .kixuz-theme-toggle-btn {
             background: rgba(108, 60, 224, 0.12);
             color: #150A24;
         }
-
-        /* --- CABECERA FLUIDA SIN SUPERPOSICIÓN NI BLOQUEO AL SCROLLEAR --- */
-        header {
-            position: static !important;
-            top: auto !important;
-            width: 100%;
-            box-sizing: border-box;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            flex-wrap: wrap !important;
-            gap: 10px !important;
-            padding: 10px 16px !important;
-            overflow: visible !important;
-        }
-        header > * {
-            min-width: 0;
-            box-sizing: border-box;
-        }
-        header .logo,
-        header .logo-placeholder {
-            display: inline-flex !important;
-            align-items: center !important;
-            flex-shrink: 0 !important;
-        }
-        header .nav-links {
-            display: flex !important;
-            align-items: center !important;
-            flex-wrap: nowrap !important;
-            gap: 8px !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            max-width: 100% !important;
-        }
-        header .nav-links::-webkit-scrollbar {
-            display: none;
-        }
-        header .nav-links a {
-            flex-shrink: 0 !important;
-            white-space: nowrap !important;
-            margin-left: 0 !important;
-            padding: 5px 9px !important;
-            font-size: 13px !important;
-        }
-        header .user-menu {
-            display: flex !important;
-            align-items: center !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-            max-width: 100% !important;
+        @media (max-width: 860px) {
+            .kixuz-theme-toggle-btn span { display: none !important; }
+            .kixuz-theme-toggle-btn { width: 36px !important; padding: 0 !important; }
         }
 
-        /* --- ADAPTACIÓN TABLET Y CELULAR --- */
         @media (max-width: 900px) {
             .profile-layout,
             .detail-body {
@@ -140,16 +113,6 @@
         }
 
         @media (max-width: 640px) {
-            header {
-                padding: 9px 12px !important;
-                gap: 8px !important;
-            }
-            header .nav-links {
-                order: 3;
-                width: 100%;
-                border-top: 1px solid rgba(108, 60, 224, 0.22);
-                padding-top: 6px !important;
-            }
             .container,
             .page-wrapper,
             .profile-layout {
@@ -168,25 +131,41 @@
 
     function mountThemeButton() {
         const header = document.querySelector('header');
-        if (!header || header.querySelector('.kixuz-theme-toggle-btn')) return;
+        if (!header) return;
 
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'kixuz-theme-toggle-btn';
-        btn.addEventListener('click', () => {
-            const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-            applyTheme(current === 'light' ? 'dark' : 'light');
-        });
+        let userMenu = header.querySelector('.user-menu');
+        if (!userMenu) {
+            userMenu = document.createElement('div');
+            userMenu.className = 'user-menu';
+            header.appendChild(userMenu);
+        }
 
-        const userMenu = header.querySelector('.user-menu');
-        if (userMenu) {
+        // Evita duplicados si ya existe
+        const existentes = userMenu.querySelectorAll('.kixuz-theme-toggle-btn');
+        if (existentes.length > 1) {
+            for (let i = 1; i < existentes.length; i++) existentes[i].remove();
+        }
+
+        let btn = userMenu.querySelector('.kixuz-theme-toggle-btn');
+        if (!btn) {
+            btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'kixuz-theme-toggle-btn';
+            btn.addEventListener('click', () => {
+                const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                applyTheme(current === 'light' ? 'dark' : 'light');
+            });
             userMenu.appendChild(btn);
-        } else {
-            header.appendChild(btn);
         }
 
         applyTheme(getPreferredTheme());
     }
+
+    window.KIXUZ_THEME = {
+        getTheme: getPreferredTheme,
+        setTheme: applyTheme,
+        mount: mountThemeButton
+    };
 
     applyTheme(getPreferredTheme());
 
@@ -195,4 +174,5 @@
     } else {
         mountThemeButton();
     }
+    window.addEventListener('load', mountThemeButton);
 })();
