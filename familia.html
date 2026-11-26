@@ -165,9 +165,9 @@
             padding: 14px;
             border-radius: 12px;
             border: 1px solid var(--acento);
-            background: rgba(21, 10, 36, 0.65);
+            background: rgba(21, 10, 36, 0.72);
         }
-        html[data-theme="light"] .inline-editor { background: rgba(255, 255, 255, 0.95); }
+        html[data-theme="light"] .inline-editor { background: rgba(255, 255, 255, 0.96); }
         .inline-editor.open { display: block; }
 
         .tree-container {
@@ -326,8 +326,8 @@
         </section>
 
         <section class="panel-box">
-            <h2 style="font-size: 17px; color: var(--acento);">Agregar Familiar</h2>
-            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">La generación y la relación recíproca se calculan automáticamente según el lazo.</p>
+            <h2 style="font-size: 17px; color: var(--acento);">Agregar o Editar Familiar</h2>
+            <p style="font-size: 12.5px; opacity: 0.78; margin-top: 2px;">Puedes editar o quitar cualquier miembro del árbol (útil para limpiar duplicados o ajustar relaciones).</p>
 
             <div class="form-row">
                 <input type="text" id="famNombre" placeholder="Nombre del personaje">
@@ -342,7 +342,7 @@
             </div>
 
             <div class="inline-editor" id="inlineEditorBox">
-                <div style="font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--acento); margin-bottom:8px;" id="inlineEditorTitle">Editar vínculo</div>
+                <div style="font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; color:var(--acento); margin-bottom:8px;" id="inlineEditorTitle">Editar miembro de la familia</div>
                 <div class="form-row" style="margin-top:0;">
                     <input type="text" id="editFamNombre" placeholder="Nombre">
                     <input type="text" id="editFamHandle" placeholder="@Usuario">
@@ -445,13 +445,6 @@
             return { nombre: 'Personaje', handle: '@rol' };
         }
 
-        function esMiPropioPersonaje(personaje) {
-            const targetH = normHandle(personaje?.handle);
-            const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
-            if (!targetH || !activoH || activoH === '@rol') return false;
-            return targetH === activoH;
-        }
-
         function leerStorage(key) {
             try {
                 const raw = JSON.parse(localStorage.getItem(key) || 'null');
@@ -473,12 +466,12 @@
                 d.familia.forEach((item, i) => {
                     if (!item) return;
                     const id = String(item.id || `f_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.relacion)}_${i}`);
-                    famMap.set(id, { ...famMap.get(id), ...item });
+                    famMap.set(id, { ...famMap.get(id), ...item, id });
                 });
                 d.clan.forEach((item, i) => {
                     if (!item) return;
                     const id = String(item.id || `c_${normHandle(item.duenoHandle)}_${normHandle(item.handle)}_${norm(item.clanNombre)}_${i}`);
-                    clanMap.set(id, { ...clanMap.get(id), ...item });
+                    clanMap.set(id, { ...clanMap.get(id), ...item, id });
                 });
             });
             dataStore = { familia: Array.from(famMap.values()), clan: Array.from(clanMap.values()) };
@@ -568,12 +561,13 @@
             const item = dataStore.familia[index];
             if (!item) return;
             indiceEditando = index;
-            document.getElementById('inlineEditorTitle').textContent = `Editando vínculo: ${item.nombre || item.handle}`;
+            document.getElementById('inlineEditorTitle').textContent = `Editando miembro: ${item.nombre || item.handle}`;
             document.getElementById('editFamNombre').value = item.nombre || '';
             document.getElementById('editFamHandle').value = item.handle || '';
             document.getElementById('editFamRelacion').value = item.relacion || '';
             document.getElementById('editFamGeneracion').value = inferirGeneracion(item.relacion, item.generacion || 'actual');
             document.getElementById('inlineEditorBox').classList.add('open');
+            document.getElementById('editFamNombre').focus();
         }
 
         function cerrarEditorInline() {
@@ -583,7 +577,6 @@
 
         function renderArbol() {
             const focoH = normHandle(focoChar.handle);
-            const puedeEditar = esMiPropioPersonaje(focoChar);
 
             const famItems = dataStore.familia
                 .map((m, index) => ({ m, index, view: datosMostrarParaFoco(m, focoH) }))
@@ -591,33 +584,33 @@
 
             const antHtml = famItems
                 .filter(({ view }) => view.generacion === 'anterior')
-                .map(({ m, index, view }) => cardHtml({
+                .map(({ index, view }) => cardHtml({
                     nombre: view.nombre,
                     handle: view.handle,
                     etiqueta: view.etiqueta,
                     index,
-                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                    puedeEditar: true
                 })).join('');
 
             const yoCard = cardHtml({ nombre: focoChar.nombre, handle: focoChar.handle, etiqueta: 'Yo', esYo: true });
             const actItemsHtml = famItems
                 .filter(({ view }) => view.generacion === 'actual')
-                .map(({ m, index, view }) => cardHtml({
+                .map(({ index, view }) => cardHtml({
                     nombre: view.nombre,
                     handle: view.handle,
                     etiqueta: view.etiqueta,
                     index,
-                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                    puedeEditar: true
                 })).join('');
 
             const sigHtml = famItems
                 .filter(({ view }) => view.generacion === 'siguiente')
-                .map(({ m, index, view }) => cardHtml({
+                .map(({ index, view }) => cardHtml({
                     nombre: view.nombre,
                     handle: view.handle,
                     etiqueta: view.etiqueta,
                     index,
-                    puedeEditar: puedeEditar && normHandle(m.duenoHandle) === focoH
+                    puedeEditar: true
                 })).join('');
 
             const gAnt = document.getElementById('gridAnterior');
@@ -656,7 +649,7 @@
             const list = document.getElementById('solicitudesList');
             const activoH = normHandle(obtenerPersonajeActivoExacto().handle);
 
-            if (!activoH || activoH === '@rol' || !esMiPropioPersonaje(focoChar)) {
+            if (!activoH || activoH === '@rol') {
                 box.style.display = 'none';
                 return;
             }
@@ -731,15 +724,23 @@
         document.getElementById('btnGuardarEdit').addEventListener('click', () => {
             if (indiceEditando === null || !dataStore.familia[indiceEditando]) return;
             const item = dataStore.familia[indiceEditando];
+            const focoH = normHandle(focoChar.handle);
             const nuevoNombre = document.getElementById('editFamNombre').value.trim();
             const nuevoHandle = normHandle(document.getElementById('editFamHandle').value.trim() || nuevoNombre);
             const nuevaRel = document.getElementById('editFamRelacion').value.trim() || item.relacion;
             const nuevaGen = inferirGeneracion(nuevaRel, document.getElementById('editFamGeneracion').value || 'actual');
 
-            if (nuevoNombre) item.nombre = nuevoNombre;
-            if (nuevoHandle) item.handle = nuevoHandle;
-            item.relacion = nuevaRel;
-            item.generacion = nuevaGen;
+            if (normHandle(item.duenoHandle) !== focoH && normHandle(item.handle) === focoH) {
+                if (nuevoNombre) item.duenoNombre = nuevoNombre;
+                if (nuevoHandle) item.duenoHandle = nuevoHandle;
+                item.relacion = calcularRelacionInversa(nuevaRel);
+                item.generacion = nuevaGen === 'anterior' ? 'siguiente' : (nuevaGen === 'siguiente' ? 'anterior' : 'actual');
+            } else {
+                if (nuevoNombre) item.nombre = nuevoNombre;
+                if (nuevoHandle) item.handle = nuevoHandle;
+                item.relacion = nuevaRel;
+                item.generacion = nuevaGen;
+            }
 
             guardarDatos();
             cerrarEditorInline();
