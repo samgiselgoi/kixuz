@@ -174,6 +174,18 @@
                 uid: window.KIXUZ_DB?.usuarioActual?.uid || window.KIXUZ_DB?.perfilCuenta?.uid || ''
             };
         }
+        try {
+            const act = JSON.parse(localStorage.getItem('kixuz_personaje_activo') || 'null');
+            if (act && String(act.nombre || '').trim()) {
+                const nombre = String(act.nombre).trim();
+                const handle = normHandle(act.handle || nombre) || '@rol';
+                return {
+                    nombre,
+                    handle,
+                    uid: window.KIXUZ_DB?.usuarioActual?.uid || ''
+                };
+            }
+        } catch {}
         const maestro = String(
             window.KIXUZ_DB?.perfilCuenta?.nombreMaestro ||
             window.KIXUZ_DB?.usuarioActual?.displayName ||
@@ -487,8 +499,8 @@
                         </a>
                         ${canManage ? `
                             <div class="kixuz-comment-btns">
-                                <button type="button" class="kixuz-mini-action btn-edit-c">✏️ Editar</button>
-                                <button type="button" class="kixuz-mini-action danger btn-del-c">🗑️ Borrar</button>
+                                <button type="button" class="kixuz-mini-action btn-edit-c">Editar</button>
+                                <button type="button" class="kixuz-mini-action danger btn-del-c">Borrar</button>
                             </div>
                         ` : ''}
                     </div>

@@ -18,9 +18,7 @@
             display: none !important;
         }
 
-        /* =========================================
-           INTERRUPTOR DESLIZANTE CON SVG INTEGRADOS
-           ========================================= */
+        /* Interruptor deslizante con SVG integrados */
         .kixuz-svg-switch {
             position: relative;
             width: 56px;
@@ -53,21 +51,18 @@
             transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease;
         }
 
-        /* SVG Sol (izquierda) */
         .kixuz-svg-switch .svg-sun {
             color: #FBBF24;
             opacity: 0.45;
             transform: scale(0.9);
         }
 
-        /* SVG Luna (derecha) */
         .kixuz-svg-switch .svg-moon {
             color: #2DD4C4;
             opacity: 1;
             transform: scale(1);
         }
 
-        /* Bolita deslizante del interruptor */
         .kixuz-svg-thumb {
             position: absolute;
             top: 3px;
@@ -81,7 +76,6 @@
             transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.28s ease;
         }
 
-        /* Estado activo: Modo Claro */
         html[data-theme="light"] .kixuz-svg-switch {
             background: #E2D9F3;
             border-color: rgba(108, 60, 224, 0.55);
@@ -104,9 +98,6 @@
             background: #6C3CE0;
         }
 
-        /* =========================================
-           PALETA GLOBAL MODO CLARO (PERLADO / VIOLETA)
-           ========================================= */
         html[data-theme="light"] {
             --bg-principal: #EDE7E0;
             --bg: #EDE7E0;
@@ -114,8 +105,8 @@
             --bg-secundario: #6C3CE0;
             --acento: #0E8F82;
             --accent: #0E8F82;
-            --bg-tarjeta: rgba(255, 255, 255, 0.85);
-            --tarjeta: rgba(255, 255, 255, 0.85);
+            --bg-tarjeta: rgba(255, 255, 255, 0.88);
+            --tarjeta: rgba(255, 255, 255, 0.88);
             --card: #FFFFFF;
             --card-2: #F4EFEA;
             --borde: rgba(108, 60, 224, 0.28);
@@ -129,7 +120,7 @@
         }
 
         html[data-theme="light"] header {
-            background-color: rgba(237, 231, 224, 0.94) !important;
+            background-color: rgba(237, 231, 224, 0.95) !important;
             border-bottom-color: rgba(108, 60, 224, 0.25) !important;
         }
 

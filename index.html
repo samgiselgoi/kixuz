@@ -24,48 +24,28 @@
             color: var(--texto);
         }
         header {
-            position: relative;
-            z-index: 900;
-            background: rgba(21, 10, 36, 0.94);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--borde);
-            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.68);
+            padding: 10px 22px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--acento);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 900;
             gap: 10px;
-            flex-wrap: nowrap;
-            overflow: visible;
         }
         .logo {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: var(--acento);
             text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 800;
             flex-shrink: 0;
         }
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
-        .nav-links a {
-            color: var(--texto);
-            text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 13.5px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(108, 60, 224, 0.25);
-            color: var(--acento);
+            gap: 6px;
         }
         .user-menu {
             display: flex;
@@ -73,13 +53,15 @@
             gap: 8px;
             flex-shrink: 0;
         }
-        .user-menu select {
-            background: rgba(0, 0, 0, 0.35);
+        .dropdown {
+            background-color: var(--bg-secundario);
             color: var(--texto);
-            border: 1px solid var(--borde);
+            padding: 7px 12px;
             border-radius: 8px;
-            padding: 6px 10px;
-            font-family: 'Inter', sans-serif;
+            border: 1px solid var(--acento);
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 12.5px;
         }
         main {
@@ -110,10 +92,6 @@
             padding: 10px 12px;
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-        }
-        html[data-theme="light"] .composer-textarea {
-            background: #ffffff;
-            color: #150A24;
         }
         .composer-bar {
             display: flex;
@@ -156,8 +134,7 @@
 <body>
     <header>
         <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:32px;">
-            <span>KIXUZ</span>
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;">
         </a>
         <nav class="nav-links">
             <a href="index.html" class="active">Inicio</a>
@@ -166,7 +143,8 @@
             <a href="familia.html">Familia / Clan</a>
         </nav>
         <div class="user-menu">
-            <select id="activeCharSelect" aria-label="Personaje activo"></select>
+            <select id="activeCharSelect" class="dropdown" aria-label="Personaje activo"></select>
+            <a href="registro.html" title="Entrar / Registro">Entrar</a>
         </div>
     </header>
 
@@ -177,7 +155,7 @@
                     <strong id="postingAsBadge">Publicando como @rol</strong>
                     <input type="text" id="targetWallInput" placeholder="Muro destino opcional (ej. @otro_pj)" style="padding:5px 9px; border-radius:8px; border:1px solid var(--borde); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
                 </div>
-                <textarea id="feedPostTextarea" class="composer-textarea" placeholder="Escribe algo o etiqueta @usuario... (Shift + Enter: salto de línea)"></textarea>
+                <textarea id="feedPostTextarea" class="composer-textarea" placeholder="Escribí algo o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
                 <div class="composer-bar">
                     <span style="font-size:12px; opacity:0.75;">Enter envía · Shift + Enter baja de línea</span>
                     <button type="submit" class="btn-primary">Publicar</button>
@@ -188,12 +166,13 @@
         <section id="feedPosts"></section>
     </main>
 
-    <script src="chat.js"></script>
+    <script src="navbar-ui.js"></script>
     <script src="theme.js"></script>
     <script src="characters.js"></script>
     <script src="buscador-global.js"></script>
     <script src="interacciones-muro.js"></script>
     <script src="notificaciones.js"></script>
+    <script src="chat.js"></script>
     <script type="module" src="firebase-config.js"></script>
 
     <script>
@@ -242,7 +221,7 @@
                     card.className = 'post-card';
                     const autorHref = `perfil.html?char=${encodeURIComponent(post.autorHandle || '')}`;
                     const muroLabel = post.muroHandle && normH(post.muroHandle) !== normH(post.autorHandle)
-                        ? ` → muro de <a href="perfil.html?char=${encodeURIComponent(normH(post.muroHandle))}" class="post-author">${esc(normH(post.muroHandle))}</a>`
+                        ? ` &gt; <a href="perfil.html?char=${encodeURIComponent(normH(post.muroHandle))}" class="post-author">${esc(normH(post.muroHandle))}</a>`
                         : '';
 
                     const cuerpoHtml = window.KIXUZ_INTERACCIONES?.formatearTextoConMenciones
@@ -329,353 +308,3 @@
     </script>
 </body>
 </html>
-```[cite: 1, 2, 3]
-
----
-
-### 2. Código completo de `perfil.html`
-
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIXUZ — Muro y Ficha de Personaje</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-principal: #150A24;
-            --bg-secundario: #6C3CE0;
-            --acento: #2DD4C4;
-            --texto: #EDE7E0;
-            --tarjeta: rgba(34, 18, 58, 0.88);
-            --borde: rgba(108, 60, 224, 0.35);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-principal);
-            color: var(--texto);
-        }
-        header {
-            position: relative;
-            z-index: 900;
-            background: rgba(21, 10, 36, 0.94);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--borde);
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            flex-wrap: nowrap;
-            overflow: visible;
-        }
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--acento);
-            text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
-        .nav-links a {
-            color: var(--texto);
-            text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 13.5px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(108, 60, 224, 0.25);
-            color: var(--acento);
-        }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .user-menu select {
-            background: rgba(0, 0, 0, 0.35);
-            color: var(--texto);
-            border: 1px solid var(--borde);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 12.5px;
-        }
-        main {
-            max-width: 860px;
-            margin: 24px auto;
-            padding: 0 16px 60px;
-        }
-        .card {
-            background: var(--tarjeta);
-            border: 1px solid var(--borde);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        html[data-theme="light"] .card {
-            background: rgba(255, 255, 255, 0.92);
-            color: #150A24;
-        }
-        .wall-textarea {
-            width: 100%;
-            min-height: 70px;
-            resize: vertical;
-            border-radius: 10px;
-            border: 1px solid var(--borde);
-            background: rgba(0, 0, 0, 0.25);
-            color: var(--texto);
-            padding: 10px 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-        }
-        html[data-theme="light"] .wall-textarea {
-            background: #ffffff;
-            color: #150A24;
-        }
-        .btn-primary {
-            background: var(--acento);
-            color: #150A24;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 15px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .post-author {
-            color: var(--acento);
-            font-weight: 700;
-            text-decoration: none;
-        }
-        .post-body {
-            white-space: pre-wrap;
-            line-height: 1.5;
-            margin: 6px 0 10px;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height:32px;">
-            <span>KIXUZ</span>
-        </a>
-        <nav class="nav-links">
-            <a href="index.html">Inicio</a>
-            <a href="perfil.html" class="active">Mi Perfil</a>
-            <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
-        </nav>
-        <div class="user-menu">
-            <select id="activeCharSelect" aria-label="Personaje activo"></select>
-        </div>
-    </header>
-
-    <main id="profileMain">
-        <section id="profileHeader" class="card">
-            <h1 id="profileTitle" style="margin:0 0 6px; font-family:'Space Grotesk',sans-serif;">Muro de Personaje</h1>
-            <div id="profileHandle" style="color:var(--acento); font-weight:700; margin-bottom:8px;">@rol</div>
-            <p id="profileBio" style="margin:0; opacity:0.85;"></p>
-        </section>
-
-        <section class="card">
-            <form id="wallComposerForm">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                    <strong id="wallComposerLabel">Escribir en este muro</strong>
-                    <span id="wallActorLabel" style="font-size:12.5px; opacity:0.8;"></span>
-                </div>
-                <textarea id="wallPostTextarea" class="wall-textarea" placeholder="Dejá un mensaje en este muro o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
-                <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-                    <button type="submit" class="btn-primary">Publicar en muro</button>
-                </div>
-            </form>
-        </section>
-
-        <section id="profileFeed"></section>
-    </main>
-
-    <script src="chat.js"></script>
-    <script src="theme.js"></script>
-    <script src="characters.js"></script>
-    <script src="buscador-global.js"></script>
-    <script src="interacciones-muro.js"></script>
-    <script src="notificaciones.js"></script>
-    <script type="module" src="firebase-config.js"></script>
-
-    <script>
-        (() => {
-            const POSTS_KEY = 'kixuz_posts_v1';
-            const normH = v => {
-                const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
-                return s ? '@' + s : '';
-            };
-            const esc = s => String(s || '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-            function obtenerMuroHandleActual() {
-                const params = new URLSearchParams(window.location.search);
-                const charParam = params.get('char') || params.get('handle') || '';
-                if (normH(charParam)) return normH(charParam);
-
-                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
-                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
-                    : { handle: '@invitado' };
-                return normH(actor.handle) || '@invitado';
-            }
-
-            function leerPosts() {
-                try {
-                    const arr = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
-                    return Array.isArray(arr) ? arr : [];
-                } catch { return []; }
-            }
-
-            function guardarPosts(arr) {
-                try { localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 200))); } catch {}
-            }
-
-            async function renderPerfilYMuro() {
-                const muroHandle = obtenerMuroHandleActual();
-                let vista = { personaje: { nombre: muroHandle.replace(/^@/, ''), handle: muroHandle, bio: '' } };
-                if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista) {
-                    try { vista = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(muroHandle); } catch {}
-                }
-
-                const pj = vista.personaje || {};
-                const nombreMuro = pj.nombre || muroHandle.replace(/^@/, '') || 'Personaje';
-                document.getElementById('profileTitle').textContent = `Muro de ${nombreMuro}`;
-                document.getElementById('profileHandle').textContent = normH(pj.handle) || muroHandle;
-                document.getElementById('profileBio').textContent = pj.bio || `Muro público de ${nombreMuro}. Cualquiera puede dejar Kixiz o comentar.`;
-
-                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
-                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
-                    : { nombre: 'Invitado', handle: '@invitado' };
-
-                document.getElementById('wallComposerLabel').textContent = `Publicar en el muro de ${nombreMuro}`;
-                document.getElementById('wallActorLabel').textContent = `Como ${actor.nombre} (${actor.handle})`;
-
-                const feed = document.getElementById('profileFeed');
-                if (!feed) return;
-                feed.innerHTML = '';
-
-                const target = normH(pj.handle) || muroHandle;
-                const postsMuro = leerPosts().filter(p =>
-                    normH(p.muroHandle) === target || normH(p.autorHandle) === target
-                );
-
-                if (!postsMuro.length) {
-                    feed.innerHTML = `<div class="card" style="opacity:0.78;">Este muro aún no tiene publicaciones. ¡Dejá la primera!</div>`;
-                    return;
-                }
-
-                postsMuro.forEach(post => {
-                    const card = document.createElement('article');
-                    card.className = 'card';
-                    const autorHref = `perfil.html?char=${encodeURIComponent(post.autorHandle || '')}`;
-                    const cuerpoHtml = window.KIXUZ_INTERACCIONES?.formatearTextoConMenciones
-                        ? window.KIXUZ_INTERACCIONES.formatearTextoConMenciones(post.contenido || '')
-                        : esc(post.contenido || '');
-
-                    card.innerHTML = `
-                        <div class="post-header">
-                            <div>
-                                <a href="${autorHref}" class="post-author">${esc(post.autorNombre || 'Personaje')}</a>
-                                <span style="opacity:0.7; font-size:12.5px;">${esc(post.autorHandle || '')}</span>
-                            </div>
-                        </div>
-                        <div class="post-body">${cuerpoHtml}</div>
-                        <div class="post-interacciones"></div>
-                    `;
-
-                    const interSlot = card.querySelector('.post-interacciones');
-                    if (window.KIXUZ_INTERACCIONES?.montarBloqueInteracciones) {
-                        window.KIXUZ_INTERACCIONES.montarBloqueInteracciones(interSlot, post, () => renderPerfilYMuro());
-                    }
-                    feed.appendChild(card);
-                });
-            }
-
-            const form = document.getElementById('wallComposerForm');
-            const ta = document.getElementById('wallPostTextarea');
-            ta.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    form.requestSubmit();
-                }
-            });
-
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                const contenido = String(ta.value || '').replace(/^\n+|\n+$/g, '');
-                if (!contenido.trim()) return;
-
-                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
-                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
-                    : { nombre: 'Invitado', handle: '@invitado', uid: '' };
-
-                const muroHandle = obtenerMuroHandleActual();
-                const nuevoPost = {
-                    id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                    autorNombre: actor.nombre,
-                    autorHandle: actor.handle,
-                    autorUid: actor.uid,
-                    muroHandle,
-                    contenido,
-                    kixiz: 0,
-                    kixPorUsuario: [],
-                    respuestas: [],
-                    creadoEn: Date.now()
-                };
-
-                const posts = leerPosts();
-                posts.unshift(nuevoPost);
-                guardarPosts(posts);
-                ta.value = '';
-                renderPerfilYMuro();
-            });
-
-            window.addEventListener('kixuz:personajes-actualizados', renderPerfilYMuro);
-            window.addEventListener('kixuz:sesion-actualizada', renderPerfilYMuro);
-            document.addEventListener('DOMContentLoaded', renderPerfilYMuro);
-            renderPerfilYMuro();
-        })();
-    </script>
-</body>
-</html>
-```[cite: 1, 2, 3]
-
-### Cómo aplicarlo
-1. Copiá el bloque de **`index.html`**, pegalo en tu archivo `index.html` y guardá con **`Ctrl + S`**.
-2. Copiá el bloque de **`perfil.html`**, pegalo en tu archivo `perfil.html` y guardá con **`Ctrl + S`**.
-3. Subí ambos archivos a **GitHub** (en la rama `main`) y recargá la página con **`Ctrl + Shift + R`**.
-
-¿Probaste comentar tanto en tu muro como en el de otro personaje (`perfil.html?char=@usuario`) y al cambiar de personaje activo?

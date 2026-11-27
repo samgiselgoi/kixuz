@@ -20,7 +20,7 @@
         * { box-sizing: border-box; }
 
         body {
-            background: linear-gradient(rgba(21, 10, 36, 0.72), rgba(21, 10, 36, 0.92)), url('https://via.placeholder.com/1920x1080/2a164d/150A24') no-repeat center center fixed;
+            background: linear-gradient(rgba(21, 10, 36, 0.75), rgba(21, 10, 36, 0.93)), url('img/banner-kixuz.webp') no-repeat center center fixed;
             background-size: cover;
             color: var(--texto);
             font-family: 'Inter', sans-serif;
@@ -31,11 +31,14 @@
             overflow-x: hidden;
         }
 
-        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
+        h1, h2, h3, h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+        }
 
         header {
-            background-color: rgba(0, 0, 0, 0.65);
-            padding: 14px 32px;
+            background-color: rgba(0, 0, 0, 0.68);
+            padding: 10px 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -44,50 +47,26 @@
             position: sticky;
             top: 0;
             z-index: 900;
-            gap: 12px;
-            flex-wrap: nowrap;
-            overflow: visible;
+            gap: 10px;
         }
 
         .logo {
-            font-family: 'Unbounded', cursive;
-            font-size: 22px;
-            color: var(--bg-secundario);
-            text-decoration: none;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
+            text-decoration: none;
             flex-shrink: 0;
         }
-        .logo span { color: var(--acento); }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
-
-        .nav-links a {
-            color: var(--texto);
-            text-decoration: none;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 13.5px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background: rgba(108, 60, 224, 0.28);
-            color: var(--acento);
+            gap: 6px;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-family: 'Space Grotesk', sans-serif;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -95,7 +74,7 @@
             background-color: var(--bg-secundario);
             color: var(--texto);
             padding: 7px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid var(--acento);
             cursor: pointer;
             font-weight: 700;
@@ -103,88 +82,171 @@
             font-size: 12.5px;
         }
 
-        .profile-container {
-            max-width: 920px;
-            margin: 32px auto 60px;
+        .profile-layout {
+            max-width: 1180px;
+            margin: 28px auto 70px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 360px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .profile-sidebar {
+            position: sticky;
+            top: 78px;
             background-color: var(--bg-tarjeta);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
             border: 1px solid var(--borde);
         }
 
-        html[data-theme="light"] .profile-container {
-            background-color: rgba(255, 255, 255, 0.92);
-            color: #150A24;
-        }
-
-        .banner {
+        .mini-banner {
             width: 100%;
-            height: 240px;
+            height: 150px;
             background-color: var(--bg-secundario);
             background-image: url('img/banner-kixuz.webp');
             background-size: cover;
             background-position: center;
         }
 
-        .profile-header-info {
-            padding: 0 36px 24px;
-            display: flex;
-            align-items: flex-end;
-            margin-top: -70px;
-            gap: 20px;
-            flex-wrap: wrap;
+        .sidebar-head {
+            padding: 0 22px 20px;
+            margin-top: -54px;
         }
 
         .avatar-circle {
-            width: 136px;
-            height: 136px;
-            background-color: #333;
+            width: 104px;
+            height: 104px;
+            background-color: #261442;
             border-radius: 50%;
-            border: 6px solid var(--bg-principal);
+            border: 5px solid var(--bg-principal);
             background-image: url('img/avatar-kixuz.webp');
             background-size: cover;
             background-position: center;
-            flex-shrink: 0;
+            margin-bottom: 10px;
         }
 
-        .title-area { padding-bottom: 8px; flex: 1; min-width: 220px; }
-        .title-area h1 { font-size: 34px; color: var(--acento); text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
-        .profile-username { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: var(--bg-secundario); font-weight: 700; margin-bottom: 6px; }
+        .sidebar-head h1 {
+            font-size: 25px;
+            color: var(--acento);
+        }
 
-        .tags-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .profile-username {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            color: #b794ff;
+            font-weight: 700;
+            margin: 2px 0 8px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(45, 212, 196, 0.14);
+            border: 1px solid rgba(45, 212, 196, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
         .info-tag {
             display: inline-flex;
             align-items: center;
             background-color: var(--bg-secundario);
-            padding: 5px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--texto);
             text-decoration: none;
         }
-        .tag-universo { background-color: rgba(108, 60, 224, 0.85); border: 1px solid var(--bg-secundario); }
-        .tag-clan { background-color: rgba(45, 212, 196, 0.2); border: 1px solid var(--acento); color: var(--acento); }
-        .tag-relacion { background-color: rgba(224, 60, 108, 0.2); border: 1px solid #e03c6c; color: #ff8aa8; }
-        .info-tag a { color: inherit; text-decoration: none; font-weight: 700; }
-        .info-tag a:hover { text-decoration: underline; }
-        .info-tag .icon { margin-right: 6px; }
 
-        .profile-body { padding: 0 36px 36px; }
+        .tag-universo {
+            background-color: rgba(108, 60, 224, 0.85);
+            border: 1px solid var(--bg-secundario);
+        }
+
+        .tag-clan {
+            background-color: rgba(45, 212, 196, 0.18);
+            border: 1px solid var(--acento);
+            color: var(--acento);
+        }
+
+        .tag-relacion {
+            background-color: rgba(224, 60, 108, 0.18);
+            border: 1px solid #e03c6c;
+            color: #ff9bb4;
+        }
+
+        .info-tag a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .info-tag a:hover {
+            text-decoration: underline;
+        }
+
+        .owner-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .btn-sec {
+            background: rgba(108, 60, 224, 0.25);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-sec:hover {
+            border-color: var(--acento);
+            color: var(--acento);
+        }
+
+        .sidebar-body {
+            padding: 0 18px 22px;
+        }
 
         details {
             background-color: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            margin-bottom: 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
             border-left: 3px solid var(--bg-secundario);
-            transition: all 0.25s ease;
         }
-        details[open] { border-left-color: var(--acento); background-color: rgba(255, 255, 255, 0.05); }
+
+        details[open] {
+            border-left-color: var(--acento);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
         summary {
-            padding: 16px 20px;
+            padding: 12px 14px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 18px;
+            font-size: 14.5px;
             font-weight: 700;
             cursor: pointer;
             list-style: none;
@@ -192,64 +254,84 @@
             justify-content: space-between;
             align-items: center;
         }
+
         summary::-webkit-details-marker { display: none; }
-        summary::after { content: '+'; font-size: 22px; color: var(--acento); }
-        details[open] summary::after { content: '−'; }
-        .details-content { padding: 18px 22px 22px; line-height: 1.75; }
+        summary::after { content: '▾'; font-size: 15px; color: var(--acento); }
+
+        .details-content {
+            padding: 10px 14px 14px;
+            font-size: 13.5px;
+            line-height: 1.65;
+        }
+
+        .details-content p { margin: 0 0 8px; }
         .details-content strong { color: var(--acento); }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12.5px;
+        }
+
+        .stat-name {
+            width: 95px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .stat-bar-container {
+            flex-grow: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+            height: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background-color: var(--acento);
+            border-radius: 6px;
+        }
+
+        .stat-bar-fill.weak {
+            background-color: #e03c6c;
+        }
 
         .btn-familia {
             display: inline-block;
             background-color: var(--bg-secundario);
             color: var(--texto);
             text-decoration: none;
-            padding: 10px 18px;
+            padding: 6px 11px;
             border-radius: 8px;
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 700;
+            font-size: 12px;
             border: 1px solid var(--acento);
-            margin-top: 8px;
-            margin-right: 8px;
-        }
-        .btn-familia:hover { background-color: var(--acento); color: var(--bg-principal); }
-
-        .wall-section-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 22px;
-            color: var(--acento);
-            margin: 24px 0 14px;
+            margin-top: 6px;
+            margin-right: 6px;
         }
 
-        .create-post {
-            background-color: rgba(108, 60, 224, 0.14);
+        .btn-familia:hover {
+            background-color: var(--acento);
+            color: #150A24;
+        }
+
+        .profile-wall-col { min-width: 0; }
+
+        .card {
+            background-color: var(--bg-tarjeta);
+            border-radius: 14px;
             padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
             border: 1px solid var(--borde);
-        }
-
-        .create-post-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            font-size: 13px;
-        }
-
-        .create-post-header { display: flex; gap: 14px; align-items: flex-start; }
-        .create-post-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--acento);
-            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
         }
 
         .create-post textarea {
-            flex-grow: 1;
+            width: 100%;
             background: rgba(0, 0, 0, 0.32);
             border: 1px solid var(--bg-secundario);
             border-radius: 8px;
@@ -257,14 +339,11 @@
             color: var(--texto);
             font-family: 'Inter', sans-serif;
             resize: vertical;
-            min-height: 72px;
+            min-height: 76px;
             outline: none;
             font-size: 14px;
         }
-        html[data-theme="light"] .create-post textarea {
-            background: #ffffff;
-            color: #150A24;
-        }
+
         .create-post textarea:focus { border-color: var(--acento); }
 
         .create-post-actions {
@@ -279,7 +358,7 @@
         }
 
         .universe-select {
-            background: rgba(21, 10, 36, 0.9);
+            background: rgba(21, 10, 36, 0.92);
             border: 1px solid var(--acento);
             color: var(--acento);
             padding: 7px 11px;
@@ -293,26 +372,13 @@
 
         .submit-btn {
             background: var(--acento);
-            color: var(--bg-principal);
+            color: #150A24;
             border: none;
             font-weight: 700;
             padding: 9px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .post-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--borde);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        html[data-theme="light"] .post-card {
-            background: rgba(244, 239, 234, 0.85);
-            color: #150A24;
         }
 
         .post-header {
@@ -335,13 +401,62 @@
             line-height: 1.5;
             margin: 6px 0 10px;
         }
+
+        .kixuz-modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .kixuz-modal-backdrop.open { display: flex; }
+
+        .kixuz-modal-box {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #1b0d30;
+            color: #EDE7E0;
+            border: 1px solid var(--acento);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+        }
+
+        .kixuz-modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .kixuz-modal-field input,
+        .kixuz-modal-field textarea,
+        .kixuz-modal-field select {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--borde);
+            background: rgba(0, 0, 0, 0.3);
+            color: inherit;
+            font-family: inherit;
+        }
+
+        @media (max-width: 900px) {
+            .profile-layout { grid-template-columns: 1fr; }
+            .profile-sidebar { position: static; }
+        }
     </style>
 </head>
 <body>
     <header>
         <a href="index.html" class="logo">
-            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 30px;">
-            KI<span>X</span>UZ
+            <img src="img/logo-kixuz.png" alt="Logo KIXUZ" style="height: 34px;">
         </a>
         <nav class="nav-links">
             <a href="index.html">Inicio</a>
@@ -350,78 +465,79 @@
             <a href="familia.html">Familia / Clan</a>
         </nav>
         <div class="user-menu">
-            <span style="font-size: 13px; opacity: 0.85;">Jugando como:</span>
             <select id="activeCharSelect" class="dropdown" aria-label="Personaje activo"></select>
+            <a href="registro.html" title="Entrar / Registro">Entrar</a>
         </div>
     </header>
 
-    <div class="profile-container" id="profileMain">
-        <div class="banner" id="profileBanner"></div>
+    <div class="profile-layout" id="profileMain">
+        <aside class="profile-sidebar">
+            <div class="mini-banner" id="profileBanner"></div>
+            <div class="sidebar-head">
+                <div class="avatar-circle" id="profileAvatar"></div>
+                <h1 id="profileTitle">Personaje</h1>
+                <div class="profile-username" id="profileHandle">@rol</div>
+                <div class="status-pill" id="profileStatus">Libre para rol</div>
 
-        <div class="profile-header-info">
-            <div class="avatar-circle" id="profileAvatar"></div>
-            <div class="title-area">
-                <h1 id="profileTitle">Cypher</h1>
-                <div class="profile-username" id="profileHandle">@cypher_hacker</div>
+                <div class="tags-container" id="profileTags">
+                    <a href="universo.html" class="info-tag tag-universo" id="tagUniverso">Sin universo</a>
+                    <a href="familia.html#clan" class="info-tag tag-clan" id="tagClan">Sin clan</a>
+                    <div class="info-tag tag-relacion" id="tagRelacion">Sin pareja</div>
+                </div>
 
-                <div class="tags-container">
-                    <a href="universo.html" class="info-tag tag-universo" id="tagUniverso">
-                        <span class="icon">🌌</span> Universo: #Sector4
-                    </a>
-                    <a href="familia.html#clan" class="info-tag tag-clan" id="tagClan">
-                        <span class="icon">🛡️</span> Clan: Los Desterrados
-                    </a>
-                    <div class="info-tag tag-relacion" id="tagRelacion">
-                        <span class="icon">💍</span> Lazos:&nbsp;<a href="familia.html">Ver familia</a>
-                    </div>
+                <div class="owner-actions" id="ownerActions">
+                    <button type="button" class="btn-sec" id="btnEditFicha">Editar info</button>
+                    <button type="button" class="btn-sec" id="btnEditFotos">Fotos</button>
                 </div>
             </div>
-        </div>
 
-        <div class="profile-body">
-            <details open>
-                <summary>Expediente Básico</summary>
-                <div class="details-content" id="expedienteContent">
-                    <p><strong>Edad:</strong> 28 años</p>
-                    <p><strong>Especie:</strong> Humano Mejorado</p>
-                    <p><strong>Ocupación:</strong> Hacker / Mercenario</p>
-                </div>
-            </details>
+            <div class="sidebar-body">
+                <details open>
+                    <summary>Datos Básicos</summary>
+                    <div class="details-content" id="expedienteContent">
+                        <p><strong>Edad:</strong> —</p>
+                        <p><strong>Especie:</strong> —</p>
+                        <p><strong>Género:</strong> —</p>
+                        <p><strong>Ocupación:</strong> —</p>
+                    </div>
+                </details>
 
-            <details>
-                <summary>Biografía</summary>
-                <div class="details-content" id="bioContent">
-                    <p>Nacido en los niveles inferiores de la megaciudad, Cypher aprendió a manipular sistemas de seguridad antes de saber caminar correctamente.</p>
-                </div>
-            </details>
+                <details>
+                    <summary>Biografía</summary>
+                    <div class="details-content" id="bioContent">
+                        <p>Sin biografía cargada todavía.</p>
+                    </div>
+                </details>
 
-            <details>
-                <summary>Familia y Lazos</summary>
-                <div class="details-content">
-                    <p>Conexiones de sangre, clan y lealtad a través del multiverso.</p>
-                    <a href="familia.html" class="btn-familia">🌳 Ver Árbol Familiar</a>
-                    <a href="familia.html#clan" class="btn-familia">🛡️ Ver Jerarquía del Clan</a>
-                </div>
-            </details>
+                <details>
+                    <summary>Habilidades & Debilidades</summary>
+                    <div class="details-content" id="statsContent">
+                        <p style="opacity:0.78;">Sin atributos configurados.</p>
+                    </div>
+                </details>
 
-            <h2 class="wall-section-title" id="wallSectionTitle">Muro de Publicaciones</h2>
+                <details>
+                    <summary>Familia & Clan Enlazados</summary>
+                    <div class="details-content" id="familyClanContent">
+                        <p>Conexiones de familia y clanes en KIXUZ.</p>
+                        <a href="familia.html#familia" class="btn-familia">Árbol Familiar</a>
+                        <a href="familia.html#clan" class="btn-familia">Clanes</a>
+                    </div>
+                </details>
+            </div>
+        </aside>
 
-            <form class="create-post" id="wallComposerForm">
-                <div class="create-post-meta">
+        <main class="profile-wall-col">
+            <form class="card create-post" id="wallComposerForm">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; font-size:13px;">
                     <strong id="wallComposerLabel">Publicar en este muro</strong>
-                    <span id="wallActorLabel" style="opacity: 0.8;"></span>
+                    <span id="wallActorLabel" style="opacity:0.8;"></span>
                 </div>
-                <div class="create-post-header">
-                    <img src="img/avatar-kixuz.webp" alt="Avatar" class="create-post-avatar" id="composerAvatar">
-                    <textarea id="wallPostTextarea" placeholder="Escribí un mensaje en este muro o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
-                </div>
+                <textarea id="wallPostTextarea" placeholder="Escribí un mensaje en este muro o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
                 <div class="create-post-actions">
                     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                         <select id="wallUniverseSelect" class="universe-select">
-                            <option value="">🌐 Sin etiqueta de universo</option>
-                            <option value="#Sector4">🌌 #Sector4</option>
-                            <option value="#NexoCentral">🌌 #NexoCentral</option>
-                            <option value="#TierrasAltas">🌌 #TierrasAltas</option>
+                            <option value="">Sin etiqueta de universo</option>
                         </select>
                         <span style="font-size:12px; opacity:0.75;">Enter envía · Shift + Enter baja de línea</span>
                     </div>
@@ -430,38 +546,113 @@
             </form>
 
             <section id="profileFeed"></section>
+        </main>
+    </div>
+
+    <div class="kixuz-modal-backdrop" id="modalEditFicha">
+        <div class="kixuz-modal-box">
+            <h3 style="margin-bottom:12px; color:var(--acento);">Editar información del personaje</h3>
+            <div class="kixuz-modal-field">
+                <label>Nombre</label>
+                <input type="text" id="fNombre">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Estado de rol</label>
+                <select id="fEstadoRol">
+                    <option value="Libre para rol">Libre para rol</option>
+                    <option value="En rol">En rol</option>
+                    <option value="Ocupado">Ocupado</option>
+                </select>
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Edad</label>
+                <input type="text" id="fEdad">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Especie / Raza</label>
+                <input type="text" id="fEspecie">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Género</label>
+                <input type="text" id="fGenero">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Ocupación</label>
+                <input type="text" id="fOcupacion">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Universo</label>
+                <input type="text" id="fUniverso" placeholder="Ej. #Nexo">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Clan</label>
+                <input type="text" id="fClan">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Pareja (@usuario)</label>
+                <input type="text" id="fPareja" placeholder="Ej. @liam_miller">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Biografía</label>
+                <textarea id="fBio" rows="3"></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+                <button type="button" class="btn-sec" id="btnCloseFicha">Cancelar</button>
+                <button type="button" class="submit-btn" id="btnSaveFicha">Guardar</button>
+            </div>
         </div>
     </div>
 
-    <script src="chat.js"></script>
+    <div class="kixuz-modal-backdrop" id="modalEditFotos">
+        <div class="kixuz-modal-box">
+            <h3 style="margin-bottom:12px; color:var(--acento);">Imágenes del perfil</h3>
+            <div class="kixuz-modal-field">
+                <label>Avatar (subir archivo o pegar URL)</label>
+                <input type="file" id="fAvatarFile" accept="image/*">
+                <input type="text" id="fAvatarUrl" placeholder="img/avatar-kixuz.webp">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Banner (subir archivo o pegar URL)</label>
+                <input type="file" id="fBannerFile" accept="image/*">
+                <input type="text" id="fBannerUrl" placeholder="img/banner-kixuz.webp">
+            </div>
+            <div class="kixuz-modal-field">
+                <label>Fondo de página (subir archivo o pegar URL)</label>
+                <input type="file" id="fFondoFile" accept="image/*">
+                <input type="text" id="fFondoUrl" placeholder="Opcional">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+                <button type="button" class="btn-sec" id="btnCloseFotos">Cancelar</button>
+                <button type="button" class="submit-btn" id="btnSaveFotos">Guardar fotos</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="navbar-ui.js"></script>
     <script src="theme.js"></script>
     <script src="characters.js"></script>
     <script src="buscador-global.js"></script>
     <script src="interacciones-muro.js"></script>
     <script src="notificaciones.js"></script>
+    <script src="chat.js"></script>
     <script type="module" src="firebase-config.js"></script>
 
     <script>
         (() => {
             const POSTS_KEY = 'kixuz_posts_v1';
+            const SUBS_KEY = 'kixuz_subpersonajes';
+            const ACT_KEY = 'kixuz_personaje_activo';
+
             const normH = v => {
                 const s = String(v || '').trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '_');
                 return s ? '@' + s : '';
             };
+
             const esc = s => String(s || '')
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-            function obtenerMuroHandleActual() {
-                const params = new URLSearchParams(window.location.search);
-                const charParam = params.get('char') || params.get('handle') || '';
-                if (normH(charParam)) return normH(charParam);
-
-                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
-                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
-                    : { handle: '@cypher_hacker' };
-                return normH(actor.handle) || '@cypher_hacker';
-            }
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
 
             function leerPosts() {
                 try {
@@ -474,48 +665,133 @@
                 try { localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 200))); } catch {}
             }
 
+            function leerSubs() {
+                try {
+                    const arr = JSON.parse(localStorage.getItem(SUBS_KEY) || '[]');
+                    if (!Array.isArray(arr)) return [];
+                    return arr.filter(p => p && !p.esPlaceholder && normH(p.handle) !== '@cypher_hacker');
+                } catch { return []; }
+            }
+
+            function guardarSubs(arr) {
+                try { localStorage.setItem(SUBS_KEY, JSON.stringify(arr)); } catch {}
+            }
+
+            function obtenerMuroHandleActual() {
+                const params = new URLSearchParams(window.location.search);
+                const charParam = params.get('char') || params.get('handle') || '';
+                if (normH(charParam)) return normH(charParam);
+
+                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
+                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
+                    : { handle: '' };
+                if (normH(actor.handle) && normH(actor.handle) !== '@invitado') {
+                    return normH(actor.handle);
+                }
+                const subs = leerSubs();
+                if (subs.length > 0) return normH(subs[0].handle || subs[0].nombre);
+                return '@personaje';
+            }
+
+            let personajeActual = null;
+
+            function cargarSelectorUniversos() {
+                const sel = document.getElementById('wallUniverseSelect');
+                if (!sel) return;
+                const valPrev = sel.value;
+                sel.innerHTML = `<option value="">Sin etiqueta de universo</option>`;
+                try {
+                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
+                    if (Array.isArray(unis)) {
+                        unis.forEach(u => {
+                            const tag = String(u.tag || u.nombre || '').trim();
+                            if (!tag || tag.toLowerCase() === '#sector4') return;
+                            const opt = document.createElement('option');
+                            opt.value = tag.startsWith('#') ? tag : '#' + tag;
+                            opt.textContent = opt.value;
+                            sel.appendChild(opt);
+                        });
+                    }
+                } catch {}
+                if (valPrev) sel.value = valPrev;
+            }
+
             async function renderPerfilYMuro() {
+                cargarSelectorUniversos();
                 const muroHandle = obtenerMuroHandleActual();
                 let vista = {
                     personaje: {
-                        nombre: muroHandle.replace(/^@/, '') || 'Cypher',
+                        nombre: muroHandle.replace(/^@/, '') || 'Personaje',
                         handle: muroHandle,
-                        universo: '#Sector4',
-                        clan: 'Los Desterrados',
+                        universo: '',
+                        clan: '',
+                        estadoRol: 'Libre para rol',
                         bio: ''
-                    }
+                    },
+                    esDueno: false
                 };
+
                 if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista) {
                     try { vista = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(muroHandle); } catch {}
                 }
 
-                const pj = vista.personaje || {};
-                const nombreMuro = pj.nombre || muroHandle.replace(/^@/, '') || 'Personaje';
+                const localSub = leerSubs().find(p => normH(p.handle || p.nombre) === muroHandle);
+                const pj = { ...(vista.personaje || {}), ...(localSub || {}) };
                 const handleFinal = normH(pj.handle) || muroHandle;
+                const nombreMuro = pj.nombre || handleFinal.replace(/^@/, '') || 'Personaje';
+                pj.handle = handleFinal;
+                pj.nombre = nombreMuro;
+                personajeActual = pj;
+
+                const esPropiaCuenta = Boolean(localSub);
+                document.getElementById('ownerActions').style.display = esPropiaCuenta ? 'flex' : 'none';
 
                 document.title = `Perfil de ${nombreMuro} - KIXUZ`;
                 document.getElementById('profileTitle').textContent = nombreMuro;
                 document.getElementById('profileHandle').textContent = handleFinal;
-                document.getElementById('tagUniverso').innerHTML = `<span class="icon">🌌</span> Universo: ${esc(pj.universo || '#Sector4')}`;
-                document.getElementById('tagClan').innerHTML = `<span class="icon">🛡️</span> Clan: ${esc(pj.clan || 'Sin clan')}`;
+                document.getElementById('profileStatus').textContent = pj.estadoRol || 'Libre para rol';
 
-                if (pj.avatar) {
-                    document.getElementById('profileAvatar').style.backgroundImage = `url('${pj.avatar}')`;
+                const uniText = pj.universo && pj.universo.toLowerCase() !== '#sector4' ? pj.universo : 'Sin universo';
+                const tagUni = document.getElementById('tagUniverso');
+                tagUni.textContent = uniText;
+                tagUni.href = uniText !== 'Sin universo' ? `universo.html?u=${encodeURIComponent(uniText)}` : 'universo.html';
+
+                const clanText = pj.clan || 'Sin clan';
+                const tagClan = document.getElementById('tagClan');
+                tagClan.textContent = clanText;
+                tagClan.href = `familia.html?char=${encodeURIComponent(handleFinal)}#clan`;
+
+                const tagRel = document.getElementById('tagRelacion');
+                const parejaH = normH(pj.pareja || pj.estadoSentimentalHandle || '');
+                if (parejaH) {
+                    tagRel.innerHTML = `Pareja:&nbsp;<a href="perfil.html?char=${encodeURIComponent(parejaH)}">${esc(parejaH)}</a>`;
+                } else {
+                    tagRel.textContent = 'Sin pareja';
                 }
-                if (pj.banner) {
-                    document.getElementById('profileBanner').style.backgroundImage = `url('${pj.banner}')`;
+
+                document.getElementById('profileAvatar').style.backgroundImage = `url('${pj.avatar || 'img/avatar-kixuz.webp'}')`;
+                document.getElementById('profileBanner').style.backgroundImage = `url('${pj.banner || 'img/banner-kixuz.webp'}')`;
+                if (pj.fondo) {
+                    document.body.style.backgroundImage = `linear-gradient(rgba(21, 10, 36, 0.72), rgba(21, 10, 36, 0.92)), url('${pj.fondo}')`;
                 }
-                if (pj.bio) {
-                    document.getElementById('bioContent').innerHTML = `<p>${esc(pj.bio)}</p>`;
-                }
+
+                document.getElementById('expedienteContent').innerHTML = `
+                    <p><strong>Edad:</strong> ${esc(pj.edad || '—')}</p>
+                    <p><strong>Especie:</strong> ${esc(pj.especie || '—')}</p>
+                    <p><strong>Género:</strong> ${esc(pj.genero || '—')}</p>
+                    <p><strong>Ocupación:</strong> ${esc(pj.ocupacion || '—')}</p>
+                `;
+
+                document.getElementById('bioContent').innerHTML = pj.bio
+                    ? `<p>${esc(pj.bio)}</p>`
+                    : `<p style="opacity:0.75;">Sin biografía cargada todavía.</p>`;
 
                 const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
                     ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
                     : { nombre: 'Invitado', handle: '@invitado' };
 
-                document.getElementById('wallSectionTitle').textContent = `Muro de ${nombreMuro}`;
                 document.getElementById('wallComposerLabel').textContent = `Publicar en el muro de ${nombreMuro} (${handleFinal})`;
-                document.getElementById('wallActorLabel').textContent = `Publicando como ${actor.nombre} (${actor.handle})`;
+                document.getElementById('wallActorLabel').textContent = `Como ${actor.nombre} (${actor.handle})`;
                 document.getElementById('wallPostTextarea').placeholder = `Escribí en el muro de ${nombreMuro} o etiquetá @usuario... (Shift + Enter: salto de línea)`;
 
                 const feed = document.getElementById('profileFeed');
@@ -527,13 +803,13 @@
                 );
 
                 if (!postsMuro.length) {
-                    feed.innerHTML = `<div class="post-card" style="opacity:0.78;">Este muro aún no tiene publicaciones. ¡Dejá la primera!</div>`;
+                    feed.innerHTML = `<div class="card" style="opacity:0.78;">Este muro aún no tiene publicaciones. ¡Dejá la primera!</div>`;
                     return;
                 }
 
                 postsMuro.forEach(post => {
                     const card = document.createElement('article');
-                    card.className = 'post-card';
+                    card.className = 'card';
                     const autorHref = `perfil.html?char=${encodeURIComponent(post.autorHandle || '')}`;
                     const destinoH = normH(post.muroHandle);
                     const destinoBadge = destinoH && destinoH !== normH(post.autorHandle)
@@ -564,6 +840,105 @@
                     feed.appendChild(card);
                 });
             }
+
+            const modalFicha = document.getElementById('modalEditFicha');
+            const modalFotos = document.getElementById('modalEditFotos');
+
+            document.getElementById('btnEditFicha').addEventListener('click', () => {
+                if (!personajeActual) return;
+                document.getElementById('fNombre').value = personajeActual.nombre || '';
+                document.getElementById('fEstadoRol').value = personajeActual.estadoRol || 'Libre para rol';
+                document.getElementById('fEdad').value = personajeActual.edad || '';
+                document.getElementById('fEspecie').value = personajeActual.especie || '';
+                document.getElementById('fGenero').value = personajeActual.genero || '';
+                document.getElementById('fOcupacion').value = personajeActual.ocupacion || '';
+                document.getElementById('fUniverso').value = personajeActual.universo || '';
+                document.getElementById('fClan').value = personajeActual.clan || '';
+                document.getElementById('fPareja').value = personajeActual.pareja || '';
+                document.getElementById('fBio').value = personajeActual.bio || '';
+                modalFicha.classList.add('open');
+            });
+
+            document.getElementById('btnCloseFicha').addEventListener('click', () => modalFicha.classList.remove('open'));
+            document.getElementById('btnSaveFicha').addEventListener('click', () => {
+                if (!personajeActual) return;
+                const updated = {
+                    ...personajeActual,
+                    nombre: document.getElementById('fNombre').value.trim() || personajeActual.nombre,
+                    estadoRol: document.getElementById('fEstadoRol').value,
+                    edad: document.getElementById('fEdad').value.trim(),
+                    especie: document.getElementById('fEspecie').value.trim(),
+                    genero: document.getElementById('fGenero').value.trim(),
+                    ocupacion: document.getElementById('fOcupacion').value.trim(),
+                    universo: document.getElementById('fUniverso').value.trim(),
+                    clan: document.getElementById('fClan').value.trim(),
+                    pareja: normH(document.getElementById('fPareja').value),
+                    bio: document.getElementById('fBio').value
+                };
+                const subs = leerSubs();
+                const idx = subs.findIndex(p => normH(p.handle || p.nombre) === normH(updated.handle));
+                if (idx >= 0) subs[idx] = updated;
+                else subs.push(updated);
+                guardarSubs(subs);
+                try {
+                    const act = JSON.parse(localStorage.getItem(ACT_KEY) || 'null');
+                    if (act && normH(act.handle || act.nombre) === normH(updated.handle)) {
+                        localStorage.setItem(ACT_KEY, JSON.stringify(updated));
+                    }
+                } catch {}
+                if (window.KIXUZ_DB?.guardarSubpersonaje) {
+                    try { window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
+                }
+                modalFicha.classList.remove('open');
+                renderPerfilYMuro();
+            });
+
+            function leerArchivoComoDataURL(fileInput, callback) {
+                const file = fileInput?.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = ev => callback(ev.target.result);
+                reader.readAsDataURL(file);
+            }
+
+            document.getElementById('fAvatarFile').addEventListener('change', e => {
+                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fAvatarUrl').value = dataUrl; });
+            });
+            document.getElementById('fBannerFile').addEventListener('change', e => {
+                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fBannerUrl').value = dataUrl; });
+            });
+            document.getElementById('fFondoFile').addEventListener('change', e => {
+                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fFondoUrl').value = dataUrl; });
+            });
+
+            document.getElementById('btnEditFotos').addEventListener('click', () => {
+                if (!personajeActual) return;
+                document.getElementById('fAvatarUrl').value = personajeActual.avatar || '';
+                document.getElementById('fBannerUrl').value = personajeActual.banner || '';
+                document.getElementById('fFondoUrl').value = personajeActual.fondo || '';
+                modalFotos.classList.add('open');
+            });
+
+            document.getElementById('btnCloseFotos').addEventListener('click', () => modalFotos.classList.remove('open'));
+            document.getElementById('btnSaveFotos').addEventListener('click', () => {
+                if (!personajeActual) return;
+                const updated = {
+                    ...personajeActual,
+                    avatar: document.getElementById('fAvatarUrl').value.trim(),
+                    banner: document.getElementById('fBannerUrl').value.trim(),
+                    fondo: document.getElementById('fFondoUrl').value.trim()
+                };
+                const subs = leerSubs();
+                const idx = subs.findIndex(p => normH(p.handle || p.nombre) === normH(updated.handle));
+                if (idx >= 0) subs[idx] = updated;
+                else subs.push(updated);
+                guardarSubs(subs);
+                if (window.KIXUZ_DB?.guardarSubpersonaje) {
+                    try { window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
+                }
+                modalFotos.classList.remove('open');
+                renderPerfilYMuro();
+            });
 
             const form = document.getElementById('wallComposerForm');
             const ta = document.getElementById('wallPostTextarea');
