@@ -141,19 +141,6 @@
             margin: 2px 0 8px;
         }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12.5px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: rgba(45, 212, 196, 0.14);
-            border: 1px solid rgba(45, 212, 196, 0.4);
-            margin-bottom: 10px;
-        }
-
         .tags-container {
             display: flex;
             flex-wrap: wrap;
@@ -178,7 +165,7 @@
             border: 1px solid var(--bg-secundario);
         }
 
-        .tag-clan {
+        .tag-familia {
             background-color: rgba(45, 212, 196, 0.18);
             border: 1px solid var(--acento);
             color: var(--acento);
@@ -267,38 +254,6 @@
         .details-content p { margin: 0 0 8px; }
         .details-content strong { color: var(--acento); }
 
-        .stat-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 12.5px;
-        }
-
-        .stat-name {
-            width: 95px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .stat-bar-container {
-            flex-grow: 1;
-            background-color: rgba(0, 0, 0, 0.4);
-            height: 8px;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .stat-bar-fill {
-            height: 100%;
-            background-color: var(--acento);
-            border-radius: 6px;
-        }
-
-        .stat-bar-fill.weak {
-            background-color: #e03c6c;
-        }
-
         .btn-familia {
             display: inline-block;
             background-color: var(--bg-secundario);
@@ -311,7 +266,6 @@
             font-size: 12px;
             border: 1px solid var(--acento);
             margin-top: 6px;
-            margin-right: 6px;
         }
 
         .btn-familia:hover {
@@ -402,6 +356,17 @@
             margin: 6px 0 10px;
         }
 
+        .btn-del-post {
+            background: rgba(224, 60, 108, 0.2);
+            color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5);
+            border-radius: 7px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         .kixuz-modal-backdrop {
             display: none;
             position: fixed;
@@ -462,7 +427,7 @@
             <a href="index.html">Inicio</a>
             <a href="perfil.html" class="active">Mi Perfil</a>
             <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
+            <a href="familia.html">Familia</a>
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" class="dropdown" aria-label="Personaje activo"></select>
@@ -477,11 +442,10 @@
                 <div class="avatar-circle" id="profileAvatar"></div>
                 <h1 id="profileTitle">Personaje</h1>
                 <div class="profile-username" id="profileHandle">@rol</div>
-                <div class="status-pill" id="profileStatus">Libre para rol</div>
 
                 <div class="tags-container" id="profileTags">
-                    <a href="universo.html" class="info-tag tag-universo" id="tagUniverso">Sin universo</a>
-                    <a href="familia.html#clan" class="info-tag tag-clan" id="tagClan">Sin clan</a>
+                    <a href="universo.html" class="info-tag tag-universo" id="tagUniverso" style="display:none;"></a>
+                    <a href="familia.html" class="info-tag tag-familia" id="tagFamilia">Familia</a>
                     <div class="info-tag tag-relacion" id="tagRelacion">Sin pareja</div>
                 </div>
 
@@ -510,18 +474,10 @@
                 </details>
 
                 <details>
-                    <summary>Habilidades & Debilidades</summary>
-                    <div class="details-content" id="statsContent">
-                        <p style="opacity:0.78;">Sin atributos configurados.</p>
-                    </div>
-                </details>
-
-                <details>
-                    <summary>Familia & Clan Enlazados</summary>
-                    <div class="details-content" id="familyClanContent">
-                        <p>Conexiones de familia y clanes en KIXUZ.</p>
-                        <a href="familia.html#familia" class="btn-familia">Árbol Familiar</a>
-                        <a href="familia.html#clan" class="btn-familia">Clanes</a>
+                    <summary>Familia & Lazos</summary>
+                    <div class="details-content" id="familyContent">
+                        <p>Vínculos familiares del personaje.</p>
+                        <a href="familia.html" class="btn-familia" id="linkArbolFamilia">Ver Árbol Familiar</a>
                     </div>
                 </details>
             </div>
@@ -531,7 +487,10 @@
             <form class="card create-post" id="wallComposerForm">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; font-size:13px;">
                     <strong id="wallComposerLabel">Publicar en este muro</strong>
-                    <span id="wallActorLabel" style="opacity:0.8;"></span>
+                    <div style="display:inline-flex; align-items:center; gap:8px;">
+                        <span id="wallActorLabel" style="opacity:0.8;"></span>
+                        <span id="wallPostModeSlot"></span>
+                    </div>
                 </div>
                 <textarea id="wallPostTextarea" placeholder="Escribí un mensaje en este muro o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
                 <div class="create-post-actions">
@@ -557,14 +516,6 @@
                 <input type="text" id="fNombre">
             </div>
             <div class="kixuz-modal-field">
-                <label>Estado de rol</label>
-                <select id="fEstadoRol">
-                    <option value="Libre para rol">Libre para rol</option>
-                    <option value="En rol">En rol</option>
-                    <option value="Ocupado">Ocupado</option>
-                </select>
-            </div>
-            <div class="kixuz-modal-field">
                 <label>Edad</label>
                 <input type="text" id="fEdad">
             </div>
@@ -581,15 +532,13 @@
                 <input type="text" id="fOcupacion">
             </div>
             <div class="kixuz-modal-field">
-                <label>Universo</label>
-                <input type="text" id="fUniverso" placeholder="Ej. #Nexo">
+                <label>Universo (solo de los creados)</label>
+                <select id="fUniverso">
+                    <option value="">Sin universo</option>
+                </select>
             </div>
             <div class="kixuz-modal-field">
-                <label>Clan</label>
-                <input type="text" id="fClan">
-            </div>
-            <div class="kixuz-modal-field">
-                <label>Pareja (@usuario)</label>
+                <label>Pareja/s (@usuario, separadas por coma)</label>
                 <input type="text" id="fPareja" placeholder="Ej. @liam_miller">
             </div>
             <div class="kixuz-modal-field">
@@ -677,6 +626,27 @@
                 try { localStorage.setItem(SUBS_KEY, JSON.stringify(arr)); } catch {}
             }
 
+            function obtenerUniversosReales() {
+                const res = [];
+                const vistos = new Set();
+                const bloqueados = new Set(['#sector4', '#nexocentral', '#tierrasaltas', 'sector 4', 'sector4']);
+                try {
+                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
+                    if (Array.isArray(unis)) {
+                        unis.forEach(u => {
+                            if (!u || u.esEjemplo || u.esPrueba) return;
+                            const raw = String(u.tag || u.nombre || '').trim();
+                            if (!raw || bloqueados.has(raw.toLowerCase())) return;
+                            const tag = raw.startsWith('#') ? raw : '#' + raw.replace(/\s+/g, '');
+                            if (bloqueados.has(tag.toLowerCase()) || vistos.has(tag.toLowerCase())) return;
+                            vistos.add(tag.toLowerCase());
+                            res.push({ tag, nombre: u.nombre || tag });
+                        });
+                    }
+                } catch {}
+                return res;
+            }
+
             function obtenerMuroHandleActual() {
                 const params = new URLSearchParams(window.location.search);
                 const charParam = params.get('char') || params.get('handle') || '';
@@ -694,38 +664,66 @@
             }
 
             let personajeActual = null;
+            let wallModeSwitch = null;
 
-            function cargarSelectorUniversos() {
-                const sel = document.getElementById('wallUniverseSelect');
-                if (!sel) return;
-                const valPrev = sel.value;
-                sel.innerHTML = `<option value="">Sin etiqueta de universo</option>`;
-                try {
-                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
-                    if (Array.isArray(unis)) {
-                        unis.forEach(u => {
-                            const tag = String(u.tag || u.nombre || '').trim();
-                            if (!tag || tag.toLowerCase() === '#sector4') return;
-                            const opt = document.createElement('option');
-                            opt.value = tag.startsWith('#') ? tag : '#' + tag;
-                            opt.textContent = opt.value;
-                            sel.appendChild(opt);
-                        });
+            function montarSwitchPost() {
+                const slot = document.getElementById('wallPostModeSlot');
+                if (!slot || slot.children.length) return;
+                if (window.KIXUZ_INTERACCIONES?.crearSwitchOcIc) {
+                    wallModeSwitch = window.KIXUZ_INTERACCIONES.crearSwitchOcIc('IC');
+                    slot.appendChild(wallModeSwitch);
+                }
+            }
+
+            function cargarSelectoresUniversos(valorSeleccionadoModal = '') {
+                const reales = obtenerUniversosReales();
+
+                const selMuro = document.getElementById('wallUniverseSelect');
+                if (selMuro) {
+                    const prev = selMuro.value;
+                    selMuro.innerHTML = `<option value="">Sin etiqueta de universo</option>`;
+                    reales.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.tag;
+                        opt.textContent = u.tag;
+                        selMuro.appendChild(opt);
+                    });
+                    if (prev && reales.some(u => u.tag === prev)) selMuro.value = prev;
+                }
+
+                const selFicha = document.getElementById('fUniverso');
+                if (selFicha) {
+                    selFicha.innerHTML = `<option value="">Sin universo</option>`;
+                    reales.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.tag;
+                        opt.textContent = `${u.nombre} (${u.tag})`;
+                        selFicha.appendChild(opt);
+                    });
+                    if (valorSeleccionadoModal && reales.some(u => u.tag.toLowerCase() === valorSeleccionadoModal.toLowerCase())) {
+                        selFicha.value = reales.find(u => u.tag.toLowerCase() === valorSeleccionadoModal.toLowerCase()).tag;
                     }
+                }
+            }
+
+            function obtenerEtiquetaFamiliaPersonaje(handle) {
+                try {
+                    const famData = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
+                    const mapEtiquetas = famData.miembrosFamiliaEtiquetas || {};
+                    if (mapEtiquetas[handle]) return mapEtiquetas[handle];
                 } catch {}
-                if (valPrev) sel.value = valPrev;
+                return 'Familia';
             }
 
             async function renderPerfilYMuro() {
-                cargarSelectorUniversos();
+                montarSwitchPost();
+                cargarSelectoresUniversos();
                 const muroHandle = obtenerMuroHandleActual();
                 let vista = {
                     personaje: {
                         nombre: muroHandle.replace(/^@/, '') || 'Personaje',
                         handle: muroHandle,
                         universo: '',
-                        clan: '',
-                        estadoRol: 'Libre para rol',
                         bio: ''
                     },
                     esDueno: false
@@ -749,22 +747,37 @@
                 document.title = `Perfil de ${nombreMuro} - KIXUZ`;
                 document.getElementById('profileTitle').textContent = nombreMuro;
                 document.getElementById('profileHandle').textContent = handleFinal;
-                document.getElementById('profileStatus').textContent = pj.estadoRol || 'Libre para rol';
 
-                const uniText = pj.universo && pj.universo.toLowerCase() !== '#sector4' ? pj.universo : 'Sin universo';
+                // Universo: solo mostrar burbuja si tiene uno de los universos realmente creados
+                const reales = obtenerUniversosReales();
+                const uniRaw = String(pj.universo || '').trim();
+                const uniMatch = reales.find(u => u.tag.toLowerCase() === uniRaw.toLowerCase() || u.nombre.toLowerCase() === uniRaw.toLowerCase());
                 const tagUni = document.getElementById('tagUniverso');
-                tagUni.textContent = uniText;
-                tagUni.href = uniText !== 'Sin universo' ? `universo.html?u=${encodeURIComponent(uniText)}` : 'universo.html';
+                if (uniMatch) {
+                    tagUni.style.display = 'inline-flex';
+                    tagUni.textContent = uniMatch.tag;
+                    tagUni.href = `universo.html?u=${encodeURIComponent(uniMatch.tag)}`;
+                } else {
+                    tagUni.style.display = 'none';
+                }
 
-                const clanText = pj.clan || 'Sin clan';
-                const tagClan = document.getElementById('tagClan');
-                tagClan.textContent = clanText;
-                tagClan.href = `familia.html?char=${encodeURIComponent(handleFinal)}#clan`;
+                // Familia (sin Clan)
+                const famEtiqueta = obtenerEtiquetaFamiliaPersonaje(handleFinal);
+                const tagFam = document.getElementById('tagFamilia');
+                tagFam.textContent = famEtiqueta;
+                tagFam.href = `familia.html?char=${encodeURIComponent(handleFinal)}`;
+                document.getElementById('linkArbolFamilia').href = `familia.html?char=${encodeURIComponent(handleFinal)}`;
 
+                // Pareja/s
                 const tagRel = document.getElementById('tagRelacion');
-                const parejaH = normH(pj.pareja || pj.estadoSentimentalHandle || '');
-                if (parejaH) {
-                    tagRel.innerHTML = `Pareja:&nbsp;<a href="perfil.html?char=${encodeURIComponent(parejaH)}">${esc(parejaH)}</a>`;
+                const parejas = String(pj.pareja || pj.estadoSentimentalHandle || '')
+                    .split(',')
+                    .map(x => normH(x))
+                    .filter(Boolean);
+                if (parejas.length) {
+                    tagRel.innerHTML = `Pareja:&nbsp;` + parejas.map(pH =>
+                        `<a href="perfil.html?char=${encodeURIComponent(pH)}">${esc(pH)}</a>`
+                    ).join(',&nbsp;');
                 } else {
                     tagRel.textContent = 'Sin pareja';
                 }
@@ -816,22 +829,40 @@
                         ? ` &gt; <a href="perfil.html?char=${encodeURIComponent(destinoH)}" class="post-author">${esc(destinoH)}</a>`
                         : '';
 
+                    const badgeModo = window.KIXUZ_INTERACCIONES?.crearBadgeModo
+                        ? window.KIXUZ_INTERACCIONES.crearBadgeModo(post.modo || 'IC')
+                        : '';
+
                     const cuerpoHtml = window.KIXUZ_INTERACCIONES?.formatearTextoConMenciones
                         ? window.KIXUZ_INTERACCIONES.formatearTextoConMenciones(post.contenido || '')
                         : esc(post.contenido || '');
 
+                    const canDel = normH(post.autorHandle) === normH(actor.handle);
+
                     card.innerHTML = `
                         <div class="post-header">
-                            <div>
+                            <div style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                ${badgeModo}
                                 <a href="${autorHref}" class="post-author">${esc(post.autorNombre || 'Personaje')}</a>
                                 <span style="opacity:0.7; font-size:12.5px;">${esc(post.autorHandle || '')}</span>
                                 ${destinoBadge}
                             </div>
-                            ${post.universo ? `<span style="font-size:12px; color:var(--acento); font-weight:700;">${esc(post.universo)}</span>` : ''}
+                            <div style="display:inline-flex; align-items:center; gap:8px;">
+                                ${post.universo ? `<span style="font-size:12px; color:var(--acento); font-weight:700;">${esc(post.universo)}</span>` : ''}
+                                ${canDel ? `<button type="button" class="btn-del-post">Eliminar</button>` : ''}
+                            </div>
                         </div>
                         <div class="post-body">${cuerpoHtml}</div>
                         <div class="post-interacciones"></div>
                     `;
+
+                    if (canDel) {
+                        card.querySelector('.btn-del-post').addEventListener('click', () => {
+                            const restantes = leerPosts().filter(x => x.id !== post.id);
+                            guardarPosts(restantes);
+                            renderPerfilYMuro();
+                        });
+                    }
 
                     const interSlot = card.querySelector('.post-interacciones');
                     if (window.KIXUZ_INTERACCIONES?.montarBloqueInteracciones) {
@@ -846,14 +877,12 @@
 
             document.getElementById('btnEditFicha').addEventListener('click', () => {
                 if (!personajeActual) return;
+                cargarSelectoresUniversos(personajeActual.universo || '');
                 document.getElementById('fNombre').value = personajeActual.nombre || '';
-                document.getElementById('fEstadoRol').value = personajeActual.estadoRol || 'Libre para rol';
                 document.getElementById('fEdad').value = personajeActual.edad || '';
                 document.getElementById('fEspecie').value = personajeActual.especie || '';
                 document.getElementById('fGenero').value = personajeActual.genero || '';
                 document.getElementById('fOcupacion').value = personajeActual.ocupacion || '';
-                document.getElementById('fUniverso').value = personajeActual.universo || '';
-                document.getElementById('fClan').value = personajeActual.clan || '';
                 document.getElementById('fPareja').value = personajeActual.pareja || '';
                 document.getElementById('fBio').value = personajeActual.bio || '';
                 modalFicha.classList.add('open');
@@ -862,17 +891,21 @@
             document.getElementById('btnCloseFicha').addEventListener('click', () => modalFicha.classList.remove('open'));
             document.getElementById('btnSaveFicha').addEventListener('click', () => {
                 if (!personajeActual) return;
+                const parejasLimpias = document.getElementById('fPareja').value
+                    .split(',')
+                    .map(x => normH(x))
+                    .filter(Boolean)
+                    .join(', ');
+
                 const updated = {
                     ...personajeActual,
                     nombre: document.getElementById('fNombre').value.trim() || personajeActual.nombre,
-                    estadoRol: document.getElementById('fEstadoRol').value,
                     edad: document.getElementById('fEdad').value.trim(),
                     especie: document.getElementById('fEspecie').value.trim(),
                     genero: document.getElementById('fGenero').value.trim(),
                     ocupacion: document.getElementById('fOcupacion').value.trim(),
                     universo: document.getElementById('fUniverso').value.trim(),
-                    clan: document.getElementById('fClan').value.trim(),
-                    pareja: normH(document.getElementById('fPareja').value),
+                    pareja: parejasLimpias,
                     bio: document.getElementById('fBio').value
                 };
                 const subs = leerSubs();
@@ -960,6 +993,7 @@
 
                 const muroHandle = obtenerMuroHandleActual();
                 const universo = document.getElementById('wallUniverseSelect').value || '';
+                const modo = wallModeSwitch?.getMode ? wallModeSwitch.getMode() : 'IC';
 
                 const nuevoPost = {
                     id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -968,6 +1002,7 @@
                     autorUid: actor.uid,
                     muroHandle,
                     universo,
+                    modo,
                     contenido,
                     kixiz: 0,
                     kixPorUsuario: [],

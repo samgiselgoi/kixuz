@@ -18,6 +18,60 @@
     const style = document.createElement('style');
     style.id = 'kixuz-interacciones-muro-style';
     style.textContent = `
+        .kixuz-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10.5px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            vertical-align: middle;
+        }
+        .kixuz-mode-badge.ic {
+            background: rgba(45, 212, 196, 0.18);
+            color: var(--acento, #2DD4C4);
+            border: 1px solid rgba(45, 212, 196, 0.5);
+        }
+        .kixuz-mode-badge.oc {
+            background: rgba(108, 60, 224, 0.28);
+            color: #d3bcff;
+            border: 1px solid rgba(108, 60, 224, 0.65);
+        }
+        html[data-theme="light"] .kixuz-mode-badge.oc {
+            color: #5528c4;
+        }
+        .kixuz-oc-ic-switch {
+            display: inline-flex;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(108, 60, 224, 0.45);
+            border-radius: 999px;
+            padding: 2px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        html[data-theme="light"] .kixuz-oc-ic-switch {
+            background: rgba(108, 60, 224, 0.1);
+        }
+        .kixuz-oc-ic-opt {
+            border: none;
+            background: transparent;
+            color: var(--texto, #EDE7E0);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            cursor: pointer;
+            opacity: 0.72;
+            transition: background 0.2s, color 0.2s, opacity 0.2s;
+        }
+        .kixuz-oc-ic-opt.active {
+            background: var(--acento, #2DD4C4);
+            color: #150A24;
+            opacity: 1;
+        }
         .kixuz-muro-post-actions {
             display: flex;
             align-items: center;
@@ -49,6 +103,9 @@
             background: rgba(45, 212, 196, 0.22);
             color: var(--acento, #2DD4C4);
             border-color: var(--acento, #2DD4C4);
+        }
+        .kixuz-kix-btn.active svg {
+            color: #ff7b39;
         }
         .kixuz-comments-wrap {
             display: flex;
@@ -120,9 +177,10 @@
             gap: 8px;
             align-items: flex-end;
             margin-top: 4px;
+            flex-wrap: wrap;
         }
         .kixuz-comment-textarea {
-            flex: 1;
+            flex: 1 1 220px;
             min-height: 38px;
             max-height: 140px;
             resize: none;
@@ -156,6 +214,8 @@
     if (!document.getElementById('kixuz-interacciones-muro-style')) {
         document.head.appendChild(style);
     }
+
+    const FLAME_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.2-1.2 5.3-3 7.1-1.5 1.5-2.5 3.1-2.5 5.2A5.5 5.5 0 0 0 12 19.8a5.5 5.5 0 0 0 5.5-5.5c0-2.6-1.4-4.7-3.2-6.5-.2 1.4-1 2.4-2.1 2.9.6-2.5.4-5.4-.2-8.7z"/></svg>`;
 
     function autoGrow(el) {
         if (!el) return;
@@ -230,19 +290,41 @@
         }).join('');
     }
 
+    function crearBadgeModo(modoRaw) {
+        const m = String(modoRaw || 'IC').toUpperCase() === 'OC' ? 'OC' : 'IC';
+        return `<span class="kixuz-mode-badge ${m.toLowerCase()}">${m}</span>`;
+    }
+
+    function crearSwitchOcIc(valorInicial = 'IC', onChange) {
+        let actual = String(valorInicial || 'IC').toUpperCase() === 'OC' ? 'OC' : 'IC';
+        const wrap = document.createElement('div');
+        wrap.className = 'kixuz-oc-ic-switch';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Modo IC u OC');
+        wrap.innerHTML = `
+            <button type="button" class="kixuz-oc-ic-opt ${actual === 'IC' ? 'active' : ''}" data-mode="IC" title="En Personaje (In Character)">IC</button>
+            <button type="button" class="kixuz-oc-ic-opt ${actual === 'OC' ? 'active' : ''}" data-mode="OC" title="Fuera de Personaje (Out of Character)">OC</button>
+        `;
+        wrap.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                actual = btn.dataset.mode;
+                wrap.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === actual));
+                if (typeof onChange === 'function') onChange(actual);
+            });
+        });
+        wrap.getMode = () => actual;
+        return wrap;
+    }
+
     function guardarNotificacionesLocales(lista) {
-        try {
-            localStorage.setItem(NOTIF_KEY, JSON.stringify(lista.slice(0, 120)));
-        } catch {}
+        try { localStorage.setItem(NOTIF_KEY, JSON.stringify(lista.slice(0, 120))); } catch {}
     }
 
     function leerNotificacionesLocales() {
         try {
             const arr = JSON.parse(localStorage.getItem(NOTIF_KEY) || '[]');
             return Array.isArray(arr) ? arr : [];
-        } catch {
-            return [];
-        }
+        } catch { return []; }
     }
 
     function emitirNotificaciones({ texto, post, tipo = 'comentario' }) {
@@ -287,15 +369,11 @@
         try {
             const arr = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
             return Array.isArray(arr) ? arr : [];
-        } catch {
-            return [];
-        }
+        } catch { return []; }
     }
 
     function guardarPosts(arr) {
-        try {
-            localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 200)));
-        } catch {}
+        try { localStorage.setItem(POSTS_KEY, JSON.stringify(arr.slice(0, 200))); } catch {}
     }
 
     function encontrarPostEnStorage(postData) {
@@ -308,31 +386,13 @@
         return { posts, index: idx, post: idx >= 0 ? posts[idx] : null };
     }
 
-    document.addEventListener('submit', e => {
-        const form = e.target;
-        if (!(form instanceof HTMLFormElement)) return;
-        const ta = form.querySelector('textarea');
-        if (!ta || form.classList.contains('kixuz-comment-form')) return;
-        const contenido = String(ta.value || '').trim();
-        if (!contenido) return;
-        const menciones = extraerMenciones(contenido);
-        if (menciones.length) {
-            emitirNotificaciones({
-                texto: contenido,
-                post: {
-                    autorHandle: obtenerActorActual().handle,
-                    muroHandle: new URLSearchParams(window.location.search).get('char') || ''
-                },
-                tipo: 'mencion'
-            });
-        }
-    }, true);
-
     window.KIXUZ_INTERACCIONES = {
         obtenerActorActual,
         puedeGestionarComentario,
         extraerMenciones,
         formatearTextoConMenciones,
+        crearBadgeModo,
+        crearSwitchOcIc,
         emitirNotificaciones,
         async alternarKix(postData) {
             const actor = obtenerActorActual();
@@ -365,11 +425,11 @@
                 try { await window.KIXUZ_DB.darKix(base.id, delta); } catch {}
             }
             if (!yaDio) {
-                emitirNotificaciones({ texto: `dio 🔥 Kix a tu publicación`, post: actualizado, tipo: 'kix' });
+                emitirNotificaciones({ texto: `dio Kix a tu publicación`, post: actualizado, tipo: 'kix' });
             }
             return nuevoTotal;
         },
-        async agregarComentario(postData, textoRaw) {
+        async agregarComentario(postData, textoRaw, modo = 'IC') {
             const texto = String(textoRaw || '').replace(/^\n+|\n+$/g, '');
             if (!texto.trim()) return null;
 
@@ -379,6 +439,7 @@
                 autorNombre: actor.nombre,
                 autorHandle: actor.handle,
                 autorUid: actor.uid,
+                modo: String(modo || 'IC').toUpperCase() === 'OC' ? 'OC' : 'IC',
                 texto,
                 creadoEn: Date.now()
             };
@@ -469,7 +530,7 @@
             actionsRow.className = 'kixuz-muro-post-actions';
             actionsRow.innerHTML = `
                 <button type="button" class="kixuz-kix-btn ${yaDioKix ? 'active' : ''}">
-                    <span>🔥</span>
+                    ${FLAME_SVG}
                     <span>${esc(kixLabel)} (${kixCount})</span>
                 </button>
                 <span style="font-size:12px; opacity:0.75;">${respuestas.length} comentario(s)</span>
@@ -491,12 +552,16 @@
                 card.className = 'kixuz-comment-card';
                 const canManage = puedeGestionarComentario(r);
                 const linkHref = `perfil.html?char=${encodeURIComponent(r.autorHandle || r.autorNombre || '')}`;
+                const badgeModo = crearBadgeModo(r.modo || 'IC');
 
                 card.innerHTML = `
                     <div class="kixuz-comment-top">
-                        <a href="${linkHref}" class="kixuz-comment-author">
-                            ${esc(r.autorNombre || 'Personaje')} <span style="opacity:0.7; font-weight:500;">${esc(r.autorHandle || '')}</span>
-                        </a>
+                        <div style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                            ${badgeModo}
+                            <a href="${linkHref}" class="kixuz-comment-author">
+                                ${esc(r.autorNombre || 'Personaje')} <span style="opacity:0.7; font-weight:500;">${esc(r.autorHandle || '')}</span>
+                            </a>
+                        </div>
                         ${canManage ? `
                             <div class="kixuz-comment-btns">
                                 <button type="button" class="kixuz-mini-action btn-edit-c">Editar</button>
@@ -561,12 +626,22 @@
 
             const form = document.createElement('form');
             form.className = 'kixuz-comment-form';
-            form.innerHTML = `
-                <textarea class="kixuz-comment-textarea" rows="1" placeholder="Comentar o etiquetar @usuario... (Shift + Enter: salto de línea)"></textarea>
-                <button type="submit" class="kixuz-comment-send">Comentar</button>
-            `;
+            const switchCommentMode = crearSwitchOcIc('IC');
+            form.appendChild(switchCommentMode);
 
-            const ta = form.querySelector('textarea');
+            const ta = document.createElement('textarea');
+            ta.className = 'kixuz-comment-textarea';
+            ta.rows = 1;
+            ta.placeholder = 'Comentar o etiquetar @usuario... (Shift + Enter: salto de línea)';
+
+            const btnSend = document.createElement('button');
+            btnSend.type = 'submit';
+            btnSend.className = 'kixuz-comment-send';
+            btnSend.textContent = 'Comentar';
+
+            form.appendChild(ta);
+            form.appendChild(btnSend);
+
             ta.addEventListener('input', () => autoGrow(ta));
             ta.addEventListener('keydown', ev => {
                 if (ev.key === 'Enter' && ev.shiftKey) {
@@ -581,7 +656,7 @@
 
             form.addEventListener('submit', async ev => {
                 ev.preventDefault();
-                const res = await window.KIXUZ_INTERACCIONES.agregarComentario(postObj, ta.value);
+                const res = await window.KIXUZ_INTERACCIONES.agregarComentario(postObj, ta.value, switchCommentMode.getMode());
                 if (res) {
                     postObj.respuestas = res.respuestas;
                     ta.value = '';

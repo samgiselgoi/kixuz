@@ -101,6 +101,16 @@
             margin-top: 10px;
             flex-wrap: wrap;
         }
+        .universe-select {
+            background: rgba(21, 10, 36, 0.92);
+            border: 1px solid var(--acento);
+            color: var(--acento);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+        }
         .btn-primary {
             background: var(--acento);
             color: #150A24;
@@ -129,6 +139,16 @@
             line-height: 1.5;
             margin: 6px 0 10px;
         }
+        .btn-del-post {
+            background: rgba(224, 60, 108, 0.2);
+            color: #ff9bb4;
+            border: 1px solid rgba(224, 60, 108, 0.5);
+            border-radius: 7px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -140,7 +160,7 @@
             <a href="index.html" class="active">Inicio</a>
             <a href="perfil.html">Mi Perfil</a>
             <a href="universo.html">Universos</a>
-            <a href="familia.html">Familia / Clan</a>
+            <a href="familia.html">Familia</a>
         </nav>
         <div class="user-menu">
             <select id="activeCharSelect" class="dropdown" aria-label="Personaje activo"></select>
@@ -153,11 +173,19 @@
             <form id="feedComposerForm">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
                     <strong id="postingAsBadge">Publicando como @rol</strong>
-                    <input type="text" id="targetWallInput" placeholder="Muro destino opcional (ej. @otro_pj)" style="padding:5px 9px; border-radius:8px; border:1px solid var(--borde); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
+                    <div style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <input type="text" id="targetWallInput" placeholder="Muro destino (ej. @otro_pj)" style="padding:5px 9px; border-radius:8px; border:1px solid var(--borde); background:rgba(0,0,0,0.25); color:inherit; font-size:12.5px;">
+                        <span id="feedPostModeSlot"></span>
+                    </div>
                 </div>
                 <textarea id="feedPostTextarea" class="composer-textarea" placeholder="Escribí algo o etiquetá @usuario... (Shift + Enter: salto de línea)"></textarea>
                 <div class="composer-bar">
-                    <span style="font-size:12px; opacity:0.75;">Enter envía · Shift + Enter baja de línea</span>
+                    <div style="display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <select id="feedUniverseSelect" class="universe-select">
+                            <option value="">Sin etiqueta de universo</option>
+                        </select>
+                        <span style="font-size:12px; opacity:0.75;">Enter envía · Shift + Enter baja de línea</span>
+                    </div>
                     <button type="submit" class="btn-primary">Publicar</button>
                 </div>
             </form>
@@ -186,6 +214,40 @@
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+            let feedModeSwitch = null;
+
+            function montarSwitchFeed() {
+                const slot = document.getElementById('feedPostModeSlot');
+                if (!slot || slot.children.length) return;
+                if (window.KIXUZ_INTERACCIONES?.crearSwitchOcIc) {
+                    feedModeSwitch = window.KIXUZ_INTERACCIONES.crearSwitchOcIc('IC');
+                    slot.appendChild(feedModeSwitch);
+                }
+            }
+
+            function cargarUniversosReales() {
+                const sel = document.getElementById('feedUniverseSelect');
+                if (!sel) return;
+                const bloqueados = new Set(['#sector4', '#nexocentral', '#tierrasaltas', 'sector 4', 'sector4']);
+                sel.innerHTML = `<option value="">Sin etiqueta de universo</option>`;
+                try {
+                    const unis = JSON.parse(localStorage.getItem('kixuz_universos_v1') || '[]');
+                    if (Array.isArray(unis)) {
+                        unis.forEach(u => {
+                            if (!u || u.esEjemplo || u.esPrueba) return;
+                            const raw = String(u.tag || u.nombre || '').trim();
+                            if (!raw || bloqueados.has(raw.toLowerCase())) return;
+                            const tag = raw.startsWith('#') ? raw : '#' + raw.replace(/\s+/g, '');
+                            if (bloqueados.has(tag.toLowerCase())) return;
+                            const opt = document.createElement('option');
+                            opt.value = tag;
+                            opt.textContent = tag;
+                            sel.appendChild(opt);
+                        });
+                    }
+                } catch {}
+            }
+
             function leerPosts() {
                 try {
                     const arr = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
@@ -206,9 +268,14 @@
             }
 
             function renderFeed() {
+                montarSwitchFeed();
+                cargarUniversosReales();
                 const cont = document.getElementById('feedPosts');
                 if (!cont) return;
                 const posts = leerPosts();
+                const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
+                    ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
+                    : { handle: '@invitado' };
                 cont.innerHTML = '';
 
                 if (!posts.length) {
@@ -224,21 +291,40 @@
                         ? ` &gt; <a href="perfil.html?char=${encodeURIComponent(normH(post.muroHandle))}" class="post-author">${esc(normH(post.muroHandle))}</a>`
                         : '';
 
+                    const badgeModo = window.KIXUZ_INTERACCIONES?.crearBadgeModo
+                        ? window.KIXUZ_INTERACCIONES.crearBadgeModo(post.modo || 'IC')
+                        : '';
+
                     const cuerpoHtml = window.KIXUZ_INTERACCIONES?.formatearTextoConMenciones
                         ? window.KIXUZ_INTERACCIONES.formatearTextoConMenciones(post.contenido || '')
                         : esc(post.contenido || '');
 
+                    const canDel = normH(post.autorHandle) === normH(actor.handle);
+
                     card.innerHTML = `
                         <div class="post-header">
-                            <div>
+                            <div style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                ${badgeModo}
                                 <a href="${autorHref}" class="post-author">${esc(post.autorNombre || 'Personaje')}</a>
                                 <span style="opacity:0.7; font-size:12.5px;">${esc(post.autorHandle || '')}</span>
                                 ${muroLabel}
+                            </div>
+                            <div style="display:inline-flex; align-items:center; gap:8px;">
+                                ${post.universo ? `<span style="font-size:12px; color:var(--acento); font-weight:700;">${esc(post.universo)}</span>` : ''}
+                                ${canDel ? `<button type="button" class="btn-del-post">Eliminar</button>` : ''}
                             </div>
                         </div>
                         <div class="post-body">${cuerpoHtml}</div>
                         <div class="post-interacciones"></div>
                     `;
+
+                    if (canDel) {
+                        card.querySelector('.btn-del-post').addEventListener('click', () => {
+                            const restantes = leerPosts().filter(x => x.id !== post.id);
+                            guardarPosts(restantes);
+                            renderFeed();
+                        });
+                    }
 
                     const interSlot = card.querySelector('.post-interacciones');
                     if (window.KIXUZ_INTERACCIONES?.montarBloqueInteracciones) {
@@ -268,6 +354,8 @@
 
                 const muroInput = document.getElementById('targetWallInput').value;
                 const muroHandle = normH(muroInput) || actor.handle;
+                const universo = document.getElementById('feedUniverseSelect').value || '';
+                const modo = feedModeSwitch?.getMode ? feedModeSwitch.getMode() : 'IC';
 
                 const nuevoPost = {
                     id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -275,6 +363,8 @@
                     autorHandle: actor.handle,
                     autorUid: actor.uid,
                     muroHandle,
+                    universo,
+                    modo,
                     contenido,
                     kixiz: 0,
                     kixPorUsuario: [],
