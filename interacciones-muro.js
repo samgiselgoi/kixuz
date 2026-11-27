@@ -296,7 +296,6 @@
         return { posts, index: idx, post: idx >= 0 ? posts[idx] : null };
     }
 
-    // Intercepta envíos de formularios de publicación para emitir notificaciones si hay @menciones
     document.addEventListener('submit', e => {
         const form = e.target;
         if (!(form instanceof HTMLFormElement)) return;
@@ -378,6 +377,9 @@
 
             if (index >= 0) {
                 posts[index] = { ...posts[index], respuestas };
+                guardarPosts(posts);
+            } else if (base) {
+                posts.unshift({ ...base, respuestas });
                 guardarPosts(posts);
             }
             if (window.KIXUZ_DB?.agregarRespuestaPost && base?.id && !String(base.id).startsWith('local_')) {
