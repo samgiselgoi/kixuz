@@ -104,7 +104,7 @@
 
         .mini-banner {
             width: 100%;
-            height: 150px;
+            height: 156px;
             background-color: var(--bg-secundario);
             background-image: url('img/banner-kixuz.webp');
             background-size: cover;
@@ -117,8 +117,8 @@
         }
 
         .avatar-circle {
-            width: 104px;
-            height: 104px;
+            width: 106px;
+            height: 106px;
             background-color: #261442;
             border-radius: 50%;
             border: 5px solid var(--bg-principal);
@@ -126,6 +126,7 @@
             background-size: cover;
             background-position: center;
             margin-bottom: 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
         }
 
         .sidebar-head h1 {
@@ -139,6 +140,18 @@
             color: #b794ff;
             font-weight: 700;
             margin: 2px 0 8px;
+        }
+
+        .visitor-notice {
+            display: none;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--acento);
+            background: rgba(45, 212, 196, 0.12);
+            border: 1px solid rgba(45, 212, 196, 0.35);
+            border-radius: 8px;
+            padding: 5px 10px;
+            margin-top: 8px;
         }
 
         .tags-container {
@@ -440,7 +453,7 @@
             <div class="mini-banner" id="profileBanner"></div>
             <div class="sidebar-head">
                 <div class="avatar-circle" id="profileAvatar"></div>
-                <h1 id="profileTitle">Personaje</h1>
+                <h1 id="profileTitle">Cargando perfil...</h1>
                 <div class="profile-username" id="profileHandle">@rol</div>
 
                 <div class="tags-container" id="profileTags">
@@ -449,7 +462,11 @@
                     <div class="info-tag tag-relacion" id="tagRelacion">Sin pareja</div>
                 </div>
 
-                <div class="owner-actions" id="ownerActions">
+                <div class="visitor-notice" id="visitorNotice">
+                    Viendo perfil y fotos de otro personaje (solo lectura)
+                </div>
+
+                <div class="owner-actions" id="ownerActions" style="display:none;">
                     <button type="button" class="btn-sec" id="btnEditFicha">Editar info</button>
                     <button type="button" class="btn-sec" id="btnEditFotos">Fotos</button>
                 </div>
@@ -466,7 +483,7 @@
                     </div>
                 </details>
 
-                <details>
+                <details open>
                     <summary>Biografía</summary>
                     <div class="details-content" id="bioContent">
                         <p>Sin biografía cargada todavía.</p>
@@ -647,10 +664,15 @@
                 return res;
             }
 
-            function obtenerMuroHandleActual() {
+            function obtenerParamCharUrl() {
                 const params = new URLSearchParams(window.location.search);
                 const charParam = params.get('char') || params.get('handle') || '';
-                if (normH(charParam)) return normH(charParam);
+                return normH(charParam);
+            }
+
+            function obtenerMuroHandleActual() {
+                const urlChar = obtenerParamCharUrl();
+                if (urlChar) return urlChar;
 
                 const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
                     ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
@@ -715,10 +737,32 @@
                 return 'Familia';
             }
 
+            function aplicarImagenesPerfil(pj) {
+                const avatarEl = document.getElementById('profileAvatar');
+                const bannerEl = document.getElementById('profileBanner');
+
+                const avatarSrc = pj.avatar || pj.avatarData || 'img/avatar-kixuz.webp';
+                const bannerSrc = pj.banner || pj.bannerData || 'img/banner-kixuz.webp';
+                const fondoSrc = pj.fondo || pj.fondoData || '';
+
+                if (avatarEl) {
+                    avatarEl.style.backgroundImage = `url("${avatarSrc}")`;
+                }
+                if (bannerEl) {
+                    bannerEl.style.backgroundImage = `url("${bannerSrc}")`;
+                }
+                if (fondoSrc) {
+                    document.body.style.backgroundImage = `linear-gradient(rgba(21, 10, 36, 0.72), rgba(21, 10, 36, 0.92)), url("${fondoSrc}")`;
+                } else {
+                    document.body.style.backgroundImage = `linear-gradient(rgba(21, 10, 36, 0.75), rgba(21, 10, 36, 0.93)), url('img/banner-kixuz.webp')`;
+                }
+            }
+
             async function renderPerfilYMuro() {
                 montarSwitchPost();
                 cargarSelectoresUniversos();
                 const muroHandle = obtenerMuroHandleActual();
+
                 let vista = {
                     personaje: {
                         nombre: muroHandle.replace(/^@/, '') || 'Personaje',
@@ -726,11 +770,14 @@
                         universo: '',
                         bio: ''
                     },
-                    esDueno: false
+                    esDueno: false,
+                    esVisitante: false
                 };
 
                 if (window.KIXUZ_CHARS?.obtenerPersonajeParaVista) {
-                    try { vista = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(muroHandle); } catch {}
+                    try {
+                        vista = await window.KIXUZ_CHARS.obtenerPersonajeParaVista(muroHandle);
+                    } catch {}
                 }
 
                 const localSub = leerSubs().find(p => normH(p.handle || p.nombre) === muroHandle);
@@ -741,14 +788,14 @@
                 pj.nombre = nombreMuro;
                 personajeActual = pj;
 
-                const esPropiaCuenta = Boolean(localSub);
+                const esPropiaCuenta = Boolean(localSub) || Boolean(vista.esDueno);
                 document.getElementById('ownerActions').style.display = esPropiaCuenta ? 'flex' : 'none';
+                document.getElementById('visitorNotice').style.display = esPropiaCuenta ? 'none' : 'block';
 
                 document.title = `Perfil de ${nombreMuro} - KIXUZ`;
                 document.getElementById('profileTitle').textContent = nombreMuro;
                 document.getElementById('profileHandle').textContent = handleFinal;
 
-                // Universo: solo mostrar burbuja si tiene uno de los universos realmente creados
                 const reales = obtenerUniversosReales();
                 const uniRaw = String(pj.universo || '').trim();
                 const uniMatch = reales.find(u => u.tag.toLowerCase() === uniRaw.toLowerCase() || u.nombre.toLowerCase() === uniRaw.toLowerCase());
@@ -761,14 +808,12 @@
                     tagUni.style.display = 'none';
                 }
 
-                // Familia (sin Clan)
                 const famEtiqueta = obtenerEtiquetaFamiliaPersonaje(handleFinal);
                 const tagFam = document.getElementById('tagFamilia');
                 tagFam.textContent = famEtiqueta;
                 tagFam.href = `familia.html?char=${encodeURIComponent(handleFinal)}`;
                 document.getElementById('linkArbolFamilia').href = `familia.html?char=${encodeURIComponent(handleFinal)}`;
 
-                // Pareja/s
                 const tagRel = document.getElementById('tagRelacion');
                 const parejas = String(pj.pareja || pj.estadoSentimentalHandle || '')
                     .split(',')
@@ -782,11 +827,7 @@
                     tagRel.textContent = 'Sin pareja';
                 }
 
-                document.getElementById('profileAvatar').style.backgroundImage = `url('${pj.avatar || 'img/avatar-kixuz.webp'}')`;
-                document.getElementById('profileBanner').style.backgroundImage = `url('${pj.banner || 'img/banner-kixuz.webp'}')`;
-                if (pj.fondo) {
-                    document.body.style.backgroundImage = `linear-gradient(rgba(21, 10, 36, 0.72), rgba(21, 10, 36, 0.92)), url('${pj.fondo}')`;
-                }
+                aplicarImagenesPerfil(pj);
 
                 document.getElementById('expedienteContent').innerHTML = `
                     <p><strong>Edad:</strong> ${esc(pj.edad || '—')}</p>
@@ -837,7 +878,7 @@
                         ? window.KIXUZ_INTERACCIONES.formatearTextoConMenciones(post.contenido || '')
                         : esc(post.contenido || '');
 
-                    const canDel = normH(post.autorHandle) === normH(actor.handle);
+                    const canDel = normH(post.autorHandle) === normH(actor.handle) || Boolean(window.KIXUZ_DB?.esAdmin);
 
                     card.innerHTML = `
                         <div class="post-header">
@@ -889,7 +930,7 @@
             });
 
             document.getElementById('btnCloseFicha').addEventListener('click', () => modalFicha.classList.remove('open'));
-            document.getElementById('btnSaveFicha').addEventListener('click', () => {
+            document.getElementById('btnSaveFicha').addEventListener('click', async () => {
                 if (!personajeActual) return;
                 const parejasLimpias = document.getElementById('fPareja').value
                     .split(',')
@@ -920,28 +961,53 @@
                     }
                 } catch {}
                 if (window.KIXUZ_DB?.guardarSubpersonaje) {
-                    try { window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
+                    try { await window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
                 }
                 modalFicha.classList.remove('open');
                 renderPerfilYMuro();
             });
 
-            function leerArchivoComoDataURL(fileInput, callback) {
+            // Comprime imágenes subidas para que se guarden rápido y quepan tanto en localStorage como en Firestore
+            function comprimirImagenArchivo(fileInput, maxW, maxH, calidad, callback) {
                 const file = fileInput?.files?.[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = ev => callback(ev.target.result);
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxW || h > maxH) {
+                            const ratio = Math.min(maxW / w, maxH / h);
+                            w = Math.round(w * ratio);
+                            h = Math.round(h * ratio);
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        callback(canvas.toDataURL('image/webp', calidad));
+                    };
+                    img.src = ev.target.result;
+                };
                 reader.readAsDataURL(file);
             }
 
             document.getElementById('fAvatarFile').addEventListener('change', e => {
-                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fAvatarUrl').value = dataUrl; });
+                comprimirImagenArchivo(e.target, 320, 320, 0.82, dataUrl => {
+                    document.getElementById('fAvatarUrl').value = dataUrl;
+                });
             });
             document.getElementById('fBannerFile').addEventListener('change', e => {
-                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fBannerUrl').value = dataUrl; });
+                comprimirImagenArchivo(e.target, 960, 360, 0.80, dataUrl => {
+                    document.getElementById('fBannerUrl').value = dataUrl;
+                });
             });
             document.getElementById('fFondoFile').addEventListener('change', e => {
-                leerArchivoComoDataURL(e.target, dataUrl => { document.getElementById('fFondoUrl').value = dataUrl; });
+                comprimirImagenArchivo(e.target, 1280, 720, 0.78, dataUrl => {
+                    document.getElementById('fFondoUrl').value = dataUrl;
+                });
             });
 
             document.getElementById('btnEditFotos').addEventListener('click', () => {
@@ -953,7 +1019,7 @@
             });
 
             document.getElementById('btnCloseFotos').addEventListener('click', () => modalFotos.classList.remove('open'));
-            document.getElementById('btnSaveFotos').addEventListener('click', () => {
+            document.getElementById('btnSaveFotos').addEventListener('click', async () => {
                 if (!personajeActual) return;
                 const updated = {
                     ...personajeActual,
@@ -966,8 +1032,14 @@
                 if (idx >= 0) subs[idx] = updated;
                 else subs.push(updated);
                 guardarSubs(subs);
+                try {
+                    const act = JSON.parse(localStorage.getItem(ACT_KEY) || 'null');
+                    if (act && normH(act.handle || act.nombre) === normH(updated.handle)) {
+                        localStorage.setItem(ACT_KEY, JSON.stringify(updated));
+                    }
+                } catch {}
                 if (window.KIXUZ_DB?.guardarSubpersonaje) {
-                    try { window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
+                    try { await window.KIXUZ_DB.guardarSubpersonaje(updated); } catch {}
                 }
                 modalFotos.classList.remove('open');
                 renderPerfilYMuro();
@@ -1000,6 +1072,7 @@
                     autorNombre: actor.nombre,
                     autorHandle: actor.handle,
                     autorUid: actor.uid,
+                    autorAvatar: window.KIXUZ_ACTIVE_CHAR?.avatar || '',
                     muroHandle,
                     universo,
                     modo,

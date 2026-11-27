@@ -39,7 +39,7 @@
             position: absolute;
             top: calc(100% + 8px);
             right: 0;
-            width: 290px;
+            width: 300px;
             max-width: calc(100vw - 24px);
             background: #1a0d2e;
             color: var(--texto, #EDE7E0);
@@ -67,17 +67,18 @@
             outline: none;
         }
         .kixuz-search-list {
-            max-height: 270px;
+            max-height: 280px;
             overflow-y: auto;
             margin-top: 6px;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 4px;
         }
         .kixuz-search-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
             padding: 7px 9px;
             border-radius: 8px;
             text-decoration: none;
@@ -86,6 +87,15 @@
         }
         .kixuz-search-row:hover {
             background: rgba(45, 212, 196, 0.16);
+        }
+        .kixuz-search-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid var(--acento, #2DD4C4);
+            flex-shrink: 0;
+            background: #261442;
         }
     `;
     if (!document.getElementById('kixuz-global-search-style')) {
@@ -103,21 +113,22 @@
             if (!nombre && !handle) return;
             if (handle === '@cypher_hacker') return;
             const k = handle || norm(nombre);
+            const prev = mapa.get(k) || {};
             mapa.set(k, {
-                nombre: nombre || handle.replace(/^@/, ''),
-                handle: handle || ('@' + norm(nombre).replace(/\s+/g, '_')),
-                clan: p.clan || ''
+                nombre: nombre || prev.nombre || handle.replace(/^@/, ''),
+                handle: handle || prev.handle || ('@' + norm(nombre).replace(/\s+/g, '_')),
+                avatar: p.avatar || p.avatarData || prev.avatar || 'img/avatar-kixuz.webp',
+                universo: p.universo || prev.universo || ''
             });
         };
         try { JSON.parse(localStorage.getItem('kixuz_subpersonajes') || '[]').forEach(add); } catch {}
         try {
             const fam = JSON.parse(localStorage.getItem('kixuz_familia_clan_v1') || '{}');
             (fam.familia || []).forEach(add);
-            (fam.clan || []).forEach(c => add({ nombre: c.nombre, handle: c.handle, clan: c.clanNombre }));
         } catch {}
         try {
             JSON.parse(localStorage.getItem('kixuz_posts_v1') || '[]').forEach(p => {
-                add({ nombre: p.autorNombre, handle: p.autorHandle });
+                add({ nombre: p.autorNombre, handle: p.autorHandle, avatar: p.autorAvatar });
                 if (p.muroHandle) add({ nombre: p.muroNombre, handle: p.muroHandle });
             });
         } catch {}
@@ -133,7 +144,13 @@
                 (rem || []).forEach(p => {
                     const h = normHandle(p.handle || p.nombre);
                     if (h && h !== '@cypher_hacker') {
-                        mapa.set(h, { nombre: p.nombre || h.replace(/^@/, ''), handle: h, clan: p.clan || '' });
+                        const prev = mapa.get(h) || {};
+                        mapa.set(h, {
+                            nombre: p.nombre || prev.nombre || h.replace(/^@/, ''),
+                            handle: h,
+                            avatar: p.avatar || p.avatarData || prev.avatar || 'img/avatar-kixuz.webp',
+                            universo: p.universo || prev.universo || ''
+                        });
                     }
                 });
             } catch {}
@@ -149,11 +166,11 @@
         wrap.id = 'kixuzSearchToggleWrap';
         wrap.className = 'kixuz-search-toggle-wrap';
         wrap.innerHTML = `
-            <button type="button" class="kixuz-search-icon-btn" id="kixuzSearchBtn" title="Buscar personajes, @usuarios, clanes o universos" aria-label="Buscar">
+            <button type="button" class="kixuz-search-icon-btn" id="kixuzSearchBtn" title="Buscar personajes o @usuarios" aria-label="Buscar">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </button>
             <div class="kixuz-search-popover" id="kixuzSearchPopover">
-                <input type="search" id="kixuzSearchInput" placeholder="Buscar @usuario, personaje o clan..." autocomplete="off">
+                <input type="search" id="kixuzSearchInput" placeholder="Buscar @usuario, personaje o universo..." autocomplete="off">
                 <div class="kixuz-search-list" id="kixuzSearchList"></div>
             </div>
         `;
@@ -170,16 +187,19 @@
         function render(qRaw) {
             const q = norm(qRaw).replace(/^@+/, '');
             const filtrados = q
-                ? catalogo.filter(p => norm(p.nombre).includes(q) || norm(p.handle).includes(q) || norm(p.clan).includes(q))
-                : catalogo.slice(0, 8);
+                ? catalogo.filter(p => norm(p.nombre).includes(q) || norm(p.handle).includes(q) || norm(p.universo).includes(q))
+                : catalogo.slice(0, 10);
 
-            let html = filtrados.slice(0, 8).map(p => `
+            let html = filtrados.slice(0, 10).map(p => `
                 <a href="perfil.html?char=${encodeURIComponent(p.handle)}" class="kixuz-search-row">
-                    <div>
-                        <div style="font-weight:700;">${esc(p.nombre)}</div>
-                        <div style="font-size:11px; color:var(--acento);">${esc(p.handle)}${p.clan ? ' · ' + esc(p.clan) : ''}</div>
+                    <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                        <img src="${esc(p.avatar || 'img/avatar-kixuz.webp')}" alt="" class="kixuz-search-avatar" onerror="this.src='img/avatar-kixuz.webp'">
+                        <div style="min-width:0;">
+                            <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(p.nombre)}</div>
+                            <div style="font-size:11px; color:var(--acento);">${esc(p.handle)}${p.universo ? ' · ' + esc(p.universo) : ''}</div>
+                        </div>
                     </div>
-                    <span style="font-size:11px; opacity:0.75;">Ver</span>
+                    <span style="font-size:11px; opacity:0.75; flex-shrink:0;">Ver</span>
                 </a>
             `).join('');
 
