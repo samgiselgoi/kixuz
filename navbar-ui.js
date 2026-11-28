@@ -115,8 +115,8 @@
         inicio: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>`,
         personaje: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>`,
         universos: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(-25 12 12)"/></svg>`,
-        // Varias personas / vínculos familiares entrelazados (sin escudo)
-        familia: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="16.5" cy="8.5" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M13.5 19a4.5 4.5 0 0 1 7 0"/></svg>`,
+        // Arbolito genealógico con tronco, ramas y nodos en las puntas
+        familia: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="21" x2="12" y2="9"/><path d="M12 15l-5.5-4.5"/><path d="M12 13l5.5-4.5"/><circle cx="12" cy="6.5" r="2.5"/><circle cx="5.5" cy="9.5" r="2.2"/><circle cx="18.5" cy="7.5" r="2.2"/></svg>`,
         entrar: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>`
     };
 
@@ -223,11 +223,8 @@
         const header = document.querySelector('header');
         if (!header) return;
 
-        // Quitar enlaces sueltos a Cuenta Maestra fuera del desplegable
         header.querySelectorAll('a[href="cuenta-maestra.html"]').forEach(a => a.remove());
 
-        // Garantizar un único logo limpio (img/logo-kixuz.png) sin duplicados ni texto al lado
-        const todosLogos = header.querySelectorAll('.logo, a[href="index.html"] img');
         let logo = header.querySelector('.logo');
         if (!logo) {
             logo = document.createElement('a');
@@ -237,7 +234,6 @@
         }
         logo.innerHTML = `<img src="img/logo-kixuz.png" alt="Logo KIXUZ">`;
 
-        // Eliminar cualquier segundo logo duplicado dentro del header
         header.querySelectorAll('.logo').forEach((el, idx) => {
             if (idx > 0) el.remove();
         });

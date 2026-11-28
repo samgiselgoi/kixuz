@@ -82,6 +82,7 @@
             font-size: 12.5px;
         }
 
+        /* Sin position: sticky ni overflow independiente para que ambos lados scroleen juntos */
         .profile-layout {
             max-width: 1180px;
             margin: 28px auto 70px;
@@ -93,8 +94,6 @@
         }
 
         .profile-sidebar {
-            position: sticky;
-            top: 78px;
             background-color: var(--bg-tarjeta);
             border-radius: 16px;
             overflow: hidden;
@@ -267,6 +266,60 @@
         .details-content p { margin: 0 0 8px; }
         .details-content strong { color: var(--acento); }
 
+        .stats-subtitle {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 6px 0 8px;
+            color: var(--acento);
+        }
+        .stats-subtitle.weak-title {
+            color: #ff8aa8;
+            margin-top: 12px;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12.5px;
+        }
+
+        .stat-name {
+            width: 98px;
+            font-weight: 600;
+            flex-shrink: 0;
+            word-break: break-word;
+        }
+
+        .stat-bar-container {
+            flex-grow: 1;
+            background-color: rgba(0, 0, 0, 0.45);
+            height: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background-color: var(--acento);
+            border-radius: 6px;
+        }
+
+        .stat-bar-fill.weak {
+            background-color: #e03c6c;
+        }
+
+        .stat-val {
+            font-size: 11.5px;
+            font-weight: 700;
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+
         .btn-familia {
             display: inline-block;
             background-color: var(--bg-secundario);
@@ -395,7 +448,7 @@
 
         .kixuz-modal-box {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
             background: #1b0d30;
@@ -425,9 +478,33 @@
             font-family: inherit;
         }
 
+        .attr-edit-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .attr-edit-row input[type="text"] {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 7px;
+            border: 1px solid var(--borde);
+            background: rgba(0,0,0,0.3);
+            color: inherit;
+            font-size: 12.5px;
+        }
+        .attr-edit-row input[type="number"] {
+            width: 72px;
+            padding: 6px 8px;
+            border-radius: 7px;
+            border: 1px solid var(--borde);
+            background: rgba(0,0,0,0.3);
+            color: inherit;
+            font-size: 12.5px;
+        }
+
         @media (max-width: 900px) {
             .profile-layout { grid-template-columns: 1fr; }
-            .profile-sidebar { position: static; }
         }
     </style>
 </head>
@@ -487,6 +564,13 @@
                     <summary>Biografía</summary>
                     <div class="details-content" id="bioContent">
                         <p>Sin biografía cargada todavía.</p>
+                    </div>
+                </details>
+
+                <details open>
+                    <summary>Habilidades & Debilidades (1–100)</summary>
+                    <div class="details-content" id="statsContent">
+                        <p style="opacity:0.75;">Sin habilidades ni debilidades cargadas.</p>
                     </div>
                 </details>
 
@@ -562,6 +646,23 @@
                 <label>Biografía</label>
                 <textarea id="fBio" rows="3"></textarea>
             </div>
+
+            <div class="kixuz-modal-field">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label>Habilidades (1 a 100)</label>
+                    <button type="button" class="btn-sec" id="btnAddHab" style="padding:3px 8px; font-size:11px;">+ Habilidad</button>
+                </div>
+                <div id="editHabList"></div>
+            </div>
+
+            <div class="kixuz-modal-field">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label>Debilidades (1 a 100)</label>
+                    <button type="button" class="btn-sec" id="btnAddDeb" style="padding:3px 8px; font-size:11px;">+ Debilidad</button>
+                </div>
+                <div id="editDebList"></div>
+            </div>
+
             <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
                 <button type="button" class="btn-sec" id="btnCloseFicha">Cancelar</button>
                 <button type="button" class="submit-btn" id="btnSaveFicha">Guardar</button>
@@ -619,6 +720,12 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
+
+            function clamp100(val) {
+                const n = Number(val);
+                if (!Number.isFinite(n)) return 50;
+                return Math.max(1, Math.min(100, Math.round(n)));
+            }
 
             function leerPosts() {
                 try {
@@ -758,6 +865,70 @@
                 }
             }
 
+            function renderHabilidadesYDebilidades(pj) {
+                const box = document.getElementById('statsContent');
+                if (!box) return;
+                const habs = Array.isArray(pj.habilidades) ? pj.habilidades.filter(h => h && String(h.nombre || '').trim()) : [];
+                const debs = Array.isArray(pj.debilidades) ? pj.debilidades.filter(d => d && String(d.nombre || '').trim()) : [];
+
+                if (!habs.length && !debs.length) {
+                    box.innerHTML = `<p style="opacity:0.75;">Sin habilidades ni debilidades cargadas.</p>`;
+                    return;
+                }
+
+                let html = '';
+                if (habs.length) {
+                    html += `<div class="stats-subtitle">Habilidades</div>`;
+                    html += habs.map(h => {
+                        const val = clamp100(h.valor ?? h.puntaje ?? 50);
+                        return `
+                            <div class="stat-row">
+                                <span class="stat-name">${esc(h.nombre)}</span>
+                                <div class="stat-bar-container"><div class="stat-bar-fill" style="width:${val}%;"></div></div>
+                                <span class="stat-val">${val}/100</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                if (debs.length) {
+                    html += `<div class="stats-subtitle weak-title">Debilidades</div>`;
+                    html += debs.map(d => {
+                        const val = clamp100(d.valor ?? d.puntaje ?? 50);
+                        return `
+                            <div class="stat-row">
+                                <span class="stat-name">${esc(d.nombre)}</span>
+                                <div class="stat-bar-container"><div class="stat-bar-fill weak" style="width:${val}%;"></div></div>
+                                <span class="stat-val">${val}/100</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                box.innerHTML = html;
+            }
+
+            function agregarFilaAtributo(contenedor, item = { nombre: '', valor: 50 }) {
+                const row = document.createElement('div');
+                row.className = 'attr-edit-row';
+                row.innerHTML = `
+                    <input type="text" class="attr-name-inp" placeholder="Nombre" value="${esc(item.nombre || '')}">
+                    <input type="number" class="attr-val-inp" min="1" max="100" value="${clamp100(item.valor ?? 50)}">
+                    <button type="button" class="btn-del-post btn-rm-attr" title="Quitar">✕</button>
+                `;
+                row.querySelector('.btn-rm-attr').addEventListener('click', () => row.remove());
+                contenedor.appendChild(row);
+            }
+
+            function leerFilasAtributo(contenedor) {
+                if (!contenedor) return [];
+                const out = [];
+                contenedor.querySelectorAll('.attr-edit-row').forEach(row => {
+                    const nombre = String(row.querySelector('.attr-name-inp')?.value || '').trim();
+                    const valor = clamp100(row.querySelector('.attr-val-inp')?.value);
+                    if (nombre) out.push({ nombre, valor });
+                });
+                return out;
+            }
+
             async function renderPerfilYMuro() {
                 montarSwitchPost();
                 cargarSelectoresUniversos();
@@ -768,7 +939,9 @@
                         nombre: muroHandle.replace(/^@/, '') || 'Personaje',
                         handle: muroHandle,
                         universo: '',
-                        bio: ''
+                        bio: '',
+                        habilidades: [],
+                        debilidades: []
                     },
                     esDueno: false,
                     esVisitante: false
@@ -840,13 +1013,15 @@
                     ? `<p>${esc(pj.bio)}</p>`
                     : `<p style="opacity:0.75;">Sin biografía cargada todavía.</p>`;
 
+                renderHabilidadesYDebilidades(pj);
+
                 const actor = window.KIXUZ_INTERACCIONES?.obtenerActorActual
                     ? window.KIXUZ_INTERACCIONES.obtenerActorActual()
                     : { nombre: 'Invitado', handle: '@invitado' };
 
                 document.getElementById('wallComposerLabel').textContent = `Publicar en el muro de ${nombreMuro} (${handleFinal})`;
                 document.getElementById('wallActorLabel').textContent = `Como ${actor.nombre} (${actor.handle})`;
-                document.getElementById('wallPostTextarea').placeholder = `Escribí en el muro de ${nombreMuro} o etiquetá @usuario... (Shift + Enter: salto de línea)`;
+                document.getElementById('wallPostTextarea').placeholder = `Escribí un mensaje en este muro o etiquetá @usuario... (Shift + Enter: salto de línea)`;
 
                 const feed = document.getElementById('profileFeed');
                 if (!feed) return;
@@ -915,6 +1090,15 @@
 
             const modalFicha = document.getElementById('modalEditFicha');
             const modalFotos = document.getElementById('modalEditFotos');
+            const editHabList = document.getElementById('editHabList');
+            const editDebList = document.getElementById('editDebList');
+
+            document.getElementById('btnAddHab').addEventListener('click', () => {
+                agregarFilaAtributo(editHabList, { nombre: '', valor: 50 });
+            });
+            document.getElementById('btnAddDeb').addEventListener('click', () => {
+                agregarFilaAtributo(editDebList, { nombre: '', valor: 50 });
+            });
 
             document.getElementById('btnEditFicha').addEventListener('click', () => {
                 if (!personajeActual) return;
@@ -926,6 +1110,17 @@
                 document.getElementById('fOcupacion').value = personajeActual.ocupacion || '';
                 document.getElementById('fPareja').value = personajeActual.pareja || '';
                 document.getElementById('fBio').value = personajeActual.bio || '';
+
+                editHabList.innerHTML = '';
+                (Array.isArray(personajeActual.habilidades) ? personajeActual.habilidades : []).forEach(h => {
+                    agregarFilaAtributo(editHabList, h);
+                });
+
+                editDebList.innerHTML = '';
+                (Array.isArray(personajeActual.debilidades) ? personajeActual.debilidades : []).forEach(d => {
+                    agregarFilaAtributo(editDebList, d);
+                });
+
                 modalFicha.classList.add('open');
             });
 
@@ -947,7 +1142,9 @@
                     ocupacion: document.getElementById('fOcupacion').value.trim(),
                     universo: document.getElementById('fUniverso').value.trim(),
                     pareja: parejasLimpias,
-                    bio: document.getElementById('fBio').value
+                    bio: document.getElementById('fBio').value,
+                    habilidades: leerFilasAtributo(editHabList),
+                    debilidades: leerFilasAtributo(editDebList)
                 };
                 const subs = leerSubs();
                 const idx = subs.findIndex(p => normH(p.handle || p.nombre) === normH(updated.handle));
@@ -967,7 +1164,6 @@
                 renderPerfilYMuro();
             });
 
-            // Comprime imágenes subidas para que se guarden rápido y quepan tanto en localStorage como en Firestore
             function comprimirImagenArchivo(fileInput, maxW, maxH, calidad, callback) {
                 const file = fileInput?.files?.[0];
                 if (!file) return;
